@@ -20,7 +20,7 @@ export function AboutPage() {
 
   return (
     <>
-      <SeoHead title="About" description={profile?.bio?.slice(0, 160) || 'About Alex Rivera'} seoSettings={seoSettings} />
+      <SeoHead title="About" description={profile?.bio?.slice(0, 160) || 'About Dawud Muhammed'} seoSettings={seoSettings} />
 
       <div className="pt-32 pb-20">
         <div className="section-container">
@@ -39,7 +39,7 @@ export function AboutPage() {
             </div>
             <div className="lg:col-span-2">
               <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">About Me</p>
-              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">{profile?.name || 'Alex Rivera'}</h1>
+              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">{profile?.name || 'Dawud Muhammed'}</h1>
               <p className="text-xl text-accent-400 font-medium mb-6">{profile?.title || 'Full-Stack Software Engineer'}</p>
               <p className="text-foreground/60 text-lg leading-relaxed mb-6">{profile?.bio}</p>
 

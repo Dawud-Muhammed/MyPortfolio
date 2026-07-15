@@ -22,15 +22,15 @@ export function LoadingScreen() {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-aurora"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-background"
       style={{ opacity: progress >= 100 ? 0 : 1, transition: 'opacity 0.3s ease' }}
     >
       <div className="text-center">
         <div className="mb-8 flex items-center justify-center gap-3">
           <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center">
-            <span className="text-foreground font-bold text-xl">A</span>
+            <span className="text-white font-bold text-xl">D</span>
           </div>
-          <span className="text-foreground font-bold text-2xl tracking-tight">Alex Rivera</span>
+          <span className="text-foreground font-bold text-2xl tracking-tight">Dawud Muhammed</span>
         </div>
         <div className="w-48 h-1 bg-foreground/10 rounded-full overflow-hidden mx-auto">
           <div

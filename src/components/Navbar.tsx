@@ -34,10 +34,10 @@ export function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center transition-transform group-hover:scale-110">
-              <span className="text-foreground font-bold text-lg">A</span>
+              <span className="text-white font-bold text-lg">{(profile?.name || 'Dawud')[0]}</span>
             </div>
             <span className="font-bold text-lg tracking-tight text-foreground">
-              {profile?.name?.split(' ')[0] || 'Alex'}
+              {profile?.name?.split(' ')[0] || 'Dawud'}
             </span>
           </Link>
 

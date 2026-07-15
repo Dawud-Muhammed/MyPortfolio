@@ -57,9 +57,9 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center">
-                <span className="text-foreground font-bold text-lg">A</span>
+                <span className="text-white font-bold text-lg">{(settings?.site_name || 'Dawud')[0]}</span>
               </div>
-              <span className="font-bold text-xl text-foreground">{settings?.site_name || 'Alex Rivera'}</span>
+              <span className="font-bold text-xl text-foreground">{settings?.site_name || 'Dawud Muhammed'}</span>
             </Link>
             <p className="text-foreground/50 text-sm leading-relaxed max-w-md mb-6">
               {settings?.footer_bio || 'Full-stack software engineer crafting digital products with precision and care.'}
@@ -128,7 +128,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-foreground/5 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-foreground/30 text-xs">
-            {currentYear} {settings?.footer_copyright || 'Alex Rivera'}. All rights reserved.
+            {currentYear} {settings?.footer_copyright || 'Dawud Muhammed'}. All rights reserved.
           </p>
           <p className="text-foreground/30 text-xs flex items-center gap-1.5">
             {settings?.footer_tagline || 'Built with care and way too much coffee'}

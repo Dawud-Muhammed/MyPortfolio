@@ -52,14 +52,14 @@ export function AdminLayout() {
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 h-screen w-64 bg-background-secondary border-r border-foreground/5 z-50 transition-transform duration-300 ${
+        className={`fixed lg:sticky top-0 left-0 h-screen w-64 bg-background-secondary border-r border-foreground/5 z-50 transition-transform duration-300 flex flex-col ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        <div className="h-16 flex items-center justify-between px-5 border-b border-foreground/5">
+        <div className="h-16 flex items-center justify-between px-5 border-b border-foreground/5 shrink-0">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center">
-              <span className="text-foreground font-bold text-sm">A</span>
+              <span className="text-white font-bold text-sm">D</span>
             </div>
             <span className="text-foreground font-bold text-sm">Admin Panel</span>
           </div>
@@ -68,7 +68,7 @@ export function AdminLayout() {
           </button>
         </div>
 
-        <nav className="p-3 space-y-0.5 overflow-y-auto h-[calc(100vh-8rem)]">
+        <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
@@ -86,7 +86,7 @@ export function AdminLayout() {
               <item.icon size={18} />
               <span>{item.label}</span>
               {item.to === '/admin/messages' && unreadCount > 0 && (
-                <span className="ml-auto bg-error-500 text-foreground text-xs px-1.5 py-0.5 rounded-full">
+                <span className="ml-auto bg-error-500 text-white text-xs px-1.5 py-0.5 rounded-full">
                   {unreadCount}
                 </span>
               )}
@@ -94,7 +94,7 @@ export function AdminLayout() {
           ))}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-foreground/5 space-y-1">
+        <div className="shrink-0 p-3 border-t border-foreground/5 space-y-1">
           <a
             href="/"
             target="_blank"

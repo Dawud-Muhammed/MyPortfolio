@@ -8,8 +8,8 @@ export function SeoHead({ title, description, image, seoSettings }: {
   seoSettings?: SeoSettings | null;
 }) {
   useEffect(() => {
-    const template = seoSettings?.site_title_template || '%s | Alex Rivera';
-    const fullTitle = title ? template.replace('%s', title) : 'Alex Rivera — Full-Stack Software Engineer';
+    const template = seoSettings?.site_title_template || '%s | Dawud Muhammed';
+    const fullTitle = title ? template.replace('%s', title) : 'Dawud Muhammed — Full-Stack Software Engineer';
     const metaDesc = description || seoSettings?.meta_description || 'Full-stack software engineer building delightful digital experiences.';
 
     document.title = fullTitle;
