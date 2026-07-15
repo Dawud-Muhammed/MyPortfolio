@@ -32,37 +32,37 @@ if (err) {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center mx-auto mb-4">
-            <Lock size={24} className="text-white" />
+            <Lock size={24} className="text-foreground" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Admin Login</h1>
-          <p className="text-white/50 text-sm mt-2">Sign in to manage your portfolio</p>
+          <h1 className="text-2xl font-bold text-foreground">Admin Login</h1>
+          <p className="text-foreground/50 text-sm mt-2">Sign in to manage your portfolio</p>
         </div>
 
         <form onSubmit={handleSubmit} className="glass-strong rounded-3xl p-8 space-y-5">
           <div>
-            <label className="text-white/70 text-sm font-medium mb-2 block">Email</label>
+            <label className="text-foreground/70 text-sm font-medium mb-2 block">Email</label>
             <div className="relative">
-              <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+              <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@example.com"
-                className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30 pl-10"
+                className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 pl-10"
                 required
               />
             </div>
           </div>
           <div>
-            <label className="text-white/70 text-sm font-medium mb-2 block">Password</label>
+            <label className="text-foreground/70 text-sm font-medium mb-2 block">Password</label>
             <div className="relative">
-              <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+              <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30" />
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30 pl-10"
+                className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 pl-10"
                 required
               />
             </div>

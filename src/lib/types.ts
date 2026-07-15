@@ -136,7 +136,6 @@ export interface Skill {
   name: string;
   icon_url: string | null;
   category: string;
-  proficiency: number;
   order_index: number;
 }
 

@@ -77,8 +77,8 @@ export function CrudModule({ config }: { config: CrudConfig }) {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">{config.label}</h1>
-          <p className="text-white/40 text-sm mt-1">{items.length} items total</p>
+          <h1 className="text-2xl font-bold text-foreground">{config.label}</h1>
+          <p className="text-foreground/40 text-sm mt-1">{items.length} items total</p>
         </div>
         <button
           onClick={() => { setEditing(null); setShowForm(true); }}
@@ -91,13 +91,13 @@ export function CrudModule({ config }: { config: CrudConfig }) {
 
       {/* Search */}
       <div className="relative mb-6 max-w-xs">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={`Search ${config.label.toLowerCase()}...`}
-          className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30 pl-10"
+          className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 pl-10"
         />
       </div>
 
@@ -108,7 +108,7 @@ export function CrudModule({ config }: { config: CrudConfig }) {
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-white/30">No items found.</p>
+          <p className="text-foreground/30">No items found.</p>
         </div>
       ) : (
         <div className="grid gap-3">
@@ -118,9 +118,9 @@ export function CrudModule({ config }: { config: CrudConfig }) {
                 <img src={item[config.imageField]} alt="" className="h-12 w-12 rounded-lg object-cover shrink-0" />
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-white font-medium truncate">{item[config.displayField]}</p>
+                <p className="text-foreground font-medium truncate">{item[config.displayField]}</p>
                 {config.subtitleField && item[config.subtitleField] && (
-                  <p className="text-white/40 text-sm truncate">{item[config.subtitleField]}</p>
+                  <p className="text-foreground/40 text-sm truncate">{item[config.subtitleField]}</p>
                 )}
               </div>
               {config.statusField && item[config.statusField] && (
@@ -137,13 +137,13 @@ export function CrudModule({ config }: { config: CrudConfig }) {
               <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => { setEditing(item); setShowForm(true); }}
-                  className="p-2 rounded-lg text-white/50 hover:text-accent-400 hover:bg-white/10 transition-all"
+                  className="p-2 rounded-lg text-foreground/50 hover:text-accent-400 hover:bg-foreground/10 transition-all"
                 >
                   <Edit3 size={16} />
                 </button>
                 <button
                   onClick={() => handleDelete(item.id)}
-                  className="p-2 rounded-lg text-white/50 hover:text-error-400 hover:bg-error-500/10 transition-all"
+                  className="p-2 rounded-lg text-foreground/50 hover:text-error-400 hover:bg-error-500/10 transition-all"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -212,9 +212,9 @@ function CrudForm({ config, editing, onSave, onClose, saving }: {
   return (
     <div className="fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4 overflow-y-auto">
       <div className="glass-strong rounded-3xl w-full max-w-2xl my-8">
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
-          <h2 className="text-xl font-bold text-white">{editing ? 'Edit' : 'Add'} {config.label}</h2>
-          <button onClick={onClose} className="text-white/40 hover:text-white">
+        <div className="flex items-center justify-between p-6 border-b border-foreground/10">
+          <h2 className="text-xl font-bold text-foreground">{editing ? 'Edit' : 'Add'} {config.label}</h2>
+          <button onClick={onClose} className="text-foreground/40 hover:text-foreground">
             <X size={20} />
           </button>
         </div>
@@ -223,7 +223,7 @@ function CrudForm({ config, editing, onSave, onClose, saving }: {
           <div className="grid md:grid-cols-2 gap-4">
             {config.fields.map((field) => (
               <div key={field.name} className={field.full ? 'md:col-span-2' : ''}>
-                <label className="text-white/70 text-sm font-medium mb-2 block">
+                <label className="text-foreground/70 text-sm font-medium mb-2 block">
                   {field.label}
                 </label>
                 {field.type === 'textarea' ? (
@@ -232,17 +232,17 @@ function CrudForm({ config, editing, onSave, onClose, saving }: {
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                     placeholder={field.placeholder}
                     rows={4}
-                    className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30 resize-none"
+                    className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 resize-none"
                   />
                 ) : field.type === 'boolean' ? (
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, [field.name]: !formData[field.name] })}
                     className={`relative w-12 h-6 rounded-full transition-colors ${
-                      formData[field.name] ? 'bg-accent-500' : 'bg-white/10'
+                      formData[field.name] ? 'bg-accent-500' : 'bg-foreground/10'
                     }`}
                   >
-                    <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${
+                    <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-background transition-transform ${
                       formData[field.name] ? 'translate-x-6' : 'translate-x-0.5'
                     }`} />
                   </button>
@@ -250,11 +250,11 @@ function CrudForm({ config, editing, onSave, onClose, saving }: {
                   <select
                     value={formData[field.name] || ''}
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
-                    className="input-field !bg-white/5 !border-white/10 !text-white"
+                    className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground"
                   >
                     <option value="">Select...</option>
                     {field.options?.map((opt) => (
-                      <option key={opt.value} value={opt.value} className="bg-[#0d1018]">{opt.label}</option>
+                      <option key={opt.value} value={opt.value} className="bg-background-secondary">{opt.label}</option>
                     ))}
                   </select>
                 ) : field.type === 'json' ? (
@@ -263,7 +263,7 @@ function CrudForm({ config, editing, onSave, onClose, saving }: {
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                     placeholder={field.placeholder || '["item1", "item2"]'}
                     rows={4}
-                    className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30 resize-none font-mono text-xs"
+                    className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 resize-none font-mono text-xs"
                   />
                 ) : (
                   <input
@@ -271,7 +271,7 @@ function CrudForm({ config, editing, onSave, onClose, saving }: {
                     value={formData[field.name] ?? ''}
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                     placeholder={field.placeholder}
-                    className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30"
+                    className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50"
                   />
                 )}
               </div>
@@ -283,7 +283,7 @@ function CrudForm({ config, editing, onSave, onClose, saving }: {
               <Save size={16} />
               {saving ? 'Saving...' : 'Save'}
             </button>
-            <button type="button" onClick={onClose} className="btn-ghost !text-white !border-white/20 hover:!bg-white/10">
+            <button type="button" onClick={onClose} className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10">
               Cancel
             </button>
           </div>

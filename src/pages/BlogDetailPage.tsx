@@ -62,7 +62,7 @@ export function BlogDetailPage() {
     return (
       <div className="pt-32 pb-20 text-center">
         <div className="section-container">
-          <h1 className="text-3xl font-bold text-white mb-4">Article not found</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-4">Article not found</h1>
           <Link to="/blog" className="btn-primary">
             <ArrowLeft size={16} /> Back to Blog
           </Link>
@@ -83,7 +83,7 @@ export function BlogDetailPage() {
       <article className="pt-28 pb-20">
         <div className="section-container max-w-3xl">
           {/* Back link */}
-          <Link to="/blog" className="inline-flex items-center gap-1 text-white/50 hover:text-white text-sm mb-8 group">
+          <Link to="/blog" className="inline-flex items-center gap-1 text-foreground/50 hover:text-foreground text-sm mb-8 group">
             <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
             Back to Blog
           </Link>
@@ -99,9 +99,9 @@ export function BlogDetailPage() {
                 {post.category.name}
               </span>
             )}
-            <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight">{post.title}</h1>
-            <p className="text-lg text-white/50 mb-4">{post.excerpt}</p>
-            <div className="flex items-center gap-4 text-sm text-white/40">
+            <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-4 leading-tight">{post.title}</h1>
+            <p className="text-lg text-foreground/50 mb-4">{post.excerpt}</p>
+            <div className="flex items-center gap-4 text-sm text-foreground/40">
               <span className="flex items-center gap-1.5">
                 <Calendar size={14} />
                 {formatDate(post.published_at)}
@@ -134,13 +134,13 @@ export function BlogDetailPage() {
           )}
 
           {/* Content */}
-          <div className="prose-content text-white/75">
+          <div className="prose-content text-foreground/75">
             <ReactMarkdown>{post.content}</ReactMarkdown>
           </div>
 
           {/* Comments section */}
-          <div className="mt-16 pt-8 border-t border-white/10">
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+          <div className="mt-16 pt-8 border-t border-foreground/10">
+            <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
               <MessageCircle size={20} />
               Comments ({(comments || []).length})
             </h2>
@@ -158,14 +158,14 @@ export function BlogDetailPage() {
                     placeholder="Your name"
                     value={commentForm.name}
                     onChange={(e) => setCommentForm({ ...commentForm, name: e.target.value })}
-                    className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30"
+                    className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50"
                   />
                   <input
                     type="email"
                     placeholder="Your email"
                     value={commentForm.email}
                     onChange={(e) => setCommentForm({ ...commentForm, email: e.target.value })}
-                    className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30"
+                    className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50"
                   />
                 </div>
                 <textarea
@@ -173,7 +173,7 @@ export function BlogDetailPage() {
                   value={commentForm.comment}
                   onChange={(e) => setCommentForm({ ...commentForm, comment: e.target.value })}
                   rows={4}
-                  className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30 resize-none"
+                  className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 resize-none"
                 />
                 {error && <p className="text-error-400 text-sm">{error}</p>}
                 <button type="submit" disabled={submitting} className="btn-primary disabled:opacity-50">
@@ -192,11 +192,11 @@ export function BlogDetailPage() {
                       {c.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()}
                     </div>
                     <div>
-                      <p className="text-white font-medium text-sm">{c.name}</p>
-                      <p className="text-white/30 text-xs">{formatDate(c.created_at, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                      <p className="text-foreground font-medium text-sm">{c.name}</p>
+                      <p className="text-foreground/30 text-xs">{formatDate(c.created_at, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                     </div>
                   </div>
-                  <p className="text-white/60 text-sm leading-relaxed">{c.comment}</p>
+                  <p className="text-foreground/60 text-sm leading-relaxed">{c.comment}</p>
                 </div>
               ))}
             </div>

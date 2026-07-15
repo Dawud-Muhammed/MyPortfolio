@@ -47,8 +47,8 @@ export function AdminMessages() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">Messages</h1>
-        <p className="text-white/40 text-sm mt-1">{messages.filter((m) => !m.is_read).length} unread</p>
+        <h1 className="text-2xl font-bold text-foreground">Messages</h1>
+        <p className="text-foreground/40 text-sm mt-1">{messages.filter((m) => !m.is_read).length} unread</p>
       </div>
 
       {/* Filter tabs */}
@@ -58,7 +58,7 @@ export function AdminMessages() {
             key={f}
             onClick={() => setFilter(f)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
-              filter === f ? 'bg-accent-500 text-white' : 'glass text-white/60 hover:text-white'
+              filter === f ? 'bg-accent-500 text-white' : 'glass text-foreground/60 hover:text-foreground'
             }`}
           >
             {f}
@@ -72,8 +72,8 @@ export function AdminMessages() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-20">
-          <Inbox size={48} className="text-white/20 mx-auto mb-4" />
-          <p className="text-white/30">No messages found.</p>
+          <Inbox size={48} className="text-foreground/20 mx-auto mb-4" />
+          <p className="text-foreground/30">No messages found.</p>
         </div>
       ) : (
         <div className="grid lg:grid-cols-3 gap-4">
@@ -88,12 +88,12 @@ export function AdminMessages() {
                 } ${!msg.is_read ? 'border-l-2 border-l-accent-400' : ''}`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <p className={`text-sm ${msg.is_read ? 'text-white/60' : 'text-white font-medium'}`}>
+                  <p className={`text-sm ${msg.is_read ? 'text-foreground/60' : 'text-foreground font-medium'}`}>
                     {msg.name}
                   </p>
-                  <span className="text-white/30 text-xs">{formatRelativeTime(msg.created_at)}</span>
+                  <span className="text-foreground/30 text-xs">{formatRelativeTime(msg.created_at)}</span>
                 </div>
-                <p className="text-white/50 text-xs truncate">{msg.subject}</p>
+                <p className="text-foreground/50 text-xs truncate">{msg.subject}</p>
               </button>
             ))}
           </div>
@@ -104,32 +104,32 @@ export function AdminMessages() {
               <div className="glass rounded-2xl p-6">
                 <div className="flex items-start justify-between mb-6">
                   <div>
-                    <h2 className="text-xl font-bold text-white">{selectedMsg.subject}</h2>
-                    <p className="text-white/40 text-sm mt-1">
+                    <h2 className="text-xl font-bold text-foreground">{selectedMsg.subject}</h2>
+                    <p className="text-foreground/40 text-sm mt-1">
                       From <span className="text-accent-400">{selectedMsg.name}</span> ({selectedMsg.email})
                     </p>
-                    <p className="text-white/30 text-xs mt-1">{formatRelativeTime(selectedMsg.created_at)}</p>
+                    <p className="text-foreground/30 text-xs mt-1">{formatRelativeTime(selectedMsg.created_at)}</p>
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => toggleArchive(selectedMsg.id, selectedMsg.is_archived)}
-                      className="p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-all"
+                      className="p-2 rounded-lg text-foreground/50 hover:text-foreground hover:bg-foreground/10 transition-all"
                       title={selectedMsg.is_archived ? 'Unarchive' : 'Archive'}
                     >
                       <Archive size={16} />
                     </button>
                     <button
                       onClick={() => handleDelete(selectedMsg.id)}
-                      className="p-2 rounded-lg text-white/50 hover:text-error-400 hover:bg-error-500/10 transition-all"
+                      className="p-2 rounded-lg text-foreground/50 hover:text-error-400 hover:bg-error-500/10 transition-all"
                     >
                       <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
-                <div className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
+                <div className="text-foreground/70 text-sm leading-relaxed whitespace-pre-wrap">
                   {selectedMsg.message}
                 </div>
-                <div className="mt-6 pt-6 border-t border-white/10">
+                <div className="mt-6 pt-6 border-t border-foreground/10">
                   <a
                     href={`mailto:${selectedMsg.email}?subject=Re: ${selectedMsg.subject}`}
                     className="btn-primary"
@@ -141,8 +141,8 @@ export function AdminMessages() {
               </div>
             ) : (
               <div className="glass rounded-2xl p-12 text-center">
-                <Mail size={48} className="text-white/20 mx-auto mb-4" />
-                <p className="text-white/30">Select a message to read</p>
+                <Mail size={48} className="text-foreground/20 mx-auto mb-4" />
+                <p className="text-foreground/30">Select a message to read</p>
               </div>
             )}
           </div>

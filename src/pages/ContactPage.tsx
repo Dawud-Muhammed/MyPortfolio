@@ -59,8 +59,8 @@ export function ContactPage() {
             className="text-center mb-16"
           >
             <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">Get in Touch</p>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Let's Talk</h1>
-            <p className="text-white/50 max-w-2xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Let's Talk</h1>
+            <p className="text-foreground/50 max-w-2xl mx-auto">
               Have a project in mind, a question, or just want to say hello? I'd love to hear from you. Fill out the form below or reach me directly.
             </p>
           </motion.div>
@@ -78,8 +78,8 @@ export function ContactPage() {
                     <Mail size={20} className="text-accent-400" />
                   </div>
                   <div>
-                    <h3 className="text-white font-semibold mb-1">Email</h3>
-                    <p className="text-white/50 text-sm">{profile.email}</p>
+                    <h3 className="text-foreground font-semibold mb-1">Email</h3>
+                    <p className="text-foreground/50 text-sm">{profile.email}</p>
                   </div>
                 </a>
               )}
@@ -90,8 +90,8 @@ export function ContactPage() {
                     <Phone size={20} className="text-accent-400" />
                   </div>
                   <div>
-                    <h3 className="text-white font-semibold mb-1">Phone</h3>
-    <p className="text-white/50 text-sm">{profile.phone}</p>
+                    <h3 className="text-foreground font-semibold mb-1">Phone</h3>
+    <p className="text-foreground/50 text-sm">{profile.phone}</p>
                   </div>
                 </a>
               )}
@@ -102,15 +102,15 @@ export function ContactPage() {
                     <MapPin size={20} className="text-accent-400" />
                   </div>
                   <div>
-                    <h3 className="text-white font-semibold mb-1">Location</h3>
-                    <p className="text-white/50 text-sm">{profile.location}</p>
+                    <h3 className="text-foreground font-semibold mb-1">Location</h3>
+                    <p className="text-foreground/50 text-sm">{profile.location}</p>
                   </div>
                 </div>
               )}
 
               {/* Social links */}
               <div className="glass rounded-2xl p-6">
-                <h3 className="text-white font-semibold mb-4">Follow Me</h3>
+                <h3 className="text-foreground font-semibold mb-4">Follow Me</h3>
                 <div className="flex gap-3">
                   {visibleSocials.map((s) => {
                     const Icon = platformIcons[s.platform.toLowerCase()] || Mail;
@@ -120,7 +120,7 @@ export function ContactPage() {
                         href={s.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="h-10 w-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-white/60 hover:text-white transition-all hover:scale-110"
+                        className="h-10 w-10 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 flex items-center justify-center text-foreground/60 hover:text-foreground transition-all hover:scale-110"
                         aria-label={s.platform}
                       >
                         <Icon size={18} />
@@ -159,9 +159,9 @@ export function ContactPage() {
                     <div className="h-16 w-16 rounded-full bg-success-500/20 flex items-center justify-center mx-auto mb-4">
                       <CheckCircle2 size={32} className="text-success-400" />
                     </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">Message Sent!</h3>
-                    <p className="text-white/50 mb-6">Thanks for reaching out. I'll get back to you as soon as possible.</p>
-                    <button onClick={() => setSent(false)} className="btn-ghost !text-white !border-white/20 hover:!bg-white/10">
+                    <h3 className="text-2xl font-bold text-foreground mb-2">Message Sent!</h3>
+                    <p className="text-foreground/50 mb-6">Thanks for reaching out. I'll get back to you as soon as possible.</p>
+                    <button onClick={() => setSent(false)} className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10">
                       Send Another Message
                     </button>
                   </div>
@@ -169,44 +169,44 @@ export function ContactPage() {
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="grid md:grid-cols-2 gap-5">
                       <div>
-                        <label className="text-white/70 text-sm font-medium mb-2 block">Name</label>
+                        <label className="text-foreground/70 text-sm font-medium mb-2 block">Name</label>
                         <input
                           type="text"
                           value={form.name}
                           onChange={(e) => setForm({ ...form, name: e.target.value })}
                           placeholder="Your name"
-                          className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30"
+                          className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50"
                         />
                       </div>
                       <div>
-                        <label className="text-white/70 text-sm font-medium mb-2 block">Email</label>
+                        <label className="text-foreground/70 text-sm font-medium mb-2 block">Email</label>
                         <input
                           type="email"
                           value={form.email}
                           onChange={(e) => setForm({ ...form, email: e.target.value })}
                           placeholder="your@email.com"
-                          className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30"
+                          className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="text-white/70 text-sm font-medium mb-2 block">Subject</label>
+                      <label className="text-foreground/70 text-sm font-medium mb-2 block">Subject</label>
                       <input
                         type="text"
                         value={form.subject}
                         onChange={(e) => setForm({ ...form, subject: e.target.value })}
                         placeholder="What's this about?"
-                        className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30"
+                        className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50"
                       />
                     </div>
                     <div>
-                      <label className="text-white/70 text-sm font-medium mb-2 block">Message</label>
+                      <label className="text-foreground/70 text-sm font-medium mb-2 block">Message</label>
                       <textarea
                         value={form.message}
                         onChange={(e) => setForm({ ...form, message: e.target.value })}
                         placeholder="Tell me about your project..."
                         rows={6}
-                        className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30 resize-none"
+                        className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 resize-none"
                       />
                     </div>
                     {error && <p className="text-error-400 text-sm">{error}</p>}
@@ -223,7 +223,7 @@ export function ContactPage() {
           {/* FAQs */}
           {(faqs || []).length > 0 && (
             <div className="mt-20 max-w-3xl mx-auto">
-              <h2 className="text-3xl font-bold text-white text-center mb-10">Frequently Asked Questions</h2>
+              <h2 className="text-3xl font-bold text-foreground text-center mb-10">Frequently Asked Questions</h2>
               <div className="space-y-3">
                 {(faqs || []).map((faq, i) => (
                   <motion.details
@@ -234,11 +234,11 @@ export function ContactPage() {
                     transition={{ delay: i * 0.05 }}
                     className="glass rounded-2xl p-5 group"
                   >
-                    <summary className="text-white font-medium cursor-pointer flex items-center justify-between list-none">
+                    <summary className="text-foreground font-medium cursor-pointer flex items-center justify-between list-none">
                       {faq.question}
-                      <span className="text-white/40 group-open:rotate-45 transition-transform text-xl">+</span>
+                      <span className="text-foreground/40 group-open:rotate-45 transition-transform text-xl">+</span>
                     </summary>
-                    <p className="text-white/50 text-sm mt-3 leading-relaxed">{faq.answer}</p>
+                    <p className="text-foreground/50 text-sm mt-3 leading-relaxed">{faq.answer}</p>
                   </motion.details>
                 ))}
               </div>

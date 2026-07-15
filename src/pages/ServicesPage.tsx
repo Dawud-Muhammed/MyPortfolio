@@ -24,8 +24,8 @@ export function ServicesPage() {
             className="text-center mb-16"
           >
             <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">What I Offer</p>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Services</h1>
-            <p className="text-white/50 max-w-2xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Services</h1>
+            <p className="text-foreground/50 max-w-2xl mx-auto">
               From full-stack web development to technical consulting, I help teams and individuals bring their ideas to life with clean, performant code.
             </p>
           </motion.div>
@@ -48,14 +48,14 @@ export function ServicesPage() {
                       <Icon size={28} className="text-accent-400" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-white mb-2">{service.title}</h3>
-                      <p className="text-white/50 text-sm leading-relaxed">{service.description}</p>
+                      <h3 className="text-xl font-bold text-foreground mb-2">{service.title}</h3>
+                      <p className="text-foreground/50 text-sm leading-relaxed">{service.description}</p>
                     </div>
                   </div>
                   {(service.included_items || []).length > 0 && (
-                    <ul className="space-y-2 pt-4 border-t border-white/10">
+                    <ul className="space-y-2 pt-4 border-t border-foreground/10">
                       {(service.included_items || []).map((item, idx) => (
-                        <li key={idx} className="text-sm text-white/60 flex items-start gap-2">
+                        <li key={idx} className="text-sm text-foreground/60 flex items-start gap-2">
                           <CheckCircle2 size={16} className="text-accent-400 shrink-0 mt-0.5" />
                           {item}
                         </li>
@@ -70,7 +70,7 @@ export function ServicesPage() {
           {/* Testimonials */}
           {(testimonials || []).length > 0 && (
             <section className="mb-20">
-              <h2 className="text-3xl font-bold text-white mb-8 text-center">What Clients Say</h2>
+              <h2 className="text-3xl font-bold text-foreground mb-8 text-center">What Clients Say</h2>
               <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                 {(testimonials || []).map((t, i) => (
                   <motion.div
@@ -86,18 +86,18 @@ export function ServicesPage() {
                         <span key={idx} className="text-warning-400 text-lg">★</span>
                       ))}
                     </div>
-                    <p className="text-white/70 text-sm leading-relaxed mb-4">"{t.quote}"</p>
+                    <p className="text-foreground/70 text-sm leading-relaxed mb-4">"{t.quote}"</p>
                     <div className="flex items-center gap-3">
                       {t.avatar_url ? (
                         <img src={t.avatar_url} alt={t.name} className="h-10 w-10 rounded-full object-cover" />
                       ) : (
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center text-white font-bold text-sm">
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center text-foreground font-bold text-sm">
                           {t.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                         </div>
                       )}
                       <div>
-                        <p className="text-white font-medium text-sm">{t.name}</p>
-                        <p className="text-white/40 text-xs">{t.role}{t.company ? `, ${t.company}` : ''}</p>
+                        <p className="text-foreground font-medium text-sm">{t.name}</p>
+                        <p className="text-foreground/40 text-xs">{t.role}{t.company ? `, ${t.company}` : ''}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -113,8 +113,8 @@ export function ServicesPage() {
             viewport={{ once: true }}
             className="glass-strong rounded-3xl p-12 text-center max-w-3xl mx-auto"
           >
-            <h2 className="text-3xl font-bold text-white mb-4">Ready to start your project?</h2>
-            <p className="text-white/60 text-lg mb-8">Let's discuss how I can help you build something great.</p>
+            <h2 className="text-3xl font-bold text-foreground mb-4">Ready to start your project?</h2>
+            <p className="text-foreground/60 text-lg mb-8">Let's discuss how I can help you build something great.</p>
             <Link to="/contact" className="btn-primary group inline-flex">
               Get in Touch
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />

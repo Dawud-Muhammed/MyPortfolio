@@ -33,8 +33,8 @@ export function ProjectsPage() {
             className="text-center mb-12"
           >
             <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">Portfolio</p>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Projects</h1>
-            <p className="text-white/50 max-w-2xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Projects</h1>
+            <p className="text-foreground/50 max-w-2xl mx-auto">
               A collection of things I've built — from open source libraries to full-scale SaaS products. Each project represents a problem I wanted to solve.
             </p>
           </motion.div>
@@ -47,7 +47,7 @@ export function ProjectsPage() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   activeCategory === 'all'
                     ? 'bg-accent-500 text-white'
-                    : 'glass text-white/60 hover:text-white'
+                    : 'glass text-foreground/60 hover:text-foreground'
                 }`}
               >
                 All
@@ -59,7 +59,7 @@ export function ProjectsPage() {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     activeCategory === cat.id
                       ? 'bg-accent-500 text-white'
-                      : 'glass text-white/60 hover:text-white'
+                      : 'glass text-foreground/60 hover:text-foreground'
                   }`}
                 >
                   {cat.name}
@@ -68,13 +68,13 @@ export function ProjectsPage() {
             </div>
 
             <div className="relative w-full md:w-64">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search projects..."
-                className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30 pl-10"
+                className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 pl-10"
               />
             </div>
           </div>
@@ -88,8 +88,8 @@ export function ProjectsPage() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-20">
-              <Filter className="mx-auto text-white/20 mb-4" size={48} />
-              <p className="text-white/40">No projects found matching your filters.</p>
+              <Filter className="mx-auto text-foreground/20 mb-4" size={48} />
+              <p className="text-foreground/40">No projects found matching your filters.</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -104,7 +104,7 @@ export function ProjectsPage() {
                     to={`/projects/${project.slug}`}
                     className="group block glass rounded-2xl overflow-hidden card-hover"
                   >
-                    <div className="aspect-[4/3] overflow-hidden bg-white/5 relative">
+                    <div className="aspect-[4/3] overflow-hidden bg-foreground/5 relative">
                       {project.cover_image_url && (
                         <img
                           src={project.cover_image_url}
@@ -132,14 +132,14 @@ export function ProjectsPage() {
                             {project.category.name}
                           </span>
                         )}
-                        <span className="text-white/20">·</span>
-                        <span className="text-xs text-white/40">{project.difficulty}</span>
+                        <span className="text-foreground/20">·</span>
+                        <span className="text-xs text-foreground/40">{project.difficulty}</span>
                       </div>
-                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-accent-400 transition-colors flex items-center gap-1">
+                      <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-accent-400 transition-colors flex items-center gap-1">
                         {project.title}
                         <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                       </h3>
-                      <p className="text-sm text-white/50 line-clamp-2">{project.excerpt || project.description}</p>
+                      <p className="text-sm text-foreground/50 line-clamp-2">{project.excerpt || project.description}</p>
                       <div className="mt-4 flex flex-wrap gap-1.5">
                         {(project.technologies || []).slice(0, 4).map((tech) => (
                           <span key={tech.id} className="badge !text-xs !py-0.5">

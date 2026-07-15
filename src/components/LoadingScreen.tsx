@@ -28,17 +28,17 @@ export function LoadingScreen() {
       <div className="text-center">
         <div className="mb-8 flex items-center justify-center gap-3">
           <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center">
-            <span className="text-white font-bold text-xl">A</span>
+            <span className="text-foreground font-bold text-xl">A</span>
           </div>
-          <span className="text-white font-bold text-2xl tracking-tight">Alex Rivera</span>
+          <span className="text-foreground font-bold text-2xl tracking-tight">Alex Rivera</span>
         </div>
-        <div className="w-48 h-1 bg-white/10 rounded-full overflow-hidden mx-auto">
+        <div className="w-48 h-1 bg-foreground/10 rounded-full overflow-hidden mx-auto">
           <div
             className="h-full bg-gradient-to-r from-accent-400 to-accent-600 rounded-full transition-all duration-100"
             style={{ width: `${Math.min(progress, 100)}%` }}
           />
         </div>
-        <p className="text-white/50 text-sm mt-4 font-mono">Loading...</p>
+        <p className="text-foreground/50 text-sm mt-4 font-mono">Loading...</p>
       </div>
     </div>
   );

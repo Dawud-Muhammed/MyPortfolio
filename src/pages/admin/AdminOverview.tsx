@@ -24,8 +24,8 @@ export function AdminOverview() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Welcome back{session?.user?.email ? `, ${session.user.email.split('@')[0]}` : ''}!</h1>
-        <p className="text-white/40 text-sm mt-1">Here's what's happening with your portfolio.</p>
+        <h1 className="text-2xl font-bold text-foreground">Welcome back{session?.user?.email ? `, ${session.user.email.split('@')[0]}` : ''}!</h1>
+        <p className="text-foreground/40 text-sm mt-1">Here's what's happening with your portfolio.</p>
       </div>
 
       {/* Stats grid */}
@@ -39,8 +39,8 @@ export function AdminOverview() {
             <div className={`h-10 w-10 rounded-xl ${stat.bg} flex items-center justify-center mb-3`}>
               <stat.icon size={20} className={stat.color} />
             </div>
-            <p className="text-2xl font-bold text-white">{stat.value}</p>
-            <p className="text-white/40 text-xs mt-1">{stat.label}</p>
+            <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+            <p className="text-foreground/40 text-xs mt-1">{stat.label}</p>
           </Link>
         ))}
       </div>
@@ -49,7 +49,7 @@ export function AdminOverview() {
         {/* Recent messages */}
         <div className="glass rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-white font-semibold flex items-center gap-2">
+            <h2 className="text-foreground font-semibold flex items-center gap-2">
               <Inbox size={18} className="text-accent-400" />
               Recent Messages
             </h2>
@@ -57,17 +57,17 @@ export function AdminOverview() {
           </div>
           <div className="space-y-3">
             {(messages || []).slice(0, 5).map((msg) => (
-              <div key={msg.id} className="flex items-start gap-3 p-3 rounded-xl bg-white/5">
-                <div className={`h-2 w-2 rounded-full mt-1.5 ${msg.is_read ? 'bg-white/20' : 'bg-accent-400'}`} />
+              <div key={msg.id} className="flex items-start gap-3 p-3 rounded-xl bg-foreground/5">
+                <div className={`h-2 w-2 rounded-full mt-1.5 ${msg.is_read ? 'bg-foreground/20' : 'bg-accent-400'}`} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-medium truncate">{msg.name}</p>
-                  <p className="text-white/40 text-xs truncate">{msg.subject}</p>
-                  <p className="text-white/30 text-xs mt-1">{formatRelativeTime(msg.created_at)}</p>
+                  <p className="text-foreground text-sm font-medium truncate">{msg.name}</p>
+                  <p className="text-foreground/40 text-xs truncate">{msg.subject}</p>
+                  <p className="text-foreground/30 text-xs mt-1">{formatRelativeTime(msg.created_at)}</p>
                 </div>
               </div>
             ))}
             {(messages || []).length === 0 && (
-              <p className="text-white/30 text-sm text-center py-4">No messages yet.</p>
+              <p className="text-foreground/30 text-sm text-center py-4">No messages yet.</p>
             )}
           </div>
         </div>
@@ -75,7 +75,7 @@ export function AdminOverview() {
         {/* Featured projects */}
         <div className="glass rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-white font-semibold flex items-center gap-2">
+            <h2 className="text-foreground font-semibold flex items-center gap-2">
               <Star size={18} className="text-accent-400" />
               Featured Projects
             </h2>
@@ -83,19 +83,19 @@ export function AdminOverview() {
           </div>
           <div className="space-y-3">
             {featuredProjects.map((p) => (
-              <div key={p.id} className="flex items-center gap-3 p-3 rounded-xl bg-white/5">
+              <div key={p.id} className="flex items-center gap-3 p-3 rounded-xl bg-foreground/5">
                 {p.cover_image_url && (
                   <img src={p.cover_image_url} alt={p.title} className="h-10 w-10 rounded-lg object-cover" />
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-medium truncate">{p.title}</p>
-                  <p className="text-white/40 text-xs truncate">{p.excerpt || p.description}</p>
+                  <p className="text-foreground text-sm font-medium truncate">{p.title}</p>
+                  <p className="text-foreground/40 text-xs truncate">{p.excerpt || p.description}</p>
                 </div>
                 <span className="badge !text-xs !py-0.5">{p.status}</span>
               </div>
             ))}
             {featuredProjects.length === 0 && (
-              <p className="text-white/30 text-sm text-center py-4">No featured projects.</p>
+              <p className="text-foreground/30 text-sm text-center py-4">No featured projects.</p>
             )}
           </div>
         </div>

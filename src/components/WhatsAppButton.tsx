@@ -16,12 +16,12 @@ export function WhatsAppButton() {
         <div className="glass-strong rounded-2xl p-4 max-w-xs animate-scale-in relative">
           <button
             onClick={() => setShowTooltip(false)}
-            className="absolute top-2 right-2 text-white/40 hover:text-white"
+            className="absolute top-2 right-2 text-foreground/40 hover:text-foreground"
           >
             <X size={16} />
           </button>
           <p className="text-sm text-white font-medium mb-1">Let's talk!</p>
-          <p className="text-xs text-white/60">Have a project in mind? Send me a message on WhatsApp.</p>
+          <p className="text-xs text-foreground/60">Have a project in mind? Send me a message on WhatsApp.</p>
         </div>
       )}
       <a

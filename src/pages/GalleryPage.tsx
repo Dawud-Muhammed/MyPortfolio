@@ -31,8 +31,8 @@ export function GalleryPage() {
             className="text-center mb-12"
           >
             <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">Visual</p>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Gallery</h1>
-            <p className="text-white/50 max-w-2xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Gallery</h1>
+            <p className="text-foreground/50 max-w-2xl mx-auto">
               A collection of screenshots, designs, and moments from my journey as a developer.
             </p>
           </motion.div>
@@ -43,7 +43,7 @@ export function GalleryPage() {
               <button
                 onClick={() => setFilter('all')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  filter === 'all' ? 'bg-accent-500 text-white' : 'glass text-white/60 hover:text-white'
+                  filter === 'all' ? 'bg-accent-500 text-white' : 'glass text-foreground/60 hover:text-foreground'
                 }`}
               >
                 All
@@ -53,7 +53,7 @@ export function GalleryPage() {
                   key={tag}
                   onClick={() => setFilter(tag)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    filter === tag ? 'bg-accent-500 text-white' : 'glass text-white/60 hover:text-white'
+                    filter === tag ? 'bg-accent-500 text-white' : 'glass text-foreground/60 hover:text-foreground'
                   }`}
                 >
                   {tag}
@@ -83,7 +83,7 @@ export function GalleryPage() {
                   <img src={item.image_url} alt={item.caption || ''} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   {item.caption && (
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                      <p className="text-white text-sm font-medium">{item.caption}</p>
+                      <p className="text-foreground text-sm font-medium">{item.caption}</p>
                     </div>
                   )}
                 </motion.div>
@@ -96,10 +96,10 @@ export function GalleryPage() {
       {/* Lightbox */}
       {lightbox !== null && filtered[lightbox] && (
         <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4" onClick={closeLightbox}>
-          <button className="absolute top-4 right-4 text-white/60 hover:text-white p-2" onClick={closeLightbox}>
+          <button className="absolute top-4 right-4 text-foreground/60 hover:text-foreground p-2" onClick={closeLightbox}>
             <X size={24} />
           </button>
-          <button className="absolute left-4 text-white/60 hover:text-white p-2" onClick={(e) => { e.stopPropagation(); prev(); }}>
+          <button className="absolute left-4 text-foreground/60 hover:text-foreground p-2" onClick={(e) => { e.stopPropagation(); prev(); }}>
             <ChevronLeft size={32} />
           </button>
           <img
@@ -108,11 +108,11 @@ export function GalleryPage() {
             className="max-w-full max-h-[85vh] object-contain rounded-xl"
             onClick={(e) => e.stopPropagation()}
           />
-          <button className="absolute right-4 text-white/60 hover:text-white p-2" onClick={(e) => { e.stopPropagation(); next(); }}>
+          <button className="absolute right-4 text-foreground/60 hover:text-foreground p-2" onClick={(e) => { e.stopPropagation(); next(); }}>
             <ChevronRight size={32} />
           </button>
           {filtered[lightbox].caption && (
-            <p className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/80 text-sm">{filtered[lightbox].caption}</p>
+            <p className="absolute bottom-8 left-1/2 -translate-x-1/2 text-foreground/80 text-sm">{filtered[lightbox].caption}</p>
           )}
         </div>
       )}

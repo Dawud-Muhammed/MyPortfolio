@@ -35,7 +35,7 @@ export function AdminLayout() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0c14]">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="h-8 w-8 rounded-full border-2 border-accent-500 border-t-transparent animate-spin" />
       </div>
     );
@@ -49,21 +49,21 @@ export function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0c14] flex">
+    <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 h-screen w-64 bg-[#0d1018] border-r border-white/5 z-50 transition-transform duration-300 ${
+        className={`fixed lg:sticky top-0 left-0 h-screen w-64 bg-background-secondary border-r border-foreground/5 z-50 transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        <div className="h-16 flex items-center justify-between px-5 border-b border-white/5">
+        <div className="h-16 flex items-center justify-between px-5 border-b border-foreground/5">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
+              <span className="text-foreground font-bold text-sm">A</span>
             </div>
-            <span className="text-white font-bold text-sm">Admin Panel</span>
+            <span className="text-foreground font-bold text-sm">Admin Panel</span>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-white/40">
+          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-foreground/40">
             <X size={20} />
           </button>
         </div>
@@ -79,14 +79,14 @@ export function AdminLayout() {
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActive
                     ? 'bg-accent-500/15 text-accent-400'
-                    : 'text-white/50 hover:text-white hover:bg-white/5'
+                    : 'text-foreground/50 hover:text-foreground hover:bg-foreground/5'
                 }`
               }
             >
               <item.icon size={18} />
               <span>{item.label}</span>
               {item.to === '/admin/messages' && unreadCount > 0 && (
-                <span className="ml-auto bg-error-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                <span className="ml-auto bg-error-500 text-foreground text-xs px-1.5 py-0.5 rounded-full">
                   {unreadCount}
                 </span>
               )}
@@ -94,11 +94,11 @@ export function AdminLayout() {
           ))}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-white/5 space-y-1">
+        <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-foreground/5 space-y-1">
           <a
             href="/"
             target="_blank"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/50 hover:text-white hover:bg-white/5 transition-all"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground/50 hover:text-foreground hover:bg-foreground/5 transition-all"
           >
             <Eye size={18} />
             View Site
@@ -121,11 +121,11 @@ export function AdminLayout() {
       {/* Main content */}
       <div className="flex-1 min-w-0">
         {/* Mobile header */}
-        <div className="lg:hidden h-16 flex items-center justify-between px-4 border-b border-white/5 sticky top-0 bg-[#0a0c14] z-30">
-          <button onClick={() => setSidebarOpen(true)} className="text-white/60">
+        <div className="lg:hidden h-16 flex items-center justify-between px-4 border-b border-foreground/5 sticky top-0 bg-background z-30">
+          <button onClick={() => setSidebarOpen(true)} className="text-foreground/60">
             <Menu size={24} />
           </button>
-          <span className="text-white font-bold text-sm">Admin</span>
+          <span className="text-foreground font-bold text-sm">Admin</span>
           <button onClick={handleSignOut} className="text-error-400">
             <LogOut size={20} />
           </button>

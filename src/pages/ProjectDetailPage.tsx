@@ -26,7 +26,7 @@ export function ProjectDetailPage() {
     return (
       <div className="pt-32 pb-20 text-center">
         <div className="section-container">
-          <h1 className="text-3xl font-bold text-white mb-4">Project not found</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-4">Project not found</h1>
           <Link to="/projects" className="btn-primary">
             <ArrowLeft size={16} /> Back to Projects
           </Link>
@@ -47,7 +47,7 @@ export function ProjectDetailPage() {
       <div className="pt-28 pb-20">
         <div className="section-container">
           {/* Back link */}
-          <Link to="/projects" className="inline-flex items-center gap-1 text-white/50 hover:text-white text-sm mb-8 group">
+          <Link to="/projects" className="inline-flex items-center gap-1 text-foreground/50 hover:text-foreground text-sm mb-8 group">
             <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
             Back to Projects
           </Link>
@@ -69,8 +69,8 @@ export function ProjectDetailPage() {
               </span>
               <span className="badge">{project.difficulty}</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{project.title}</h1>
-            <p className="text-lg text-white/60 max-w-3xl">{project.excerpt || project.description}</p>
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">{project.title}</h1>
+            <p className="text-lg text-foreground/60 max-w-3xl">{project.excerpt || project.description}</p>
           </motion.div>
 
           {/* Cover image */}
@@ -93,13 +93,13 @@ export function ProjectDetailPage() {
               </a>
             )}
             {project.github_url && (
-              <a href={project.github_url} target="_blank" rel="noopener noreferrer" className="btn-ghost !text-white !border-white/20 hover:!bg-white/10">
+              <a href={project.github_url} target="_blank" rel="noopener noreferrer" className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10">
                 <Github size={16} />
                 Source Code
               </a>
             )}
             {project.video_demo_url && (
-              <a href={project.video_demo_url} target="_blank" rel="noopener noreferrer" className="btn-ghost !text-white !border-white/20 hover:!bg-white/10">
+              <a href={project.video_demo_url} target="_blank" rel="noopener noreferrer" className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10">
                 <Play size={16} />
                 Video Demo
               </a>
@@ -109,8 +109,8 @@ export function ProjectDetailPage() {
           <div className="grid lg:grid-cols-3 gap-12">
             {/* Description */}
             <div className="lg:col-span-2">
-              <h2 className="text-2xl font-bold text-white mb-4">About this project</h2>
-              <div className="prose-content text-white/70">
+              <h2 className="text-2xl font-bold text-foreground mb-4">About this project</h2>
+              <div className="prose-content text-foreground/70">
                 {project.description.split('\n').map((para, i) => (
                   <p key={i}>{para}</p>
                 ))}
@@ -119,7 +119,7 @@ export function ProjectDetailPage() {
               {/* Gallery */}
               {project.gallery && project.gallery.length > 0 && (
                 <div className="mt-12">
-                  <h2 className="text-2xl font-bold text-white mb-4">Gallery</h2>
+                  <h2 className="text-2xl font-bold text-foreground mb-4">Gallery</h2>
                   <div className="grid grid-cols-2 gap-4">
                     {project.gallery.map((img, i) => (
                       <div key={i} className="aspect-[4/3] rounded-xl overflow-hidden glass">
@@ -134,7 +134,7 @@ export function ProjectDetailPage() {
             {/* Sidebar */}
             <div>
               <div className="glass rounded-2xl p-6 sticky top-24">
-                <h3 className="text-white font-semibold mb-4">Technologies</h3>
+                <h3 className="text-foreground font-semibold mb-4">Technologies</h3>
                 <div className="flex flex-wrap gap-2 mb-6">
                   {(project.technologies || []).map((tech) => (
                     <span key={tech.id} className="badge">
@@ -143,20 +143,20 @@ export function ProjectDetailPage() {
                   ))}
                 </div>
 
-                <h3 className="text-white font-semibold mb-4">Project Info</h3>
+                <h3 className="text-foreground font-semibold mb-4">Project Info</h3>
                 <dl className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <dt className="text-white/40">Status</dt>
-                    <dd className="text-white/80">{project.status}</dd>
+                    <dt className="text-foreground/40">Status</dt>
+                    <dd className="text-foreground/80">{project.status}</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="text-white/40">Difficulty</dt>
-                    <dd className="text-white/80">{project.difficulty}</dd>
+                    <dt className="text-foreground/40">Difficulty</dt>
+                    <dd className="text-foreground/80">{project.difficulty}</dd>
                   </div>
                   {project.category && (
                     <div className="flex justify-between">
-                      <dt className="text-white/40">Category</dt>
-                      <dd className="text-white/80">{project.category.name}</dd>
+                      <dt className="text-foreground/40">Category</dt>
+                      <dd className="text-foreground/80">{project.category.name}</dd>
                     </div>
                   )}
                 </dl>

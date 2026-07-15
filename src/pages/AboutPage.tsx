@@ -39,25 +39,25 @@ export function AboutPage() {
             </div>
             <div className="lg:col-span-2">
               <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">About Me</p>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{profile?.name || 'Alex Rivera'}</h1>
+              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">{profile?.name || 'Alex Rivera'}</h1>
               <p className="text-xl text-accent-400 font-medium mb-6">{profile?.title || 'Full-Stack Software Engineer'}</p>
-              <p className="text-white/60 text-lg leading-relaxed mb-6">{profile?.bio}</p>
+              <p className="text-foreground/60 text-lg leading-relaxed mb-6">{profile?.bio}</p>
 
               <div className="flex flex-wrap gap-4 mb-6">
                 {profile?.email && (
-                  <a href={`mailto:${profile.email}`} className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm">
+                  <a href={`mailto:${profile.email}`} className="inline-flex items-center gap-2 text-foreground/60 hover:text-foreground text-sm">
                     <Mail size={16} className="text-accent-400" />
                     {profile.email}
                   </a>
                 )}
                 {profile?.phone && (
-                  <span className="inline-flex items-center gap-2 text-white/60 text-sm">
+                  <span className="inline-flex items-center gap-2 text-foreground/60 text-sm">
                     <Phone size={16} className="text-accent-400" />
                     {profile.phone}
                   </span>
                 )}
                 {profile?.location && (
-                  <span className="inline-flex items-center gap-2 text-white/60 text-sm">
+                  <span className="inline-flex items-center gap-2 text-foreground/60 text-sm">
                     <MapPin size={16} className="text-accent-400" />
                     {profile.location}
                   </span>
@@ -70,7 +70,7 @@ export function AboutPage() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-success-500" />
                   </span>
-                  <span className="text-white/80 text-sm font-medium">Available for work</span>
+                  <span className="text-foreground/80 text-sm font-medium">Available for work</span>
                 </div>
               )}
 
@@ -85,7 +85,7 @@ export function AboutPage() {
 
           {/* Skills */}
           <section className="mb-20">
-            <h2 className="text-3xl font-bold text-white mb-8 text-center">Skills & Expertise</h2>
+            <h2 className="text-3xl font-bold text-foreground mb-8 text-center">Skills & Expertise</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Object.entries(skillsByCategory).map(([category, items], catIdx) => (
                 <motion.div
@@ -96,26 +96,15 @@ export function AboutPage() {
                   transition={{ delay: catIdx * 0.1 }}
                   className="glass rounded-2xl p-6"
                 >
-                  <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                  <h3 className="text-foreground font-semibold mb-4 flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full bg-accent-400" />
                     {category}
                   </h3>
                   <div className="space-y-3">
                     {items.map((skill) => (
-                      <div key={skill.id}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-white/70">{skill.name}</span>
-                          <span className="text-xs text-white/40">{skill.proficiency}%</span>
-                        </div>
-                        <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            whileInView={{ width: `${skill.proficiency}%` }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 1, ease: 'easeOut' }}
-                            className="h-full rounded-full bg-gradient-to-r from-accent-500 to-accent-300"
-                          />
-                        </div>
+                      <div key={skill.id} className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
+                        <span className="text-sm text-foreground/70">{skill.name}</span>
                       </div>
                     ))}
                   </div>
@@ -126,7 +115,7 @@ export function AboutPage() {
 
           {/* Experience */}
           <section className="mb-20">
-            <h2 className="text-3xl font-bold text-white mb-8 text-center flex items-center justify-center gap-2">
+            <h2 className="text-3xl font-bold text-foreground mb-8 text-center flex items-center justify-center gap-2">
               <Briefcase size={28} className="text-accent-400" />
               Work Experience
             </h2>
@@ -141,7 +130,7 @@ export function AboutPage() {
                   className="relative pl-8 pb-12 last:pb-0"
                 >
                   {i < (experience || []).length - 1 && (
-                    <div className="absolute left-2.5 top-2 bottom-0 w-px bg-white/10" />
+                    <div className="absolute left-2.5 top-2 bottom-0 w-px bg-foreground/10" />
                   )}
                   <div className="absolute left-0 top-1.5 h-5 w-5 rounded-full bg-accent-500/20 border-2 border-accent-400 flex items-center justify-center">
                     <div className="h-1.5 w-1.5 rounded-full bg-accent-400" />
@@ -149,15 +138,15 @@ export function AboutPage() {
                   <div className="glass rounded-2xl p-5 card-hover">
                     <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                       <div>
-                        <h3 className="text-white font-bold text-lg">{exp.role}</h3>
+                        <h3 className="text-foreground font-bold text-lg">{exp.role}</h3>
                         <p className="text-accent-400 text-sm font-medium">{exp.company}</p>
                       </div>
-                      <span className="text-xs text-white/40 flex items-center gap-1">
+                      <span className="text-xs text-foreground/40 flex items-center gap-1">
                         <Calendar size={12} />
                         {exp.start_date} — {exp.is_current ? 'Present' : exp.end_date}
                       </span>
                     </div>
-                    <p className="text-sm text-white/50 mt-2 leading-relaxed">{exp.description}</p>
+                    <p className="text-sm text-foreground/50 mt-2 leading-relaxed">{exp.description}</p>
                   </div>
                 </motion.div>
               ))}
@@ -167,7 +156,7 @@ export function AboutPage() {
           {/* Education */}
           {(education || []).length > 0 && (
             <section className="mb-20">
-              <h2 className="text-3xl font-bold text-white mb-8 text-center flex items-center justify-center gap-2">
+              <h2 className="text-3xl font-bold text-foreground mb-8 text-center flex items-center justify-center gap-2">
                 <GraduationCap size={28} className="text-accent-400" />
                 Education
               </h2>
@@ -181,10 +170,10 @@ export function AboutPage() {
                     transition={{ delay: i * 0.1 }}
                     className="glass rounded-2xl p-6 card-hover"
                   >
-                    <h3 className="text-white font-bold mb-1">{edu.institution}</h3>
+                    <h3 className="text-foreground font-bold mb-1">{edu.institution}</h3>
                     <p className="text-accent-400 text-sm font-medium mb-2">{edu.degree}</p>
-                    <p className="text-white/40 text-sm">{edu.field}</p>
-                    <p className="text-white/30 text-xs mt-2">{edu.start_date} — {edu.end_date || 'Present'}</p>
+                    <p className="text-foreground/40 text-sm">{edu.field}</p>
+                    <p className="text-foreground/30 text-xs mt-2">{edu.start_date} — {edu.end_date || 'Present'}</p>
                   </motion.div>
                 ))}
               </div>
@@ -194,7 +183,7 @@ export function AboutPage() {
           {/* Certifications */}
           {(certifications || []).length > 0 && (
             <section className="mb-20">
-              <h2 className="text-3xl font-bold text-white mb-8 text-center flex items-center justify-center gap-2">
+              <h2 className="text-3xl font-bold text-foreground mb-8 text-center flex items-center justify-center gap-2">
                 <Award size={28} className="text-accent-400" />
                 Certifications
               </h2>
@@ -208,9 +197,9 @@ export function AboutPage() {
                     transition={{ delay: i * 0.1 }}
                     className="glass rounded-2xl p-6 card-hover"
                   >
-                    <h3 className="text-white font-bold mb-1">{cert.title}</h3>
+                    <h3 className="text-foreground font-bold mb-1">{cert.title}</h3>
                     <p className="text-accent-400 text-sm font-medium mb-2">{cert.issuer}</p>
-                    <p className="text-white/40 text-xs">{cert.issue_date}{cert.expiry_date ? ` — ${cert.expiry_date}` : ''}</p>
+                    <p className="text-foreground/40 text-xs">{cert.issue_date}{cert.expiry_date ? ` — ${cert.expiry_date}` : ''}</p>
                     {cert.verify_url && (
                       <a href={cert.verify_url} target="_blank" rel="noopener noreferrer" className="text-accent-400 text-xs mt-2 inline-block hover:underline">
                         Verify credential
@@ -225,7 +214,7 @@ export function AboutPage() {
           {/* Achievements */}
           {(achievements || []).length > 0 && (
             <section className="mb-20">
-              <h2 className="text-3xl font-bold text-white mb-8 text-center flex items-center justify-center gap-2">
+              <h2 className="text-3xl font-bold text-foreground mb-8 text-center flex items-center justify-center gap-2">
                 <Star size={28} className="text-accent-400" />
                 Achievements & Awards
               </h2>
@@ -242,10 +231,10 @@ export function AboutPage() {
                     {ach.image_url && (
                       <img src={ach.image_url} alt={ach.title} className="h-12 w-12 rounded-xl object-cover mb-3" />
                     )}
-                    <h3 className="text-white font-bold mb-1">{ach.title}</h3>
+                    <h3 className="text-foreground font-bold mb-1">{ach.title}</h3>
                     <p className="text-accent-400 text-sm font-medium mb-2">{ach.issuer}</p>
-                    <p className="text-white/40 text-xs mb-2">{ach.date}</p>
-                    {ach.description && <p className="text-white/50 text-sm leading-relaxed">{ach.description}</p>}
+                    <p className="text-foreground/40 text-xs mb-2">{ach.date}</p>
+                    {ach.description && <p className="text-foreground/50 text-sm leading-relaxed">{ach.description}</p>}
                   </motion.div>
                 ))}
               </div>

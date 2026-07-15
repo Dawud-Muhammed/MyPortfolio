@@ -34,9 +34,9 @@ export function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center transition-transform group-hover:scale-110">
-              <span className="text-white font-bold text-lg">A</span>
+              <span className="text-foreground font-bold text-lg">A</span>
             </div>
-            <span className="font-bold text-lg tracking-tight text-white">
+            <span className="font-bold text-lg tracking-tight text-foreground">
               {profile?.name?.split(' ')[0] || 'Alex'}
             </span>
           </Link>
@@ -52,8 +52,8 @@ export function Navbar() {
                   to={item.target}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     isActive
-                      ? 'text-white bg-white/10'
-                      : 'text-white/60 hover:text-white hover:bg-white/5'
+                      ? 'text-foreground bg-foreground/10'
+                      : 'text-foreground/60 hover:text-foreground hover:bg-foreground/5'
                   }`}
                 >
                   {item.label}
@@ -66,7 +66,7 @@ export function Navbar() {
           <div className="flex items-center gap-2">
             <button
               onClick={toggle}
-              className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all"
+              className="p-2 rounded-lg text-foreground/60 hover:text-foreground hover:bg-foreground/10 transition-all"
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
@@ -80,7 +80,7 @@ export function Navbar() {
             </button>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10"
+              className="md:hidden p-2 rounded-lg text-foreground/60 hover:text-foreground hover:bg-foreground/10"
             >
               {mobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -92,13 +92,13 @@ export function Navbar() {
       {mobileOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <div className="absolute top-16 left-0 right-0 glass-strong border-t border-white/10 p-4 animate-fade-down">
+          <div className="absolute top-16 left-0 right-0 glass-strong border-t border-foreground/10 p-4 animate-fade-down">
             <div className="flex flex-col gap-1">
               {navbarItems.map((item) => (
                 <Link
                   key={item.id}
                   to={item.target}
-                  className="px-4 py-3 rounded-lg text-white/80 hover:text-white hover:bg-white/10 font-medium transition-all"
+                  className="px-4 py-3 rounded-lg text-foreground/80 hover:text-foreground hover:bg-foreground/10 font-medium transition-all"
                 >
                   {item.label}
                 </Link>

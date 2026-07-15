@@ -38,8 +38,8 @@ export function BlogPage() {
             className="text-center mb-12"
           >
             <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">Writing</p>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Blog</h1>
-            <p className="text-white/50 max-w-2xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Blog</h1>
+            <p className="text-foreground/50 max-w-2xl mx-auto">
               Thoughts on software engineering, web development, performance, and developer experience.
             </p>
           </motion.div>
@@ -50,7 +50,7 @@ export function BlogPage() {
               <button
                 onClick={() => setActiveCategory('all')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  activeCategory === 'all' ? 'bg-accent-500 text-white' : 'glass text-white/60 hover:text-white'
+                  activeCategory === 'all' ? 'bg-accent-500 text-white' : 'glass text-foreground/60 hover:text-foreground'
                 }`}
               >
                 All
@@ -60,7 +60,7 @@ export function BlogPage() {
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    activeCategory === cat.id ? 'bg-accent-500 text-white' : 'glass text-white/60 hover:text-white'
+                    activeCategory === cat.id ? 'bg-accent-500 text-white' : 'glass text-foreground/60 hover:text-foreground'
                   }`}
                 >
                   {cat.name}
@@ -68,13 +68,13 @@ export function BlogPage() {
               ))}
             </div>
             <div className="relative w-full md:w-64">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search articles..."
-                className="input-field !bg-white/5 !border-white/10 !text-white !placeholder-white/30 pl-10"
+                className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 pl-10"
               />
             </div>
           </div>
@@ -90,7 +90,7 @@ export function BlogPage() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-white/40">No articles found.</p>
+              <p className="text-foreground/40">No articles found.</p>
             </div>
           ) : (
             <>
@@ -102,7 +102,7 @@ export function BlogPage() {
                 >
                   <div className="grid md:grid-cols-2">
                     {featuredPost.cover_image_url && (
-                      <div className="aspect-[16/10] md:aspect-auto overflow-hidden bg-white/5">
+                      <div className="aspect-[16/10] md:aspect-auto overflow-hidden bg-foreground/5">
                         <img src={featuredPost.cover_image_url} alt={featuredPost.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                       </div>
                     )}
@@ -112,11 +112,11 @@ export function BlogPage() {
                           {featuredPost.category.name}
                         </span>
                       )}
-                      <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 group-hover:text-accent-400 transition-colors">
+                      <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3 group-hover:text-accent-400 transition-colors">
                         {featuredPost.title}
                       </h2>
-                      <p className="text-white/50 mb-4 line-clamp-3">{featuredPost.excerpt}</p>
-                      <div className="flex items-center gap-4 text-xs text-white/40">
+                      <p className="text-foreground/50 mb-4 line-clamp-3">{featuredPost.excerpt}</p>
+                      <div className="flex items-center gap-4 text-xs text-foreground/40">
                         <span className="flex items-center gap-1">
                           <Calendar size={12} />
                           {formatDate(featuredPost.published_at)}
@@ -145,7 +145,7 @@ export function BlogPage() {
                       className="group block glass rounded-2xl overflow-hidden card-hover h-full"
                     >
                       {post.cover_image_url && (
-                        <div className="aspect-[16/10] overflow-hidden bg-white/5">
+                        <div className="aspect-[16/10] overflow-hidden bg-foreground/5">
                           <img src={post.cover_image_url} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                         </div>
                       )}
@@ -155,12 +155,12 @@ export function BlogPage() {
                             {post.category.name}
                           </span>
                         )}
-                        <h3 className="text-lg font-bold text-white mb-2 group-hover:text-accent-400 transition-colors flex items-start gap-1">
+                        <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-accent-400 transition-colors flex items-start gap-1">
                           {post.title}
                           <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" />
                         </h3>
-                        <p className="text-sm text-white/50 line-clamp-2 mb-3">{post.excerpt}</p>
-                        <div className="flex items-center gap-3 text-xs text-white/40">
+                        <p className="text-sm text-foreground/50 line-clamp-2 mb-3">{post.excerpt}</p>
+                        <div className="flex items-center gap-3 text-xs text-foreground/40">
                           <span className="flex items-center gap-1">
                             <Calendar size={12} />
                             {formatDate(post.published_at)}

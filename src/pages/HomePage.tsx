@@ -51,7 +51,7 @@ export function HomePage() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-success-500" />
                 </span>
-                <span className="text-white/80 text-sm font-medium">{hero.availability_label || 'Available for work'}</span>
+                <span className="text-foreground/80 text-sm font-medium">{hero.availability_label || 'Available for work'}</span>
               </div>
             )}
 
@@ -63,14 +63,14 @@ export function HomePage() {
             )}
 
             {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight text-balance">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-[1.1] tracking-tight text-balance">
               {headlineParts[0]}
               <span className="text-gradient">{highlightedWord}</span>
               {headlineParts[1]}
             </h1>
 
             {/* Subheadline */}
-            <p className="mt-8 text-lg md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed text-balance">
+            <p className="mt-8 text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto leading-relaxed text-balance">
               {hero?.subheadline || 'Full-stack engineer crafting performant, accessible, and beautiful digital products.'}
             </p>
 
@@ -81,7 +81,7 @@ export function HomePage() {
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
               </Link>
               {hero?.cta_secondary_label && (
-                <Link to="/contact" className="btn-ghost !text-white !border-white/20 hover:!bg-white/10">
+                <Link to="/contact" className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10">
                   {hero.cta_secondary_label}
                 </Link>
               )}
@@ -101,8 +101,8 @@ export function HomePage() {
                   transition={{ delay: 0.3 + i * 0.1 }}
                   className="text-center"
                 >
-                  <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
-                  <div className="text-xs text-white/40 mt-1">{stat.label}</div>
+                  <div className="text-2xl md:text-3xl font-bold text-foreground">{stat.value}</div>
+                  <div className="text-xs text-foreground/40 mt-1">{stat.label}</div>
                 </motion.div>
               ))}
             </div>
@@ -111,8 +111,8 @@ export function HomePage() {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce-subtle">
-          <div className="w-6 h-10 rounded-full border-2 border-white/20 flex items-start justify-center p-1.5">
-            <div className="w-1 h-2 rounded-full bg-white/40" />
+          <div className="w-6 h-10 rounded-full border-2 border-foreground/20 flex items-start justify-center p-1.5">
+            <div className="w-1 h-2 rounded-full bg-foreground/40" />
           </div>
         </div>
       </section>
@@ -123,9 +123,9 @@ export function HomePage() {
           <div className="flex items-end justify-between mb-12">
             <div>
               <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">Featured Work</p>
-              <h2 className="text-3xl md:text-4xl font-bold text-white">Selected Projects</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">Selected Projects</h2>
             </div>
-            <Link to="/projects" className="hidden md:inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-medium group">
+            <Link to="/projects" className="hidden md:inline-flex items-center gap-1 text-foreground/60 hover:text-foreground text-sm font-medium group">
               View all
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
             </Link>
@@ -151,7 +151,7 @@ export function HomePage() {
                     to={`/projects/${project.slug}`}
                     className="group block glass rounded-2xl overflow-hidden card-hover"
                   >
-                    <div className="aspect-[4/3] overflow-hidden bg-white/5 relative">
+                    <div className="aspect-[4/3] overflow-hidden bg-foreground/5 relative">
                       {project.cover_image_url && (
                         <img
                           src={project.cover_image_url}
@@ -172,13 +172,13 @@ export function HomePage() {
                             {project.category.name}
                           </span>
                         )}
-                        <span className="text-white/20">·</span>
-                        <span className="text-xs text-white/40">{project.difficulty}</span>
+                        <span className="text-foreground/20">·</span>
+                        <span className="text-xs text-foreground/40">{project.difficulty}</span>
                       </div>
-                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-accent-400 transition-colors">
+                      <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-accent-400 transition-colors">
                         {project.title}
                       </h3>
-                      <p className="text-sm text-white/50 line-clamp-2">{project.excerpt || project.description}</p>
+                      <p className="text-sm text-foreground/50 line-clamp-2">{project.excerpt || project.description}</p>
                       <div className="mt-4 flex flex-wrap gap-1.5">
                         {(project.technologies || []).slice(0, 4).map((tech) => (
                           <span key={tech.id} className="badge !text-xs !py-0.5">
@@ -194,7 +194,7 @@ export function HomePage() {
           )}
 
           <div className="mt-8 md:hidden">
-            <Link to="/projects" className="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-medium">
+            <Link to="/projects" className="inline-flex items-center gap-1 text-foreground/60 hover:text-foreground text-sm font-medium">
               View all <ArrowRight size={14} />
             </Link>
           </div>
@@ -206,7 +206,7 @@ export function HomePage() {
         <div className="section-container">
           <div className="text-center mb-12">
             <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">Tech Stack</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white">Skills & Expertise</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground">Skills & Expertise</h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -219,26 +219,15 @@ export function HomePage() {
                 transition={{ delay: catIdx * 0.1 }}
                 className="glass rounded-2xl p-6"
               >
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                <h3 className="text-foreground font-semibold mb-4 flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-accent-400" />
                   {category}
                 </h3>
                 <div className="space-y-3">
                   {(items as any[]).map((skill) => (
-                    <div key={skill.id}>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm text-white/70">{skill.name}</span>
-                        <span className="text-xs text-white/40">{skill.proficiency}%</span>
-                      </div>
-                      <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          whileInView={{ width: `${skill.proficiency}%` }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 1, ease: 'easeOut' }}
-                          className="h-full rounded-full bg-gradient-to-r from-accent-500 to-accent-300"
-                        />
-                      </div>
+                    <div key={skill.id} className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
+                      <span className="text-sm text-foreground/70">{skill.name}</span>
                     </div>
                   ))}
                 </div>
@@ -253,7 +242,7 @@ export function HomePage() {
         <div className="section-container">
           <div className="text-center mb-12">
             <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">Career</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white">Work Experience</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground">Work Experience</h2>
           </div>
 
           <div className="max-w-3xl mx-auto">
@@ -268,7 +257,7 @@ export function HomePage() {
               >
                 {/* Timeline line */}
                 {i < (experience || []).length - 1 && (
-                  <div className="absolute left-2.5 top-2 bottom-0 w-px bg-white/10" />
+                  <div className="absolute left-2.5 top-2 bottom-0 w-px bg-foreground/10" />
                 )}
                 {/* Timeline dot */}
                 <div className="absolute left-0 top-1.5 h-5 w-5 rounded-full bg-accent-500/20 border-2 border-accent-400 flex items-center justify-center">
@@ -278,23 +267,23 @@ export function HomePage() {
                 <div className="glass rounded-2xl p-5 card-hover">
                   <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                     <div>
-                      <h3 className="text-white font-bold text-lg">{exp.role}</h3>
+                      <h3 className="text-foreground font-bold text-lg">{exp.role}</h3>
                       <p className="text-accent-400 text-sm font-medium">{exp.company}</p>
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                      <span className="text-xs text-white/40 flex items-center gap-1">
+                      <span className="text-xs text-foreground/40 flex items-center gap-1">
                         <Calendar size={12} />
                         {exp.start_date} — {exp.is_current ? 'Present' : exp.end_date}
                       </span>
                       {exp.location && (
-                        <span className="text-xs text-white/40 flex items-center gap-1">
+                        <span className="text-xs text-foreground/40 flex items-center gap-1">
                           <MapPin size={12} />
                           {exp.location}
                         </span>
                       )}
                     </div>
                   </div>
-                  <p className="text-sm text-white/50 mt-2 leading-relaxed">{exp.description}</p>
+                  <p className="text-sm text-foreground/50 mt-2 leading-relaxed">{exp.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -308,7 +297,7 @@ export function HomePage() {
           <div className="section-container">
             <div className="text-center mb-12">
               <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">What I Do</p>
-              <h2 className="text-3xl md:text-4xl font-bold text-white">Services</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">Services</h2>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -326,12 +315,12 @@ export function HomePage() {
                     <div className="h-12 w-12 rounded-xl bg-accent-500/10 flex items-center justify-center mb-4">
                       <Icon size={24} className="text-accent-400" />
                     </div>
-                    <h3 className="text-white font-bold mb-2">{service.title}</h3>
-                    <p className="text-sm text-white/50 mb-4">{service.description}</p>
+                    <h3 className="text-foreground font-bold mb-2">{service.title}</h3>
+                    <p className="text-sm text-foreground/50 mb-4">{service.description}</p>
                     {(service.included_items || []).length > 0 && (
                       <ul className="space-y-1.5">
                         {(service.included_items || []).map((item, idx) => (
-                          <li key={idx} className="text-xs text-white/60 flex items-start gap-2">
+                          <li key={idx} className="text-xs text-foreground/60 flex items-start gap-2">
                             <CheckCircle2 size={14} className="text-accent-400 shrink-0 mt-0.5" />
                             {item}
                           </li>
@@ -352,7 +341,7 @@ export function HomePage() {
           <div className="section-container">
             <div className="text-center mb-12">
               <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">Kind Words</p>
-              <h2 className="text-3xl md:text-4xl font-bold text-white">Testimonials</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">Testimonials</h2>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -371,18 +360,18 @@ export function HomePage() {
                       <Star key={idx} size={14} className="text-warning-400" fill="currentColor" />
                     ))}
                   </div>
-                  <p className="text-white/70 text-sm leading-relaxed mb-4">"{t.quote}"</p>
+                  <p className="text-foreground/70 text-sm leading-relaxed mb-4">"{t.quote}"</p>
                   <div className="flex items-center gap-3">
                     {t.avatar_url ? (
                       <img src={t.avatar_url} alt={t.name} className="h-10 w-10 rounded-full object-cover" />
                     ) : (
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center text-white font-bold text-sm">
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center text-foreground font-bold text-sm">
                         {t.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                       </div>
                     )}
                     <div>
-                      <p className="text-white font-medium text-sm">{t.name}</p>
-                      <p className="text-white/40 text-xs">{t.role}{t.company ? `, ${t.company}` : ''}</p>
+                      <p className="text-foreground font-medium text-sm">{t.name}</p>
+                      <p className="text-foreground/40 text-xs">{t.role}{t.company ? `, ${t.company}` : ''}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -401,8 +390,8 @@ export function HomePage() {
             viewport={{ once: true }}
             className="glass-strong rounded-3xl p-12 text-center max-w-3xl mx-auto"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Let's build something great together</h2>
-            <p className="text-white/60 text-lg mb-8 max-w-xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Let's build something great together</h2>
+            <p className="text-foreground/60 text-lg mb-8 max-w-xl mx-auto">
               I'm currently available for new projects. Whether you have a question, a project idea, or just want to say hi, my inbox is always open.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -410,7 +399,7 @@ export function HomePage() {
                 Get in Touch
                 <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
               </Link>
-              <Link to="/projects" className="btn-ghost !text-white !border-white/20 hover:!bg-white/10">
+              <Link to="/projects" className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10">
                 View My Work
               </Link>
             </div>

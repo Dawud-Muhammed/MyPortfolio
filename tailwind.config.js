@@ -10,6 +10,17 @@ export default {
         display: ['Clash Display', 'Inter', 'sans-serif'],
       },
       colors: {
+        foreground: 'rgb(var(--fg) / <alpha-value>)',
+        'foreground-secondary': 'rgb(var(--fg-secondary) / <alpha-value>)',
+        'foreground-muted': 'rgb(var(--fg-muted) / <alpha-value>)',
+        background: 'rgb(var(--bg) / <alpha-value>)',
+        'background-secondary': 'rgb(var(--bg-secondary) / <alpha-value>)',
+        'background-tertiary': 'rgb(var(--bg-tertiary) / <alpha-value>)',
+        card: 'rgb(var(--card) / <alpha-value>)',
+        border: 'rgb(var(--border) / <alpha-value>)',
+        'border-strong': 'rgb(var(--border-strong) / <alpha-value>)',
+        glass: 'rgb(var(--glass) / <alpha-value>)',
+        'glass-border': 'rgb(var(--glass-border) / <alpha-value>)',
         accent: {
           50: '#eef9ff',
           100: '#d9f0ff',
