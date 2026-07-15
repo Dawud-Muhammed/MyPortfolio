@@ -19,10 +19,11 @@ export function AdminLoginPage() {
     setLoading(true);
     const { error: err } = await signIn(email, password);
     setLoading(false);
-    if (err) {
-      setError('Invalid email or password.');
-      return;
-    }
+if (err) {
+  console.error('Supabase login error:', err);
+  setError(err.message);
+  return;
+}
     navigate('/admin');
   };
 
