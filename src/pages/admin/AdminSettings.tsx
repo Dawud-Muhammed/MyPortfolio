@@ -10,6 +10,7 @@ export function AdminSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -29,13 +30,32 @@ export function AdminSettings() {
 
   const handleSave = async () => {
     setSaving(true);
-    if (profile?.id) await supabase.from('profile').update(profile).eq('id', profile.id);
-    if (hero?.id) await supabase.from('hero_content').update(hero).eq('id', hero.id);
-    if (website?.id) await supabase.from('website_settings').update(website).eq('id', website.id);
-    if (seo?.id) await supabase.from('seo_settings').update(seo).eq('id', seo.id);
+    setSaveError('');
+    const tasks: Promise<any>[] = [];
+
+    if (profile) {
+      tasks.push(supabase.from('profile').upsert(profile, { onConflict: 'id' }));
+    }
+    if (hero) {
+      tasks.push(supabase.from('hero_content').upsert(hero, { onConflict: 'id' }));
+    }
+    if (website) {
+      tasks.push(supabase.from('website_settings').upsert(website, { onConflict: 'id' }));
+    }
+    if (seo) {
+      tasks.push(supabase.from('seo_settings').upsert(seo, { onConflict: 'id' }));
+    }
+
+    const results = await Promise.all(tasks);
+    const hasError = results.some((r) => r.error);
+
     setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    if (hasError) {
+      setSaveError('Some settings failed to save. Please try again.');
+    } else {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    }
   };
 
   if (loading) {
@@ -63,6 +83,12 @@ export function AdminSettings() {
         </button>
       </div>
 
+      {saveError && (
+        <div className="glass rounded-xl p-4 mb-6 flex items-center gap-2 text-error-400 animate-fade-in">
+          <CheckCircle2 size={18} />
+          {saveError}
+        </div>
+      )}
       {saved && (
         <div className="glass rounded-xl p-4 mb-6 flex items-center gap-2 text-success-400 animate-fade-in">
           <CheckCircle2 size={18} />
