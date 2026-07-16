@@ -102,15 +102,15 @@ export function AdminMessages() {
           <div className="lg:col-span-2">
             {selectedMsg ? (
               <div className="glass rounded-2xl p-6">
-                <div className="flex items-start justify-between mb-6">
-                  <div>
+                <div className="flex items-start justify-between mb-6 gap-4">
+                  <div className="min-w-0">
                     <h2 className="text-xl font-bold text-foreground">{selectedMsg.subject}</h2>
                     <p className="text-foreground/40 text-sm mt-1">
                       From <span className="text-accent-400">{selectedMsg.name}</span> ({selectedMsg.email})
                     </p>
                     <p className="text-foreground/30 text-xs mt-1">{formatRelativeTime(selectedMsg.created_at)}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 shrink-0">
                     <button
                       onClick={() => toggleArchive(selectedMsg.id, selectedMsg.is_archived)}
                       className="p-2 rounded-lg text-foreground/50 hover:text-foreground hover:bg-foreground/10 transition-all"

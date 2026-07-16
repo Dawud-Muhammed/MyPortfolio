@@ -20,7 +20,7 @@ export function WhatsAppButton() {
           >
             <X size={16} />
           </button>
-          <p className="text-sm text-white font-medium mb-1">Let's talk!</p>
+          <p className="text-sm text-foreground font-medium mb-1">Let's talk!</p>
           <p className="text-xs text-foreground/60">Have a project in mind? Send me a message on WhatsApp.</p>
         </div>
       )}

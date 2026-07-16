@@ -10,12 +10,12 @@ export function AuroraBackground() {
       </div>
       {/* Light mode: very subtle blue tints */}
       <div className="dark:hidden block">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-accent-500/8 rounded-full blur-[140px] animate-pulse-slow" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-accent-300/6 rounded-full blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-accent-200/5 rounded-full blur-[100px] animate-float" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full blur-[140px] animate-pulse-slow" style={{ backgroundColor: 'rgba(14, 165, 233, 0.06)' }} />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s', backgroundColor: 'rgba(14, 165, 233, 0.04)' }} />
+        <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] rounded-full blur-[100px] animate-float" style={{ backgroundColor: 'rgba(14, 165, 233, 0.03)' }} />
       </div>
       <div
-        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.03]"
         style={{
           backgroundImage: `linear-gradient(rgb(var(--fg)) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--fg)) 1px, transparent 1px)`,
           backgroundSize: '60px 60px',

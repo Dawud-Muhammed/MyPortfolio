@@ -19,11 +19,11 @@ export function AdminLoginPage() {
     setLoading(true);
     const { error: err } = await signIn(email, password);
     setLoading(false);
-if (err) {
-  console.error('Supabase login error:', err);
-  setError(err.message);
-  return;
-}
+    if (err) {
+      console.error('Supabase login error:', err);
+      setError(err.message);
+      return;
+    }
     navigate('/admin');
   };
 
@@ -31,8 +31,8 @@ if (err) {
     <div className="min-h-screen bg-aurora flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center mx-auto mb-4">
-            <Lock size={24} className="text-foreground" />
+          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <Lock size={24} className="text-white" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">Admin Login</h1>
           <p className="text-foreground/50 text-sm mt-2">Sign in to manage your portfolio</p>
@@ -48,7 +48,7 @@ if (err) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@example.com"
-                className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 pl-10"
+                className="input-field pl-10"
                 required
               />
             </div>
@@ -62,7 +62,7 @@ if (err) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 pl-10"
+                className="input-field pl-10"
                 required
               />
             </div>

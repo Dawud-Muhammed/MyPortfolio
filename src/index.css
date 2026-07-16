@@ -54,7 +54,7 @@
   }
 
   /* Light mode: subtle textured background */
-  body:not(.dark) {
+  html:not(.dark) body {
     background-color: rgb(248 250 252);
     background-image:
       radial-gradient(circle at 20% 0%, rgba(14, 165, 233, 0.04), transparent 50%),
@@ -77,7 +77,7 @@
   }
 
   /* Light mode glass: more opaque white with subtle shadow */
-  body:not(.dark) .glass {
+  html:not(.dark) .glass {
     background-color: rgb(255 255 255 / 0.75);
     box-shadow: 0 1px 3px rgb(15 23 42 / 0.04), 0 1px 2px rgb(15 23 42 / 0.02);
   }
@@ -89,8 +89,8 @@
     border: 1px solid rgb(var(--glass-border) / 0.6);
   }
 
-  body:not(.dark) .glass-strong {
-    background-color: rgb(255 255 255 / 0.9);
+  html:not(.dark) .glass-strong {
+    background-color: rgb(255 255 255 / 0.92);
     box-shadow: 0 4px 24px rgb(15 23 42 / 0.06), 0 1px 2px rgb(15 23 42 / 0.04);
   }
 
@@ -101,7 +101,7 @@
     -webkit-text-fill-color: transparent;
   }
 
-  body:not(.dark) .text-gradient {
+  html:not(.dark) .text-gradient {
     background: linear-gradient(135deg, rgb(14 165 233), rgb(2 132 199), rgb(14 165 233));
     -webkit-background-clip: text;
     background-clip: text;
@@ -115,11 +115,10 @@
   }
 
   /* Light mode aurora: subtle blue-tinted gradient */
-  body:not(.dark) .bg-aurora {
+  html:not(.dark) .bg-aurora {
     background: linear-gradient(125deg, #e0f2fe, #e0e7ff, #dbeafe, #e0e7ff, #e0f2fe);
     background-size: 300% 300%;
     animation: aurora 20s ease infinite;
-    opacity: 0.4;
   }
 
   .shimmer {
@@ -144,7 +143,7 @@
     box-shadow: 0 20px 40px -12px rgb(var(--shadow-color) / 0.15);
   }
 
-  body:not(.dark) .card-hover:hover {
+  html:not(.dark) .card-hover:hover {
     box-shadow: 0 20px 40px -12px rgb(15 23 42 / 0.1), 0 4px 12px -2px rgb(15 23 42 / 0.05);
     border-color: rgb(var(--accent) / 0.2);
   }
@@ -190,7 +189,7 @@
     border-color: rgb(var(--accent) / 0.5);
   }
 
-  body:not(.dark) .btn-ghost:hover {
+  html:not(.dark) .btn-ghost:hover {
     background-color: rgb(241 245 249);
     border-color: rgb(14 165 233 / 0.4);
     color: rgb(14 165 233);
@@ -398,22 +397,17 @@
 }
 
 /* Light mode: refined link and hover colors */
-body:not(.dark) a:hover {
+html:not(.dark) a:hover {
   color: rgb(14 165 233);
 }
 
-/* Light mode: subtle section separators */
-body:not(.dark) section {
-  position: relative;
-}
-
 /* Light mode: better placeholder contrast */
-body:not(.dark) .input-field::placeholder {
+html:not(.dark) .input-field::placeholder {
   color: rgb(148 163 184);
 }
 
 /* Light mode: refined focus ring */
-body:not(.dark) .input-field:focus {
+html:not(.dark) .input-field:focus {
   border-color: rgb(14 165 233);
   box-shadow: 0 0 0 3px rgb(14 165 233 / 0.1);
 }
