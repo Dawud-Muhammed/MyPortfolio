@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Edit3, Trash2, X, Save, Search, Loader2, MoreVertical } from 'lucide-react';
+import { Plus, Edit3, Trash2, X, Save, Search, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 export interface FieldDef {
@@ -99,7 +99,7 @@ export function CrudModule({ config }: { config: CrudConfig }) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={`Search ${config.label.toLowerCase()}...`}
-          className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 pl-10"
+          className="input-field pl-10"
         />
       </div>
 
@@ -137,7 +137,7 @@ export function CrudModule({ config }: { config: CrudConfig }) {
                 )}
               </div>
               {config.statusField && item[config.statusField] && (
-                <span className={`badge !text-xs shrink-0 ${
+                <span className={`badge !text-xs shrink-0 hidden sm:inline-flex ${
                   item[config.statusField] === 'Live' || item[config.statusField] === 'Published' || item[config.statusField] === 'approved'
                     ? '!bg-success-500/20 !text-success-400 !border-success-500/30'
                     : item[config.statusField] === 'In Progress' || item[config.statusField] === 'Draft' || item[config.statusField] === 'pending'
@@ -224,85 +224,102 @@ function CrudForm({ config, editing, onSave, onClose, saving }: {
     onSave(clean);
   };
 
+  const update = (name: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   return (
-    <div className="fixed inset-0 z-[100] bg-black/70 flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="glass-strong rounded-2xl sm:rounded-3xl w-full max-w-2xl my-4 sm:my-8">
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-foreground/10 sticky top-0 glass-strong rounded-t-2xl sm:rounded-t-3xl z-10">
-          <h2 className="text-lg sm:text-xl font-bold text-foreground">{editing ? 'Edit' : 'Add'} {config.label}</h2>
-          <button onClick={onClose} className="text-foreground/40 hover:text-foreground p-1">
+    <div
+      className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-4"
+      onClick={onClose}
+    >
+      <div
+        className="glass-strong rounded-t-3xl sm:rounded-3xl w-full sm:max-w-2xl max-h-[92vh] sm:max-h-[85vh] flex flex-col animate-slide-in-right"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-foreground/10 shrink-0">
+          <h2 className="text-lg sm:text-xl font-bold text-foreground">
+            {editing ? 'Edit' : 'Add'} {config.label}
+          </h2>
+          <button onClick={onClose} className="p-2 rounded-lg text-foreground/40 hover:text-foreground hover:bg-foreground/10 transition-all">
             <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {config.fields.map((field) => (
-              <div key={field.name} className={field.full ? 'sm:col-span-2' : ''}>
-                <label className="text-foreground/70 text-sm font-medium mb-2 block">
-                  {field.label}
-                </label>
-                {field.type === 'textarea' ? (
-                  <textarea
-                    value={formData[field.name] || ''}
-                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
-                    placeholder={field.placeholder}
-                    rows={4}
-                    className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 resize-none"
-                  />
-                ) : field.type === 'boolean' ? (
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, [field.name]: !formData[field.name] })}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      formData[field.name] ? 'bg-accent-500' : 'bg-foreground/10'
-                    }`}
-                  >
-                    <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-background transition-transform ${
-                      formData[field.name] ? 'translate-x-6' : 'translate-x-0.5'
-                    }`} />
-                  </button>
-                ) : field.type === 'select' ? (
-                  <select
-                    value={formData[field.name] || ''}
-                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
-                    className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground"
-                  >
-                    <option value="">Select...</option>
-                    {field.options?.map((opt) => (
-                      <option key={opt.value} value={opt.value} className="bg-background-secondary">{opt.label}</option>
-                    ))}
-                  </select>
-                ) : field.type === 'json' ? (
-                  <textarea
-                    value={typeof formData[field.name] === 'string' ? formData[field.name] : JSON.stringify(formData[field.name] || [], null, 2)}
-                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
-                    placeholder={field.placeholder || '["item1", "item2"]'}
-                    rows={4}
-                    className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 resize-none font-mono text-xs"
-                  />
-                ) : (
-                  <input
-                    type={field.type === 'number' ? 'number' : 'text'}
-                    value={formData[field.name] ?? ''}
-                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
-                    placeholder={field.placeholder}
-                    className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50"
-                  />
-                )}
-              </div>
-            ))}
-          </div>
+        {/* Scrollable form body */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <form onSubmit={handleSubmit} id="crud-form" className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {config.fields.map((field) => (
+                <div key={field.name} className={field.full ? 'sm:col-span-2' : ''}>
+                  <label className="text-foreground/70 text-sm font-medium mb-2 block">
+                    {field.label}
+                  </label>
+                  {field.type === 'textarea' ? (
+                    <textarea
+                      value={formData[field.name] || ''}
+                      onChange={(e) => update(field.name, e.target.value)}
+                      placeholder={field.placeholder}
+                      rows={4}
+                      className="input-field resize-none"
+                    />
+                  ) : field.type === 'boolean' ? (
+                    <button
+                      type="button"
+                      onClick={() => update(field.name, !formData[field.name])}
+                      className={`relative w-12 h-6 rounded-full transition-colors ${
+                        formData[field.name] ? 'bg-accent-500' : 'bg-foreground/15'
+                      }`}
+                    >
+                      <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
+                        formData[field.name] ? 'translate-x-6' : 'translate-x-0.5'
+                      }`} />
+                    </button>
+                  ) : field.type === 'select' ? (
+                    <select
+                      value={formData[field.name] || ''}
+                      onChange={(e) => update(field.name, e.target.value)}
+                      className="input-field"
+                    >
+                      <option value="">Select...</option>
+                      {field.options?.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  ) : field.type === 'json' ? (
+                    <textarea
+                      value={typeof formData[field.name] === 'string' ? formData[field.name] : JSON.stringify(formData[field.name] || [], null, 2)}
+                      onChange={(e) => update(field.name, e.target.value)}
+                      placeholder={field.placeholder || '["item1", "item2"]'}
+                      rows={4}
+                      className="input-field resize-none font-mono text-xs"
+                    />
+                  ) : (
+                    <input
+                      type={field.type === 'number' ? 'number' : 'text'}
+                      value={formData[field.name] ?? ''}
+                      onChange={(e) => update(field.name, e.target.value)}
+                      placeholder={field.placeholder}
+                      className="input-field"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </form>
+        </div>
 
-          <div className="flex gap-3 pt-4 sticky bottom-0">
-            <button type="submit" disabled={saving} className="btn-primary flex-1 disabled:opacity-50">
-              <Save size={16} />
-              {saving ? 'Saving...' : 'Save'}
-            </button>
-            <button type="button" onClick={onClose} className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10">
-              Cancel
-            </button>
-          </div>
-        </form>
+        {/* Footer */}
+        <div className="flex gap-3 p-4 sm:p-6 border-t border-foreground/10 shrink-0">
+          <button type="submit" form="crud-form" disabled={saving} className="btn-primary flex-1 disabled:opacity-50">
+            <Save size={16} />
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+          <button type="button" onClick={onClose} className="btn-ghost">
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );
