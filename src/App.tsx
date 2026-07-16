@@ -30,7 +30,7 @@ import { AdminSettings } from './pages/admin/AdminSettings';
 import {
   AdminExperience, AdminEducation, AdminCertifications,
   AdminServices, AdminTestimonials, AdminGallery,
-  AdminAchievements, AdminFaqs, AdminSocialLinks, AdminSiteStats,
+  AdminAchievements, AdminFaqs, AdminSocialLinks,
 } from './pages/admin/AdminCrudPages';
 
 function ScrollToTop() {
@@ -94,7 +94,6 @@ function App() {
             <Route path="achievements" element={<AdminAchievements />} />
             <Route path="faqs" element={<AdminFaqs />} />
             <Route path="social" element={<AdminSocialLinks />} />
-            <Route path="site-stats" element={<AdminSiteStats />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
 

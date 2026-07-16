@@ -296,10 +296,3 @@ export interface PageView {
   created_at: string;
 }
 
-export interface SiteStat {
-  id: string;
-  label: string;
-  value: string;
-  icon: string | null;
-  order_index: number;
-}

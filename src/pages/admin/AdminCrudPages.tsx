@@ -176,19 +176,3 @@ export function AdminSocialLinks() {
   return <CrudModule config={config} />;
 }
 
-export function AdminSiteStats() {
-  const config: CrudConfig = {
-    table: 'site_stats',
-    label: 'Site Stats',
-    displayField: 'label',
-    subtitleField: 'value',
-    orderField: 'order_index',
-    fields: [
-      { name: 'label', label: 'Label', type: 'text', placeholder: 'Years Experience' },
-      { name: 'value', label: 'Value', type: 'text', placeholder: '8+' },
-      { name: 'icon', label: 'Icon (Lucide name)', type: 'text', placeholder: 'Briefcase' },
-      { name: 'order_index', label: 'Order', type: 'number' },
-    ],
-  };
-  return <CrudModule config={config} />;
-}

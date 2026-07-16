@@ -2,7 +2,7 @@ import { Navigate, NavLink, useNavigate, Outlet } from 'react-router-dom';
 import {
   LayoutDashboard, FolderKanban, FileText, Mail, Settings,
   LogOut, Code2, Briefcase, GraduationCap, Award, Wrench,
-  Star, Image, HelpCircle, Trophy, Link2, Eye, Menu, X, BarChart3,
+  Star, Image, HelpCircle, Trophy, Link2, Eye, Menu, X,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../../lib/useAuth';
@@ -23,7 +23,6 @@ const navItems = [
   { to: '/admin/achievements', label: 'Achievements', icon: Trophy },
   { to: '/admin/faqs', label: 'FAQs', icon: HelpCircle },
   { to: '/admin/social', label: 'Social Links', icon: Link2 },
-  { to: '/admin/site-stats', label: 'Site Stats', icon: BarChart3 },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 

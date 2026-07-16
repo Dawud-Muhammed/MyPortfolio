@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, Star, Quote, Sparkles, Code2, Zap, CheckCircle2, Calendar, MapPin } from 'lucide-react';
-import { useHeroContent, useProjects, useSkills, useExperience, useTestimonials, useServices, useSeoSettings, useSiteStats } from '../lib/queries';
+import { useHeroContent, useProjects, useSkills, useExperience, useTestimonials, useServices, useSeoSettings } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
 import { motion } from 'framer-motion';
 
@@ -10,6 +10,22 @@ const serviceIcons: Record<string, typeof Code2> = {
   Sparkles: Sparkles,
 };
 
+function computeYearsExperience(experience: { start_date: string; end_date: string | null; is_current: boolean }[]): number {
+  if (!experience || experience.length === 0) return 0;
+  const earliest = experience.reduce((min, exp) => {
+    const start = new Date(exp.start_date).getTime();
+    return start < min ? start : min;
+  }, Infinity);
+  if (earliest === Infinity) return 0;
+  const latest = experience.reduce((max, exp) => {
+    const end = exp.is_current ? Date.now() : (exp.end_date ? new Date(exp.end_date).getTime() : Date.now());
+    return end > max ? end : max;
+  }, 0);
+  const diffMs = latest - earliest;
+  const years = diffMs / (1000 * 60 * 60 * 24 * 365.25);
+  return Math.max(0, Math.round(years));
+}
+
 export function HomePage() {
   const { data: hero } = useHeroContent();
   const { data: projects, loading: projectsLoading } = useProjects();
@@ -18,7 +34,6 @@ export function HomePage() {
   const { data: testimonials } = useTestimonials();
   const { data: services } = useServices();
   const { data: seoSettings } = useSeoSettings();
-  const { data: siteStats } = useSiteStats();
 
   const featuredProjects = (projects || []).filter((p) => p.is_featured).slice(0, 3);
   const displayProjects = featuredProjects.length > 0 ? featuredProjects : (projects || []).slice(0, 3);
@@ -27,6 +42,12 @@ export function HomePage() {
     acc[s.category].push(s);
     return acc;
   }, {} as Record<string, typeof skills>);
+
+  const stats = [
+    { label: 'Years Experience', value: String(computeYearsExperience(experience || [])) },
+    { label: 'Projects Shipped', value: String((projects || []).length) },
+    { label: 'Skills', value: String((skills || []).length) },
+  ];
 
   const headline = hero?.headline || 'I build things for the web';
   const highlightedWord = hero?.highlighted_word || 'the web';
@@ -89,10 +110,10 @@ export function HomePage() {
             </div>
 
             {/* Quick stats */}
-            <div className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
-              {(siteStats || []).map((stat, i) => (
+            <div className="mt-16 grid grid-cols-3 gap-4 sm:gap-8 max-w-lg mx-auto">
+              {stats.map((stat, i) => (
                 <motion.div
-                  key={stat.id}
+                  key={stat.label}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 + i * 0.1 }}
