@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, Star, Quote, Sparkles, Code2, Zap, CheckCircle2, Calendar, MapPin } from 'lucide-react';
-import { useHeroContent, useProjects, useSkills, useExperience, useTestimonials, useServices, useSeoSettings } from '../lib/queries';
+import { useHeroContent, useProjects, useSkills, useExperience, useTestimonials, useServices, useSeoSettings, useSiteStats } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
 import { motion } from 'framer-motion';
 
@@ -18,6 +18,7 @@ export function HomePage() {
   const { data: testimonials } = useTestimonials();
   const { data: services } = useServices();
   const { data: seoSettings } = useSeoSettings();
+  const { data: siteStats } = useSiteStats();
 
   const featuredProjects = (projects || []).filter((p) => p.is_featured).slice(0, 3);
   const displayProjects = featuredProjects.length > 0 ? featuredProjects : (projects || []).slice(0, 3);
@@ -89,13 +90,9 @@ export function HomePage() {
 
             {/* Quick stats */}
             <div className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
-              {[
-                { label: 'Years Experience', value: '8+' },
-                { label: 'Projects Shipped', value: '50+' },
-                { label: 'Open Source Stars', value: '3.2k' },
-              ].map((stat, i) => (
+              {(siteStats || []).map((stat, i) => (
                 <motion.div
-                  key={stat.label}
+                  key={stat.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 + i * 0.1 }}
@@ -173,7 +170,6 @@ export function HomePage() {
                           </span>
                         )}
                         <span className="text-foreground/20">·</span>
-                        <span className="text-xs text-foreground/40">{project.difficulty}</span>
                       </div>
                       <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-accent-400 transition-colors">
                         {project.title}

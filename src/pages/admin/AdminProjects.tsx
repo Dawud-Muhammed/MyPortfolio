@@ -21,11 +21,6 @@ const config: CrudConfig = {
       { value: 'In Progress', label: 'In Progress' },
       { value: 'Archived', label: 'Archived' },
     ] },
-    { name: 'difficulty', label: 'Difficulty', type: 'select', options: [
-      { value: 'Beginner', label: 'Beginner' },
-      { value: 'Intermediate', label: 'Intermediate' },
-      { value: 'Advanced', label: 'Advanced' },
-    ] },
     { name: 'is_featured', label: 'Featured', type: 'boolean' },
     { name: 'order_index', label: 'Order', type: 'number' },
     { name: 'excerpt', label: 'Excerpt', type: 'textarea', full: true, placeholder: 'Short summary...' },

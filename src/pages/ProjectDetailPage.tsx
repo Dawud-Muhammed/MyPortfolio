@@ -67,7 +67,6 @@ export function ProjectDetailPage() {
               <span className={`badge ${project.status === 'Live' ? '!bg-success-500/20 !text-success-400 !border-success-500/30' : '!bg-warning-500/20 !text-warning-400 !border-warning-500/30'}`}>
                 {project.status}
               </span>
-              <span className="badge">{project.difficulty}</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">{project.title}</h1>
             <p className="text-lg text-foreground/60 max-w-3xl">{project.excerpt || project.description}</p>
@@ -148,10 +147,6 @@ export function ProjectDetailPage() {
                   <div className="flex justify-between">
                     <dt className="text-foreground/40">Status</dt>
                     <dd className="text-foreground/80">{project.status}</dd>
-                  </div>
-                  <div className="flex justify-between">
-                    <dt className="text-foreground/40">Difficulty</dt>
-                    <dd className="text-foreground/80">{project.difficulty}</dd>
                   </div>
                   {project.category && (
                     <div className="flex justify-between">

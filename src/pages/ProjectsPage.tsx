@@ -133,7 +133,6 @@ export function ProjectsPage() {
                           </span>
                         )}
                         <span className="text-foreground/20">·</span>
-                        <span className="text-xs text-foreground/40">{project.difficulty}</span>
                       </div>
                       <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-accent-400 transition-colors flex items-center gap-1">
                         {project.title}

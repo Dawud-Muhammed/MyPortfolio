@@ -73,7 +73,6 @@ export interface Project {
   github_url: string | null;
   status: string;
   is_featured: boolean;
-  difficulty: string;
   description: string;
   excerpt: string;
   video_demo_url: string | null;
@@ -295,4 +294,12 @@ export interface PageView {
   browser: string | null;
   country: string | null;
   created_at: string;
+}
+
+export interface SiteStat {
+  id: string;
+  label: string;
+  value: string;
+  icon: string | null;
+  order_index: number;
 }

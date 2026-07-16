@@ -5,7 +5,7 @@ import type {
   Technology, BlogPost, BlogCategory, BlogTag, Skill, Experience,
   Education, Certification, Service, Testimonial, SocialLink,
   SeoSettings, WebsiteSettings, NavigationItem, Faq, GalleryItem,
-  Achievement, BlogComment, ContactMessage,
+  Achievement, BlogComment, ContactMessage, SiteStat,
 } from './types';
 
 // Generic hook for fetching all data from a table
@@ -219,6 +219,7 @@ export const useSocialLinks = () => useFetchAll<SocialLink>('social_links', 'ord
 export const useSeoSettings = () => useFetchOne<SeoSettings>('seo_settings');
 export const useWebsiteSettings = () => useFetchOne<WebsiteSettings>('website_settings');
 export const useNavigationItems = () => useFetchAll<NavigationItem>('navigation_items', 'order_index');
+export const useSiteStats = () => useFetchAll<SiteStat>('site_stats', 'order_index');
 export const useFaqs = () => useFetchAll<Faq>('faqs', 'order_index');
 export const useGalleryItems = () => useFetchAll<GalleryItem>('gallery_items', 'order_index');
 export const useAchievements = () => useFetchAll<Achievement>('achievements', 'order_index');
