@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Edit3, Trash2, X, Save, Search, Loader2 } from 'lucide-react';
+import { Plus, Edit3, Trash2, X, Save, Search, Loader2, MoreVertical } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 export interface FieldDef {
@@ -48,11 +48,12 @@ export function CrudModule({ config }: { config: CrudConfig }) {
   const handleSave = async (formData: Record<string, any>) => {
     setSaving(true);
     if (editing?.id) {
-      const { id, created_at, ...updateData } = formData;
+      const { id, created_at, updated_at, ...updateData } = formData;
       const { error } = await supabase.from(config.table).update(updateData).eq('id', editing.id);
       if (error) { console.error(error); alert('Failed to save: ' + error.message); }
     } else {
-      const { error } = await supabase.from(config.table).insert(formData);
+      const { created_at, updated_at, ...insertData } = formData;
+      const { error } = await supabase.from(config.table).insert(insertData);
       if (error) { console.error(error); alert('Failed to create: ' + error.message); }
     }
     setSaving(false);
@@ -74,8 +75,8 @@ export function CrudModule({ config }: { config: CrudConfig }) {
   });
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="min-w-0">
+      <div className="flex items-start justify-between gap-3 mb-6 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-foreground">{config.label}</h1>
           <p className="text-foreground/40 text-sm mt-1">{items.length} items total</p>
@@ -85,7 +86,8 @@ export function CrudModule({ config }: { config: CrudConfig }) {
           className="btn-primary"
         >
           <Plus size={16} />
-          Add New
+          <span className="hidden sm:inline">Add New</span>
+          <span className="sm:hidden">Add</span>
         </button>
       </div>
 
@@ -113,18 +115,29 @@ export function CrudModule({ config }: { config: CrudConfig }) {
       ) : (
         <div className="grid gap-3">
           {filtered.map((item) => (
-            <div key={item.id} className="glass rounded-xl p-4 flex items-center gap-4 group">
+            <div
+              key={item.id}
+              className="glass rounded-xl p-3 sm:p-4 flex items-center gap-3 group hover:border-foreground/20 transition-colors"
+            >
               {config.imageField && item[config.imageField] && (
-                <img src={item[config.imageField]} alt="" className="h-12 w-12 rounded-lg object-cover shrink-0" />
+                <img
+                  src={item[config.imageField]}
+                  alt=""
+                  className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg object-cover shrink-0"
+                />
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-foreground font-medium truncate">{item[config.displayField]}</p>
+                <p className="text-foreground font-medium truncate text-sm sm:text-base">
+                  {item[config.displayField]}
+                </p>
                 {config.subtitleField && item[config.subtitleField] && (
-                  <p className="text-foreground/40 text-sm truncate">{item[config.subtitleField]}</p>
+                  <p className="text-foreground/40 text-xs sm:text-sm truncate">
+                    {item[config.subtitleField]}
+                  </p>
                 )}
               </div>
               {config.statusField && item[config.statusField] && (
-                <span className={`badge !text-xs ${
+                <span className={`badge !text-xs shrink-0 ${
                   item[config.statusField] === 'Live' || item[config.statusField] === 'Published' || item[config.statusField] === 'approved'
                     ? '!bg-success-500/20 !text-success-400 !border-success-500/30'
                     : item[config.statusField] === 'In Progress' || item[config.statusField] === 'Draft' || item[config.statusField] === 'pending'
@@ -134,16 +147,18 @@ export function CrudModule({ config }: { config: CrudConfig }) {
                   {item[config.statusField]}
                 </span>
               )}
-              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex gap-1 shrink-0">
                 <button
                   onClick={() => { setEditing(item); setShowForm(true); }}
                   className="p-2 rounded-lg text-foreground/50 hover:text-accent-400 hover:bg-foreground/10 transition-all"
+                  aria-label="Edit"
                 >
                   <Edit3 size={16} />
                 </button>
                 <button
                   onClick={() => handleDelete(item.id)}
                   className="p-2 rounded-lg text-foreground/50 hover:text-error-400 hover:bg-error-500/10 transition-all"
+                  aria-label="Delete"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -210,19 +225,19 @@ function CrudForm({ config, editing, onSave, onClose, saving }: {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="glass-strong rounded-3xl w-full max-w-2xl my-8">
-        <div className="flex items-center justify-between p-6 border-b border-foreground/10">
-          <h2 className="text-xl font-bold text-foreground">{editing ? 'Edit' : 'Add'} {config.label}</h2>
-          <button onClick={onClose} className="text-foreground/40 hover:text-foreground">
+    <div className="fixed inset-0 z-[100] bg-black/70 flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto">
+      <div className="glass-strong rounded-2xl sm:rounded-3xl w-full max-w-2xl my-4 sm:my-8">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-foreground/10 sticky top-0 glass-strong rounded-t-2xl sm:rounded-t-3xl z-10">
+          <h2 className="text-lg sm:text-xl font-bold text-foreground">{editing ? 'Edit' : 'Add'} {config.label}</h2>
+          <button onClick={onClose} className="text-foreground/40 hover:text-foreground p-1">
             <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-          <div className="grid md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {config.fields.map((field) => (
-              <div key={field.name} className={field.full ? 'md:col-span-2' : ''}>
+              <div key={field.name} className={field.full ? 'sm:col-span-2' : ''}>
                 <label className="text-foreground/70 text-sm font-medium mb-2 block">
                   {field.label}
                 </label>
@@ -278,7 +293,7 @@ function CrudForm({ config, editing, onSave, onClose, saving }: {
             ))}
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-4 sticky bottom-0">
             <button type="submit" disabled={saving} className="btn-primary flex-1 disabled:opacity-50">
               <Save size={16} />
               {saving ? 'Saving...' : 'Save'}
