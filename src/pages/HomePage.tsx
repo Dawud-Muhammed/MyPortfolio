@@ -104,13 +104,7 @@ export function HomePage() {
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
               </Link>
               
-              {hero?.cta_secondary_label && (
-                <Link to="/contact" className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10">
-                  {hero.cta_secondary_label}
-                </Link>
-              )}
-
-              {/* --- ADD THE CV DOWNLOADER HERE --- */}
+              {/* Secondary CTA: Now acts as the CV Downloader */}
               {profile?.resume_url ? (
                 <a
                   href={profile.resume_url}
@@ -120,16 +114,14 @@ export function HomePage() {
                   className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10 flex items-center gap-2"
                 >
                   <Download size={16} />
-                  Download CV
+                  {hero?.cta_secondary_label || 'Download CV'}
                 </a>
               ) : (
                 <button disabled className="btn-ghost !text-foreground !border-foreground/20 opacity-50 cursor-not-allowed flex items-center gap-2" title="No resume uploaded yet">
                   <Download size={16} />
-                  Download CV
+                  {hero?.cta_secondary_label || 'Download CV'}
                 </button>
               )}
-              {/* ---------------------------------- */}
-              
             </div>
             {/* Quick stats */}
             <div className="mt-16 grid grid-cols-3 gap-4 sm:gap-8 max-w-lg mx-auto">
