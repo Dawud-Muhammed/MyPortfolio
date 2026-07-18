@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit3, Trash2, X, Save, Search, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { FileUploader } from './FileUploader';
 
 export interface FieldDef {
   name: string;

@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Save, Loader2, CheckCircle2 } from 'lucide-react';
+import { Save, Loader2, CheckCircle2, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { FileUploader } from '../../components/admin/FileUploader';
 
 export function AdminSettings() {
   const [profile, setProfile] = useState<any>(null);
   const [hero, setHero] = useState<any>(null);
   const [website, setWebsite] = useState<any>(null);
   const [seo, setSeo] = useState<any>(null);
+  const [experiences, setExperiences] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -14,16 +16,18 @@ export function AdminSettings() {
 
   useEffect(() => {
     (async () => {
-      const [p, h, w, s] = await Promise.all([
+      const [p, h, w, s, e] = await Promise.all([
         supabase.from('profile').select('*').maybeSingle(),
         supabase.from('hero_content').select('*').maybeSingle(),
         supabase.from('website_settings').select('*').maybeSingle(),
         supabase.from('seo_settings').select('*').maybeSingle(),
+        supabase.from('experience').select('*').order('order_index', { ascending: true }),
       ]);
       setProfile(p.data);
       setHero(h.data);
       setWebsite(w.data);
       setSeo(s.data);
+      setExperiences(e.data || []);
       setLoading(false);
     })();
   }, []);
@@ -46,6 +50,15 @@ export function AdminSettings() {
       tasks.push(supabase.from('seo_settings').upsert(seo, { onConflict: 'id' }));
     }
 
+    for (const exp of experiences) {
+      if (exp.id) {
+        tasks.push(supabase.from('experience').upsert(exp, { onConflict: 'id' }));
+      } else {
+        const { id, ...insertData } = exp;
+        tasks.push(supabase.from('experience').insert(insertData));
+      }
+    }
+
     const results = await Promise.all(tasks);
     const hasError = results.some((r) => r.error);
 
@@ -56,6 +69,33 @@ export function AdminSettings() {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     }
+  };
+
+  const addExperience = () => {
+    setExperiences([...experiences, {
+      company: '',
+      role: '',
+      location: '',
+      start_date: '',
+      end_date: '',
+      is_current: false,
+      description: '',
+      logo_url: '',
+      order_index: experiences.length,
+    }]);
+  };
+
+  const updateExperience = (index: number, key: string, value: any) => {
+    setExperiences(experiences.map((exp, i) => i === index ? { ...exp, [key]: value } : exp));
+  };
+
+  const removeExperience = async (index: number) => {
+    const exp = experiences[index];
+    if (exp.id && !confirm('Delete this experience entry?')) return;
+    if (exp.id) {
+      await supabase.from('experience').delete().eq('id', exp.id);
+    }
+    setExperiences(experiences.filter((_, i) => i !== index));
   };
 
   if (loading) {
@@ -124,6 +164,27 @@ export function AdminSettings() {
             <div>
               <label className="text-foreground/70 text-sm font-medium mb-2 block">Profile Picture URL</label>
               <input value={profile?.profile_picture_url || ''} onChange={(e) => update(setProfile, 'profile_picture_url', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
+            </div>
+            <div>
+              <FileUploader
+                bucket="portfolio-images"
+                folder="profile"
+                value={profile?.profile_picture_url || ''}
+                onChange={(url) => update(setProfile, 'profile_picture_url', url)}
+                type="image"
+                label="Or Upload Profile Picture"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <FileUploader
+                bucket="Portfolio-documents"
+                folder="resume"
+                value={profile?.resume_url || ''}
+                onChange={(url) => update(setProfile, 'resume_url', url)}
+                accept=".pdf,.doc,.docx"
+                type="document"
+                label="Resume / CV File"
+              />
             </div>
             <div className="md:col-span-2">
               <label className="text-foreground/70 text-sm font-medium mb-2 block">Tagline</label>
@@ -257,6 +318,73 @@ export function AdminSettings() {
               <label className="text-foreground/70 text-sm font-medium mb-2 block">OG Image URL</label>
               <input value={seo?.og_image_url || ''} onChange={(e) => update(setSeo, 'og_image_url', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
             </div>
+          </div>
+        </section>
+
+        {/* Experience Management */}
+        <section className="glass rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-foreground">Experience Management</h2>
+            <button onClick={addExperience} className="btn-ghost !py-1.5 !px-3 !text-xs">
+              <Plus size={14} />
+              Add
+            </button>
+          </div>
+          <p className="text-foreground/40 text-xs mb-4">Manage work experience entries shown in your stats. These are not displayed on the public site.</p>
+          <div className="space-y-4">
+            {experiences.map((exp, i) => (
+              <div key={exp.id || i} className="glass rounded-xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-foreground/50 text-xs font-medium">Entry #{i + 1}</span>
+                  <button onClick={() => removeExperience(i)} className="p-1.5 rounded-lg text-foreground/40 hover:text-error-400 hover:bg-error-500/10 transition-all">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-foreground/60 text-xs mb-1 block">Role</label>
+                    <input value={exp.role || ''} onChange={(e) => updateExperience(i, 'role', e.target.value)} className="input-field !text-sm" placeholder="Software Engineer" />
+                  </div>
+                  <div>
+                    <label className="text-foreground/60 text-xs mb-1 block">Company</label>
+                    <input value={exp.company || ''} onChange={(e) => updateExperience(i, 'company', e.target.value)} className="input-field !text-sm" placeholder="Company" />
+                  </div>
+                  <div>
+                    <label className="text-foreground/60 text-xs mb-1 block">Location</label>
+                    <input value={exp.location || ''} onChange={(e) => updateExperience(i, 'location', e.target.value)} className="input-field !text-sm" placeholder="Remote" />
+                  </div>
+                  <div>
+                    <label className="text-foreground/60 text-xs mb-1 block">Start Date</label>
+                    <input value={exp.start_date || ''} onChange={(e) => updateExperience(i, 'start_date', e.target.value)} className="input-field !text-sm" placeholder="2020-01" />
+                  </div>
+                  <div>
+                    <label className="text-foreground/60 text-xs mb-1 block">End Date</label>
+                    <input value={exp.end_date || ''} onChange={(e) => updateExperience(i, 'end_date', e.target.value)} className="input-field !text-sm" placeholder="2023-12" disabled={exp.is_current} />
+                  </div>
+                  <div>
+                    <label className="text-foreground/60 text-xs mb-1 block">Order</label>
+                    <input type="number" value={exp.order_index ?? 0} onChange={(e) => updateExperience(i, 'order_index', Number(e.target.value))} className="input-field !text-sm" />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => updateExperience(i, 'is_current', !exp.is_current)}
+                    className={`relative w-10 h-5 rounded-full transition-colors ${exp.is_current ? 'bg-accent-500' : 'bg-foreground/15'}`}
+                  >
+                    <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${exp.is_current ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                  </button>
+                  <span className="text-foreground/60 text-xs">Currently working here</span>
+                </div>
+                <div>
+                  <label className="text-foreground/60 text-xs mb-1 block">Description</label>
+                  <textarea value={exp.description || ''} onChange={(e) => updateExperience(i, 'description', e.target.value)} className="input-field !text-sm resize-none" rows={2} placeholder="Brief description..." />
+                </div>
+              </div>
+            ))}
+            {experiences.length === 0 && (
+              <p className="text-foreground/30 text-sm text-center py-4">No experience entries yet. Click "Add" to create one.</p>
+            )}
           </div>
         </section>
       </div>

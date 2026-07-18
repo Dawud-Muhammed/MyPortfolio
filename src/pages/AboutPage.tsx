@@ -75,10 +75,23 @@ export function AboutPage() {
               )}
 
               <div>
-                <button className="btn-primary">
-                  <Download size={16} />
-                  Download Resume
-                </button>
+                {profile?.resume_url ? (
+                  <a
+                    href={profile.resume_url}
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary"
+                  >
+                    <Download size={16} />
+                    Download Resume
+                  </a>
+                ) : (
+                  <button disabled className="btn-primary opacity-50 cursor-not-allowed" title="No resume uploaded yet">
+                    <Download size={16} />
+                    Download Resume
+                  </button>
+                )}
               </div>
             </div>
           </motion.div>

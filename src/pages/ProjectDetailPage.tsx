@@ -105,12 +105,25 @@ export function ProjectDetailPage() {
             )}
           </div>
 
+          {/* Parse technologies from description if not linked via junction table */}
+          {(() => {
+            const linkedTechs = (project.technologies || []).map((t) => t.name);
+            let parsedTechs: string[] = [];
+            if (linkedTechs.length === 0 && project.description) {
+              const techMatch = project.description.match(/Technologies:\s*([\s\S]*?)(?:\n\n|$)/i);
+              if (techMatch) {
+                parsedTechs = techMatch[1].split(',').map((t) => t.trim()).filter(Boolean);
+              }
+            }
+            const allTechs = linkedTechs.length > 0 ? linkedTechs : parsedTechs;
+
+            return (
           <div className="grid lg:grid-cols-3 gap-12">
             {/* Description */}
             <div className="lg:col-span-2">
               <h2 className="text-2xl font-bold text-foreground mb-4">About this project</h2>
               <div className="prose-content text-foreground/70">
-                {project.description.split('\n').map((para, i) => (
+                {project.description.split('\n').filter((p) => p.trim() && !p.trim().startsWith('Technologies:')).map((para, i) => (
                   <p key={i}>{para}</p>
                 ))}
               </div>
@@ -135,11 +148,15 @@ export function ProjectDetailPage() {
               <div className="glass rounded-2xl p-6 sticky top-24">
                 <h3 className="text-foreground font-semibold mb-4">Technologies</h3>
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {(project.technologies || []).map((tech) => (
-                    <span key={tech.id} className="badge">
-                      {tech.name}
-                    </span>
-                  ))}
+                  {allTechs.length > 0 ? (
+                    allTechs.map((techName, i) => (
+                      <span key={i} className="badge">
+                        {techName}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-foreground/30 text-sm">No technologies listed</span>
+                  )}
                 </div>
 
                 <h3 className="text-foreground font-semibold mb-4">Project Info</h3>
@@ -154,10 +171,28 @@ export function ProjectDetailPage() {
                       <dd className="text-foreground/80">{project.category.name}</dd>
                     </div>
                   )}
+                  {project.demo_url && (
+                    <div className="flex justify-between">
+                      <dt className="text-foreground/40">Demo</dt>
+                      <dd className="text-accent-400 truncate ml-2">
+                        <a href={project.demo_url} target="_blank" rel="noopener noreferrer">{project.demo_url}</a>
+                      </dd>
+                    </div>
+                  )}
+                  {project.github_url && (
+                    <div className="flex justify-between">
+                      <dt className="text-foreground/40">Source</dt>
+                      <dd className="text-accent-400 truncate ml-2">
+                        <a href={project.github_url} target="_blank" rel="noopener noreferrer">{project.github_url}</a>
+                      </dd>
+                    </div>
+                  )}
                 </dl>
               </div>
             </div>
           </div>
+            );
+          })()}
         </div>
       </div>
     </>

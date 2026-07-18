@@ -1,14 +1,18 @@
 import { MessageCircle, X } from 'lucide-react';
 import { useState } from 'react';
-import { useWebsiteSettings } from '../lib/queries';
+import { useWebsiteSettings, useProfile } from '../lib/queries';
 
 export function WhatsAppButton() {
   const [showTooltip, setShowTooltip] = useState(false);
   const { data: settings } = useWebsiteSettings();
+  const { data: profile } = useProfile();
 
   if (!settings?.whatsapp_enabled || !settings?.whatsapp_number) return null;
 
-  const waUrl = `https://wa.me/${settings.whatsapp_number}?text=${encodeURIComponent(settings.whatsapp_message || '')}`;
+  const ownerName = (profile?.name || settings?.site_name || '').split(' ')[0];
+  const defaultMessage = `Hi ${ownerName}! I came across your portfolio and wanted to connect.`;
+  const messageText = settings.whatsapp_message || defaultMessage;
+  const waUrl = `https://wa.me/${settings.whatsapp_number}?text=${encodeURIComponent(messageText)}`;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">

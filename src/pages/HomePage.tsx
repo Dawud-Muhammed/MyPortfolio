@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, Star, Quote, Sparkles, Code2, Zap, CheckCircle2, Calendar, MapPin } from 'lucide-react';
-import { useHeroContent, useProjects, useSkills, useExperience, useTestimonials, useServices, useSeoSettings } from '../lib/queries';
+import { ArrowRight, ArrowUpRight, Star, Quote, Sparkles, Code2, Zap, CheckCircle2 } from 'lucide-react';
+import { useHeroContent, useProjects, useSkills, useTestimonials, useServices, useSeoSettings, useExperience } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
 import { motion } from 'framer-motion';
 
@@ -242,65 +242,17 @@ export function HomePage() {
                 </h3>
                 <div className="space-y-3">
                   {(items as any[]).map((skill) => (
-                    <div key={skill.id} className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
-                      <span className="text-sm text-foreground/70">{skill.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Experience Timeline */}
-      <section className="py-24 relative">
-        <div className="section-container">
-          <div className="text-center mb-12">
-            <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">Career</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">Work Experience</h2>
-          </div>
-
-          <div className="max-w-3xl mx-auto">
-            {(experience || []).map((exp, i) => (
-              <motion.div
-                key={exp.id}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="relative pl-8 pb-12 last:pb-0"
-              >
-                {/* Timeline line */}
-                {i < (experience || []).length - 1 && (
-                  <div className="absolute left-2.5 top-2 bottom-0 w-px bg-foreground/10" />
-                )}
-                {/* Timeline dot */}
-                <div className="absolute left-0 top-1.5 h-5 w-5 rounded-full bg-accent-500/20 border-2 border-accent-400 flex items-center justify-center">
-                  <div className="h-1.5 w-1.5 rounded-full bg-accent-400" />
-                </div>
-
-                <div className="glass rounded-2xl p-5 card-hover">
-                  <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-                    <div>
-                      <h3 className="text-foreground font-bold text-lg">{exp.role}</h3>
-                      <p className="text-accent-400 text-sm font-medium">{exp.company}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <span className="text-xs text-foreground/40 flex items-center gap-1">
-                        <Calendar size={12} />
-                        {exp.start_date} — {exp.is_current ? 'Present' : exp.end_date}
-                      </span>
-                      {exp.location && (
-                        <span className="text-xs text-foreground/40 flex items-center gap-1">
-                          <MapPin size={12} />
-                          {exp.location}
+                    <div key={skill.id} className="flex items-center gap-3">
+                      {skill.icon_url ? (
+                        <img src={skill.icon_url} alt={skill.name} className="h-6 w-6 rounded object-contain shrink-0" />
+                      ) : (
+                        <span className="h-6 w-6 rounded bg-accent-500/15 text-accent-400 flex items-center justify-center text-xs font-bold shrink-0">
+                          {skill.name.trim().charAt(0).toUpperCase()}
                         </span>
                       )}
+                      <span className="text-sm text-foreground/70">{skill.name.trim()}</span>
                     </div>
-                  </div>
-                  <p className="text-sm text-foreground/50 mt-2 leading-relaxed">{exp.description}</p>
+                  ))}
                 </div>
               </motion.div>
             ))}
