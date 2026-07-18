@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, Star, Quote, Sparkles, Code2, Zap, CheckCircle2, Download } from 'lucide-react';
-import { useHeroContent, useProjects, useSkills, useTestimonials, useServices, useSeoSettings, useExperience, useProfile } from '../lib/queries';
+import { ArrowRight, ArrowUpRight, Star, Quote, Sparkles, Code2, Zap, CheckCircle2 } from 'lucide-react';
+import { useHeroContent, useProjects, useSkills, useTestimonials, useServices, useSeoSettings, useExperience } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
 import { motion } from 'framer-motion';
 
@@ -28,7 +28,6 @@ function computeYearsExperience(experience: { start_date: string; end_date: stri
 
 export function HomePage() {
   const { data: hero } = useHeroContent();
-  const { data: profile } = useProfile(); 
   const { data: projects, loading: projectsLoading } = useProjects();
   const { data: skills } = useSkills();
   const { data: experience } = useExperience();
@@ -103,26 +102,13 @@ export function HomePage() {
                 {hero?.cta_primary_label || 'View Projects'}
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
               </Link>
-              
-              {/* Secondary CTA: Now acts as the CV Downloader */}
-              {profile?.resume_url ? (
-                <a
-                  href={profile.resume_url}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10 flex items-center gap-2"
-                >
-                  <Download size={16} />
-                  {hero?.cta_secondary_label || 'Download CV'}
-                </a>
-              ) : (
-                <button disabled className="btn-ghost !text-foreground !border-foreground/20 opacity-50 cursor-not-allowed flex items-center gap-2" title="No resume uploaded yet">
-                  <Download size={16} />
-                  {hero?.cta_secondary_label || 'Download CV'}
-                </button>
+              {hero?.cta_secondary_label && (
+                <Link to="/contact" className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10">
+                  {hero.cta_secondary_label}
+                </Link>
               )}
             </div>
+
             {/* Quick stats */}
             <div className="mt-16 grid grid-cols-3 gap-4 sm:gap-8 max-w-lg mx-auto">
               {stats.map((stat, i) => (
