@@ -288,6 +288,15 @@ function CrudForm({ config, editing, onSave, onClose, saving }: {
                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                       ))}
                     </select>
+                  ) : field.type === 'image' ? (
+                    <FileUploader
+                      bucket="portfolio-images"
+                      folder={config.table}
+                      value={formData[field.name] || ''}
+                      onChange={(url) => update(field.name, url)}
+                      type="image"
+                      label=""
+                    />
                   ) : field.type === 'json' ? (
                     <textarea
                       value={typeof formData[field.name] === 'string' ? formData[field.name] : JSON.stringify(formData[field.name] || [], null, 2)}

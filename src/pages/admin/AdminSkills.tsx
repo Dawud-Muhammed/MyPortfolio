@@ -8,7 +8,7 @@ const config: CrudConfig = {
   orderField: 'order_index',
   fields: [
     { name: 'name', label: 'Name', type: 'text', placeholder: 'React' },
-    { name: 'icon_url', label: 'Icon URL', type: 'text', placeholder: 'https://...' },
+    { name: 'icon_url', label: 'Icon', type: 'image', placeholder: 'https://...' },
     { name: 'category', label: 'Category', type: 'text', placeholder: 'Frontend' },
     { name: 'order_index', label: 'Order', type: 'number' },
   ],

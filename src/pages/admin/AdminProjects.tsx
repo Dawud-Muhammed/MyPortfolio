@@ -11,7 +11,7 @@ const config: CrudConfig = {
   fields: [
     { name: 'title', label: 'Title', type: 'text', placeholder: 'Project name' },
     { name: 'slug', label: 'Slug', type: 'text', placeholder: 'project-slug' },
-    { name: 'cover_image_url', label: 'Cover Image URL', type: 'text', placeholder: 'https://...', full: true },
+    { name: 'cover_image_url', label: 'Cover Image', type: 'image', placeholder: 'https://...', full: true },
     { name: 'gallery', label: 'Gallery (JSON array of URLs)', type: 'json', full: true },
     { name: 'demo_url', label: 'Demo URL', type: 'text', placeholder: 'https://...' },
     { name: 'github_url', label: 'GitHub URL', type: 'text', placeholder: 'https://github.com/...' },
