@@ -28,6 +28,7 @@ function computeYearsExperience(experience: { start_date: string; end_date: stri
 
 export function HomePage() {
   const { data: hero } = useHeroContent();
+  const { data: profile } = useProfile(); // FIXED: Added this line to define the profile variable
   const { data: projects, loading: projectsLoading } = useProjects();
   const { data: skills } = useSkills();
   const { data: experience } = useExperience();
