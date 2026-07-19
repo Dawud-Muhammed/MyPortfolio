@@ -95,30 +95,17 @@ export function HomePage() {
             <p className="mt-8 text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto leading-relaxed text-balance">
               {hero?.subheadline || 'Full-stack engineer crafting performant, accessible, and beautiful digital products.'}
             </p>
-{/* CTAs */}
+
+            {/* CTAs */}
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to={hero?.cta_primary_url || '/projects'} className="btn-primary group">
                 {hero?.cta_primary_label || 'View Projects'}
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
               </Link>
-              
-              {/* Secondary CTA: Now acts as the CV Downloader */}
-              {profile?.resume_url ? (
-                <a
-                  href={profile.resume_url}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10 flex items-center gap-2"
-                >
-                  <Download size={16} />
-                  {hero?.cta_secondary_label || 'Download CV'}
-                </a>
-              ) : (
-                <button disabled className="btn-ghost !text-foreground !border-foreground/20 opacity-50 cursor-not-allowed flex items-center gap-2" title="No resume uploaded yet">
-                  <Download size={16} />
-                  {hero?.cta_secondary_label || 'Download CV'}
-                </button>
+              {hero?.cta_secondary_label && (
+                <Link to="/contact" className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10">
+                  {hero.cta_secondary_label}
+                </Link>
               )}
             </div>
 
