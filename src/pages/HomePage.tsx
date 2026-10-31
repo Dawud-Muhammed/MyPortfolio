@@ -1,9 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Star, Quote, Sparkles, Code2, Zap, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Star, Quote, Sparkles, Code2, Zap, CheckCircle2, ArrowUpRight } from 'lucide-react';
 import { useHeroContent, useProjects, useSkills, useTestimonials, useServices, useSeoSettings, useExperience, useProfile } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
 import { motion } from 'framer-motion';
-import { ScrollRevealSection, ScrollRevealItem } from '../components/ScrollRevealSection';
+import { ScrollRevealSection } from '../components/ScrollRevealSection';
 import { SpotlightCard } from '../components/SpotlightCard';
 import { AnimatedButton } from '../components/AnimatedButton';
 
@@ -166,7 +166,7 @@ export function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, ease: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+              transition={{ duration: 0.6 }}
             >
               <p className="text-base text-text-secondary leading-relaxed">
                 {profile?.bio || 'I specialize in building full-stack web applications with modern technologies. My approach combines solid engineering fundamentals with a focus on maintainability, scalability, and reliability.'}
@@ -186,7 +186,6 @@ export function HomePage() {
                     viewport={{ once: true }}
                     transition={{
                       duration: 0.6,
-                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
                       delay: idx * 0.05,
                     }}
                   >
@@ -228,7 +227,6 @@ export function HomePage() {
                   viewport={{ once: true }}
                   transition={{
                     duration: 0.6,
-                    ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
                     delay: catIdx * 0.05,
                   }}
                 >
@@ -348,7 +346,6 @@ export function HomePage() {
                       viewport={{ once: true }}
                       transition={{
                         duration: 0.5,
-                        ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
                         delay: (i + 1) * 0.05,
                       }}
                     >
@@ -438,7 +435,6 @@ export function HomePage() {
                       viewport={{ once: true }}
                       transition={{
                         duration: 0.6,
-                        ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
                         delay: i * 0.05,
                       }}
                     >

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -84,7 +84,6 @@ export function useScrollReveal(
   } = options;
 
   const prefersReduced = usePrefersReducedMotion();
-  const triggerRef = useRef<ScrollTrigger | null>(null);
 
   useEffect(() => {
     if (!ref.current) return;
