@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Star, Quote, ArrowUpRight, Download } from 'lucide-react';
+import { ArrowRight, Star, Quote, ArrowUpRight } from 'lucide-react';
 import { useHeroContent, useProjects, useSkills, useTestimonials, useSeoSettings, useExperience, useProfile } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
 import { motion } from 'framer-motion';
@@ -110,20 +110,6 @@ export function HomePage() {
                 >
                   {hero.cta_secondary_label}
                 </AnimatedButton>
-              )}
-
-              {/* Resume download button */}
-              {profile?.resume_url && (
-                <a
-                  href={profile.resume_url}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 border border-border-subtle bg-text-primary text-void-950 rounded-lg font-semibold uppercase text-xs tracking-[0.12em] hover:bg-text-primary/90 transition-all"
-                >
-                  <Download size={16} />
-                  Resume
-                </a>
               )}
             </div>
 
