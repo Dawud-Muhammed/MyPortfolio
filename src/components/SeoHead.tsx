@@ -29,7 +29,9 @@ export function SeoHead({ title, description, image, seoSettings }: {
     setMeta('og:description', metaDesc, 'property');
     setMeta('og:type', 'website', 'property');
     if (image || seoSettings?.og_image_url) {
-      setMeta('og:image', image || seoSettings?.og_image_url || '', 'property');
+      const ogImage = image || seoSettings?.og_image_url || '';
+      setMeta('og:image', ogImage, 'property');
+      setMeta('twitter:image', ogImage);
     }
     setMeta('twitter:card', 'summary_large_image');
     setMeta('twitter:title', fullTitle);
