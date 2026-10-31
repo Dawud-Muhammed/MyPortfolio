@@ -35,7 +35,7 @@ export function AdminSettings() {
   const handleSave = async () => {
     setSaving(true);
     setSaveError('');
-    const tasks: Promise<any>[] = [];
+    const tasks: PromiseLike<any>[] = [];
 
     if (profile) {
       tasks.push(supabase.from('profile').upsert(profile, { onConflict: 'id' }));

@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { useBlogPosts, useBlogCategories, useSeoSettings } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
-import { formatDate } from '../lib/utils';
 import { motion } from 'framer-motion';
 
 export function BlogPage() {
@@ -110,7 +108,7 @@ export function BlogPage() {
                     <div className="p-8">
                       <div className="flex items-center gap-3 mb-3">
                         <span className="label-mono">
-                          {new Date(featuredPost.published_at).toLocaleDateString()}
+                          {featuredPost.published_at && new Date(featuredPost.published_at).toLocaleDateString()}
                         </span>
                         <span className="text-border-subtle">•</span>
                         <span className="label-mono">
@@ -134,7 +132,7 @@ export function BlogPage() {
                     viewport={{ once: true }}
                     transition={{
                       duration: 0.6,
-                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      ease: 'easeInOut',
                       delay: i * 0.05,
                     }}
                   >
@@ -144,7 +142,7 @@ export function BlogPage() {
                     >
                       <div className="flex items-center gap-2 mb-3">
                         <span className="label-mono">
-                          {new Date(post.published_at).toLocaleDateString()}
+                          {post.published_at && new Date(post.published_at).toLocaleDateString()}
                         </span>
                         <span className="text-border-subtle">•</span>
                         <span className="label-mono">

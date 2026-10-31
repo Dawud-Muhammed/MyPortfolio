@@ -7,27 +7,11 @@ import { AnimatedButton } from './AnimatedButton';
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { data: navItems } = useNavigationItems();
   const { data: profile } = useProfile();
   const { data: hero } = useHeroContent();
-
-  useEffect(() => {
-    // Detect touch device
-    const isTouchDevice = () => {
-      return (
-        (typeof window !== 'undefined' &&
-          ('ontouchstart' in window ||
-            navigator.maxTouchPoints > 0 ||
-            (navigator as any).msMaxTouchPoints > 0)) ||
-        window.matchMedia('(hover: none) and (pointer: coarse)').matches
-      );
-    };
-
-    setIsTouchDevice(isTouchDevice());
-  }, []);
 
   useEffect(() => {
     // Close mobile menu on route change
@@ -54,7 +38,6 @@ export function Navbar() {
       y: 0,
       transition: {
         duration: 0.3,
-        ease: [0.16, 1, 0.3, 1],
       },
     },
   };
@@ -144,7 +127,7 @@ export function Navbar() {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
           >
             <motion.div
               className="section-container py-6 space-y-2"

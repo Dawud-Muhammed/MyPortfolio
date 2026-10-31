@@ -1,7 +1,7 @@
-import { Mail, Phone, MapPin, Send, CheckCircle2 } from 'lucide-react';
+import { Mail, Send, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { useProfile, useSocialLinks, useWebsiteSettings, useSeoSettings, useFaqs } from '../lib/queries';
+import { useProfile, useSocialLinks, useSeoSettings, useFaqs } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
 import { motion } from 'framer-motion';
 import { Github, Twitter, Linkedin } from 'lucide-react';
@@ -13,7 +13,6 @@ const platformIcons: Record<string, typeof Github> = {
 export function ContactPage() {
   const { data: profile } = useProfile();
   const { data: socials } = useSocialLinks();
-  const { data: settings } = useWebsiteSettings();
   const { data: seoSettings } = useSeoSettings();
   const { data: faqs } = useFaqs();
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });

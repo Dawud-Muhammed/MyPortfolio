@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Calendar, Download, Award, GraduationCap, Briefcase, Star } from 'lucide-react';
+import { Mail, Phone, MapPin, Download } from 'lucide-react';
 import { useProfile, useSkills, useExperience, useEducation, useCertifications, useAchievements, useSeoSettings } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
 import { motion } from 'framer-motion';
@@ -138,7 +138,7 @@ export function AboutPage() {
                     viewport={{ once: true }}
                     transition={{
                       duration: 0.6,
-                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      ease: 'easeInOut',
                       delay: i * 0.05,
                     }}
                     className="relative pl-8 pb-12 last:pb-0 group"
@@ -194,7 +194,7 @@ export function AboutPage() {
                     viewport={{ once: true }}
                     transition={{
                       duration: 0.6,
-                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      ease: 'easeInOut',
                       delay: i * 0.05,
                     }}
                     className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:border-border-hover transition-all"
@@ -236,7 +236,7 @@ export function AboutPage() {
                     viewport={{ once: true }}
                     transition={{
                       duration: 0.6,
-                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      ease: 'easeInOut',
                       delay: catIdx * 0.05,
                     }}
                     className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-5 hover:border-border-hover hover:shadow-glow-cyan transition-all"
@@ -284,7 +284,7 @@ export function AboutPage() {
                     viewport={{ once: true }}
                     transition={{
                       duration: 0.6,
-                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      ease: 'easeInOut',
                       delay: i * 0.05,
                     }}
                     className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:border-border-hover transition-all"
@@ -330,7 +330,7 @@ export function AboutPage() {
                     viewport={{ once: true }}
                     transition={{
                       duration: 0.6,
-                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      ease: 'easeInOut',
                       delay: i * 0.05,
                     }}
                     className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:border-border-hover transition-all"
