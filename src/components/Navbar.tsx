@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useNavigationItems, useProfile, useHeroContent } from '../lib/queries';
+import { AnimatedButton } from './AnimatedButton';
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -52,13 +53,14 @@ export function Navbar() {
 
           {/* Right: CTA Button (Desktop) */}
           <div className="hidden md:flex items-center gap-4">
-            <button
+            <AnimatedButton
+              variant="secondary"
               onClick={() => navigate(hero?.cta_primary_url || '/contact')}
-              className="font-mono text-xs uppercase tracking-[0.18em] px-6 py-3 border border-border-subtle rounded-lg text-text-primary hover:bg-surface-elevated/60 hover:border-border-hover transition-all duration-300 cursor-pointer group"
               title="Get in touch"
+              ariaLabel="Get in touch"
             >
               {hero?.cta_primary_label || 'GET IN TOUCH'}
-            </button>
+            </AnimatedButton>
           </div>
 
           {/* Mobile Menu Toggle */}

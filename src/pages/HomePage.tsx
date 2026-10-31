@@ -3,6 +3,9 @@ import { ArrowRight, Star, Quote, Sparkles, Code2, Zap, CheckCircle2 } from 'luc
 import { useHeroContent, useProjects, useSkills, useTestimonials, useServices, useSeoSettings, useExperience, useProfile } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
 import { motion } from 'framer-motion';
+import { ScrollRevealSection, ScrollRevealItem } from '../components/ScrollRevealSection';
+import { SpotlightCard } from '../components/SpotlightCard';
+import { AnimatedButton } from '../components/AnimatedButton';
 
 const serviceIcons: Record<string, typeof Code2> = {
   Code: Code2,
@@ -99,21 +102,21 @@ export function HomePage() {
             {/* Dual CTA buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
               {/* Primary button: Solid background */}
-              <button
+              <AnimatedButton
+                variant="primary"
                 onClick={() => navigate(hero?.cta_primary_url || '/projects')}
-                className="font-mono text-xs uppercase tracking-[0.18em] px-8 py-4 bg-text-primary text-void-950 rounded-lg font-bold hover:bg-text-primary/90 transition-all duration-300 cursor-pointer"
               >
                 {hero?.cta_primary_label || 'CONTACT ME'}
-              </button>
+              </AnimatedButton>
               
               {/* Secondary button: Bordered */}
               {hero?.cta_secondary_label && (
-                <button
+                <AnimatedButton
+                  variant="secondary"
                   onClick={() => navigate(hero?.cta_secondary_url || '/projects')}
-                  className="font-mono text-xs uppercase tracking-[0.18em] px-8 py-4 border border-border-subtle rounded-lg text-text-primary hover:bg-surface-elevated/60 hover:border-border-hover transition-all duration-300 cursor-pointer"
                 >
                   {hero.cta_secondary_label}
-                </button>
+                </AnimatedButton>
               )}
             </div>
 
@@ -147,18 +150,14 @@ export function HomePage() {
       <section className="py-section relative">
         <div className="section-container">
           {/* Section header: Uppercase monospace kicker */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="mb-16"
-          >
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
-              ABOUT • FULL-STACK • LARAVEL • REACT
-            </p>
-            <h2 className="text-display-md font-bold text-text-primary">What I Offer</h2>
-          </motion.div>
+          <ScrollRevealSection type="combined" duration={0.6}>
+            <div className="mb-16" data-scroll-reveal>
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+                ABOUT • FULL-STACK • LARAVEL • REACT
+              </p>
+              <h2 className="text-display-md font-bold text-text-primary">What I Offer</h2>
+            </div>
+          </ScrollRevealSection>
 
           {/* Editorial split: Bio left, skill pillars right */}
           <div className="grid lg:grid-cols-2 gap-gutter items-start">
@@ -177,23 +176,26 @@ export function HomePage() {
             {/* Right column: Skill pillars (4-6 cards) */}
             <div className="space-y-4">
               {skillsByCategory && Object.entries(skillsByCategory).slice(0, 6).map(([category, items], idx) => (
-                <motion.div
+                <SpotlightCard
                   key={category}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{
-                    duration: 0.6,
-                    ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
-                    delay: idx * 0.05,
-                  }}
                   className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:border-border-hover transition-all duration-300"
                 >
-                  <h3 className="text-display-md font-bold text-text-primary mb-1">{category}</h3>
-                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-mono">
-                    {(items as any[]).map((s) => s.name).slice(0, 3).join(' • ')}
-                  </p>
-                </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      duration: 0.6,
+                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      delay: idx * 0.05,
+                    }}
+                  >
+                    <h3 className="text-display-md font-bold text-text-primary mb-1">{category}</h3>
+                    <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-mono">
+                      {(items as any[]).map((s) => s.name).slice(0, 3).join(' • ')}
+                    </p>
+                  </motion.div>
+                </SpotlightCard>
               ))}
             </div>
           </div>
@@ -204,61 +206,60 @@ export function HomePage() {
       <section className="py-section relative">
         <div className="section-container">
           {/* Section header */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="mb-16"
-          >
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
-              TECHNICAL EXPERTISE • SYSTEMS & ARCHITECTURE
-            </p>
-            <h2 className="text-display-md font-bold text-text-primary">Skills & Technologies</h2>
-          </motion.div>
+          <ScrollRevealSection type="combined" duration={0.6}>
+            <div className="mb-16" data-scroll-reveal>
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+                TECHNICAL EXPERTISE • SYSTEMS & ARCHITECTURE
+              </p>
+              <h2 className="text-display-md font-bold text-text-primary">Skills & Technologies</h2>
+            </div>
+          </ScrollRevealSection>
 
           {/* Categorized grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {skillsByCategory && Object.entries(skillsByCategory).map(([category, items], catIdx) => (
-              <motion.div
+              <SpotlightCard
                 key={category}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.6,
-                  ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
-                  delay: catIdx * 0.05,
-                }}
                 className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-5 hover:border-border-hover transition-all duration-300 group hover:shadow-glow-cyan"
               >
-                {/* Header */}
-                <h3 className="text-display-md font-bold text-text-primary mb-2">{category}</h3>
-                
-                {/* Monospace subtext */}
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-mono mb-4">
-                  {category.replace(/\s+/g, '_').toUpperCase()}
-                </p>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.6,
+                    ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                    delay: catIdx * 0.05,
+                  }}
+                >
+                  {/* Header */}
+                  <h3 className="text-display-md font-bold text-text-primary mb-2">{category}</h3>
+                  
+                  {/* Monospace subtext */}
+                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-mono mb-4">
+                    {category.replace(/\s+/g, '_').toUpperCase()}
+                  </p>
 
-                {/* Tech badges */}
-                <div className="flex flex-wrap gap-2">
-                  {(items as any[]).slice(0, 5).map((skill, idx) => (
-                    <motion.span
-                      key={skill.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{
-                        duration: 0.4,
-                        delay: (catIdx * 0.05) + (idx * 0.03),
-                      }}
-                      className="inline-flex px-3 py-2 border border-border-subtle rounded text-xs uppercase tracking-[0.12em] text-text-secondary hover:border-border-hover hover:text-text-primary transition-all duration-300 cursor-default"
-                    >
-                      {skill.name}
-                    </motion.span>
-                  ))}
-                </div>
-              </motion.div>
+                  {/* Tech badges */}
+                  <div className="flex flex-wrap gap-2">
+                    {(items as any[]).slice(0, 5).map((skill, idx) => (
+                      <motion.span
+                        key={skill.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{
+                          duration: 0.4,
+                          delay: (catIdx * 0.05) + (idx * 0.03),
+                        }}
+                        className="inline-flex px-3 py-2 border border-border-subtle rounded text-xs uppercase tracking-[0.12em] text-text-secondary hover:border-border-hover hover:text-text-primary transition-all duration-300 cursor-default"
+                      >
+                        {skill.name}
+                      </motion.span>
+                    ))}
+                  </div>
+                </motion.div>
+              </SpotlightCard>
             ))}
           </div>
         </div>
@@ -268,26 +269,22 @@ export function HomePage() {
       <section className="py-section relative">
         <div className="section-container">
           {/* Section header */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="mb-16"
-          >
-            <div className="flex items-end justify-between mb-4">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
-                  FEATURED WORK • ARCHITECTURE & DESIGN
-                </p>
-                <h2 className="text-display-md font-bold text-text-primary">Selected Projects</h2>
+          <ScrollRevealSection type="combined" duration={0.6}>
+            <div className="mb-16" data-scroll-reveal>
+              <div className="flex items-end justify-between mb-4">
+                <div>
+                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+                    FEATURED WORK • ARCHITECTURE & DESIGN
+                  </p>
+                  <h2 className="text-display-md font-bold text-text-primary">Selected Projects</h2>
+                </div>
+                <Link to="/projects" className="hidden md:inline-flex items-center gap-1 text-text-secondary hover:text-text-primary text-sm font-medium group">
+                  View all
+                  <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                </Link>
               </div>
-              <Link to="/projects" className="hidden md:inline-flex items-center gap-1 text-text-secondary hover:text-text-primary text-sm font-medium group">
-                View all
-                <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-              </Link>
             </div>
-          </motion.div>
+          </ScrollRevealSection>
 
           {projectsLoading ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -299,99 +296,107 @@ export function HomePage() {
             <div className="space-y-8">
               {/* Featured flagship card */}
               {displayProjects.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
+                <SpotlightCard
+                  className="group block overflow-hidden rounded-lg border border-border-subtle bg-surface-base/50 hover:border-border-hover transition-all duration-300"
                 >
-                  <Link
-                    to={`/projects/${displayProjects[0].slug}`}
-                    className="group block overflow-hidden rounded-lg border border-border-subtle bg-surface-base/50 hover:border-border-hover transition-all duration-300"
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
                   >
-                    <div className="aspect-video overflow-hidden bg-surface-elevated relative">
-                      {displayProjects[0].cover_image_url && (
-                        <img
-                          src={displayProjects[0].cover_image_url}
-                          alt={displayProjects[0].title}
-                          loading="lazy"
-                          className="w-full h-full object-cover transition-transform duration-600 group-hover:scale-105"
-                        />
-                      )}
-                      {/* Dark gradient overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-void-950 via-transparent to-transparent" />
-                      
-                      {/* Metadata and title overlay */}
-                      <div className="absolute inset-0 flex flex-col justify-end p-8">
-                        <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-3">
-                          {displayProjects[0].category?.name || 'PROJECT'} • {new Date(displayProjects[0].created_at).getFullYear()}
-                        </p>
-                        <h3 className="text-display-md font-bold text-text-primary mb-2">{displayProjects[0].title}</h3>
-                        <p className="text-text-secondary text-sm line-clamp-2">{displayProjects[0].excerpt || displayProjects[0].description}</p>
+                    <Link
+                      to={`/projects/${displayProjects[0].slug}`}
+                      className="group block"
+                    >
+                      <div className="aspect-video overflow-hidden bg-surface-elevated relative">
+                        {displayProjects[0].cover_image_url && (
+                          <img
+                            src={displayProjects[0].cover_image_url}
+                            alt={displayProjects[0].title}
+                            loading="lazy"
+                            className="w-full h-full object-cover transition-transform duration-600 group-hover:scale-105"
+                          />
+                        )}
+                        {/* Dark gradient overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-void-950 via-transparent to-transparent" />
+                        
+                        {/* Metadata and title overlay */}
+                        <div className="absolute inset-0 flex flex-col justify-end p-8">
+                          <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-3">
+                            {displayProjects[0].category?.name || 'PROJECT'} • {new Date(displayProjects[0].created_at).getFullYear()}
+                          </p>
+                          <h3 className="text-display-md font-bold text-text-primary mb-2">{displayProjects[0].title}</h3>
+                          <p className="text-text-secondary text-sm line-clamp-2">{displayProjects[0].excerpt || displayProjects[0].description}</p>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                </motion.div>
+                    </Link>
+                  </motion.div>
+                </SpotlightCard>
               )}
 
               {/* Secondary grid */}
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {displayProjects.slice(1).map((project, i) => (
-                  <motion.div
+                  <SpotlightCard
                     key={project.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      duration: 0.5,
-                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
-                      delay: (i + 1) * 0.05,
-                    }}
+                    className="group block border border-border-subtle bg-surface-base/50 rounded-lg overflow-hidden hover:border-border-hover hover:shadow-glow-cyan transition-all duration-300"
                   >
-                    <Link
-                      to={`/projects/${project.slug}`}
-                      className="group block border border-border-subtle bg-surface-base/50 rounded-lg overflow-hidden hover:border-border-hover hover:shadow-glow-cyan transition-all duration-300"
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{
+                        duration: 0.5,
+                        ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                        delay: (i + 1) * 0.05,
+                      }}
                     >
-                      {/* Image */}
-                      <div className="aspect-[4/3] overflow-hidden bg-surface-elevated relative">
-                        {project.cover_image_url && (
-                          <img
-                            src={project.cover_image_url}
-                            alt={project.title}
-                            loading="lazy"
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                        )}
-                      </div>
-
-                      {/* Content */}
-                      <div className="p-5">
-                        {/* Metadata */}
-                        <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-mono mb-3">
-                          {project.category?.name || 'PROJECT'} • {new Date(project.created_at).getFullYear()} • {(project.technologies || []).map((t) => t.name).join(', ').substring(0, 20)}
-                        </p>
-
-                        {/* Title */}
-                        <h3 className="text-lg font-bold text-text-primary mb-2 group-hover:text-accent-primary transition-colors">
-                          {project.title}
-                        </h3>
-
-                        {/* Description */}
-                        <p className="text-sm text-text-secondary line-clamp-2 mb-4">
-                          {project.excerpt || project.description}
-                        </p>
-
-                        {/* Tech stack badges */}
-                        <div className="flex flex-wrap gap-1.5">
-                          {(project.technologies || []).slice(0, 3).map((tech) => (
-                            <span key={tech.id} className="inline-flex px-2 py-1 border border-border-subtle rounded text-xs uppercase tracking-[0.12em] text-text-secondary hover:border-border-hover transition-all">
-                              {tech.name}
-                            </span>
-                          ))}
+                      <Link
+                        to={`/projects/${project.slug}`}
+                        className="group block"
+                      >
+                        {/* Image */}
+                        <div className="aspect-[4/3] overflow-hidden bg-surface-elevated relative">
+                          {project.cover_image_url && (
+                            <img
+                              src={project.cover_image_url}
+                              alt={project.title}
+                              loading="lazy"
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                          )}
                         </div>
-                      </div>
-                    </Link>
-                  </motion.div>
+
+                        {/* Content */}
+                        <div className="p-5">
+                          {/* Metadata */}
+                          <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-mono mb-3">
+                            {project.category?.name || 'PROJECT'} • {new Date(project.created_at).getFullYear()} • {(project.technologies || []).map((t) => t.name).join(', ').substring(0, 20)}
+                          </p>
+
+                          {/* Title */}
+                          <h3 className="text-lg font-bold text-text-primary mb-2 group-hover:text-accent-primary transition-colors">
+                            {project.title}
+                          </h3>
+
+                          {/* Description */}
+                          <p className="text-sm text-text-secondary line-clamp-2 mb-4">
+                            {project.excerpt || project.description}
+                          </p>
+
+                          {/* Tech stack badges */}
+                          <div className="flex flex-wrap gap-1.5">
+                            {(project.technologies || []).slice(0, 3).map((tech) => (
+                              <span key={tech.id} className="inline-flex px-2 py-1 border border-border-subtle rounded text-xs uppercase tracking-[0.12em] text-text-secondary hover:border-border-hover transition-all">
+                                {tech.name}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  </SpotlightCard>
                 ))}
               </div>
             </div>
@@ -410,51 +415,50 @@ export function HomePage() {
         <section className="py-section relative">
           <div className="section-container">
             {/* Section header */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="mb-16"
-            >
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
-                END-TO-END DELIVERY • ENGINEERING MINDSET
-              </p>
-              <h2 className="text-display-md font-bold text-text-primary">Services</h2>
-            </motion.div>
+            <ScrollRevealSection type="combined" duration={0.6}>
+              <div className="mb-16" data-scroll-reveal>
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+                  END-TO-END DELIVERY • ENGINEERING MINDSET
+                </p>
+                <h2 className="text-display-md font-bold text-text-primary">Services</h2>
+              </div>
+            </ScrollRevealSection>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {(services || []).map((service, i) => {
                 const Icon = serviceIcons[service.icon] || Code2;
                 return (
-                  <motion.div
+                  <SpotlightCard
                     key={service.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      duration: 0.6,
-                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
-                      delay: i * 0.05,
-                    }}
                     className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:border-border-hover hover:shadow-glow-cyan transition-all duration-300 group"
                   >
-                    <div className="h-12 w-12 rounded-lg bg-accent-primary/10 flex items-center justify-center mb-4">
-                      <Icon size={24} className="text-accent-primary" />
-                    </div>
-                    <h3 className="text-text-primary font-bold mb-2">{service.title}</h3>
-                    <p className="text-sm text-text-secondary mb-4">{service.description}</p>
-                    {(service.included_items || []).length > 0 && (
-                      <ul className="space-y-1.5">
-                        {(service.included_items || []).slice(0, 3).map((item, idx) => (
-                          <li key={idx} className="text-xs text-text-tertiary flex items-start gap-2">
-                            <CheckCircle2 size={14} className="text-status-emerald shrink-0 mt-0.5" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{
+                        duration: 0.6,
+                        ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                        delay: i * 0.05,
+                      }}
+                    >
+                      <div className="h-12 w-12 rounded-lg bg-accent-primary/10 flex items-center justify-center mb-4">
+                        <Icon size={24} className="text-accent-primary" />
+                      </div>
+                      <h3 className="text-text-primary font-bold mb-2">{service.title}</h3>
+                      <p className="text-sm text-text-secondary mb-4">{service.description}</p>
+                      {(service.included_items || []).length > 0 && (
+                        <ul className="space-y-1.5">
+                          {(service.included_items || []).slice(0, 3).map((item, idx) => (
+                            <li key={idx} className="text-xs text-text-tertiary flex items-start gap-2">
+                              <CheckCircle2 size={14} className="text-status-emerald shrink-0 mt-0.5" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </motion.div>
+                  </SpotlightCard>
                 );
               })}
             </div>

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { ThemeProvider } from './components/ThemeProvider';
 import { LoadingScreen } from './components/LoadingScreen';
 import { AuroraBackground } from './components/AuroraBackground';
+import { InteractiveCanvasBackground } from './components/InteractiveCanvasBackground';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { WhatsAppButton } from './components/WhatsAppButton';
@@ -43,6 +44,7 @@ function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <AuroraBackground />
+      <InteractiveCanvasBackground />
       <Navbar />
       {children}
       <Footer />
