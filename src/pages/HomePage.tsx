@@ -29,8 +29,6 @@ export function HomePage() {
 
   const stats = [
     { label: 'Years Experience', value: String(computeYearsExperience(experience || [])) },
-    { label: 'Projects Shipped', value: String((projects || []).length) },
-    { label: 'Skills', value: String((skills || []).length) },
   ];
 
   return (
