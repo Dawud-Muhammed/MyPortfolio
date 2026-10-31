@@ -143,19 +143,151 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Featured Projects */}
-      <section className="py-24 relative">
+      {/* About / What I Offer Section */}
+      <section className="py-section relative">
         <div className="section-container">
-          <div className="flex items-end justify-between mb-12">
-            <div>
-              <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">Featured Work</p>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground">Selected Projects</h2>
+          {/* Section header: Uppercase monospace kicker */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="mb-16"
+          >
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+              ABOUT • FULL-STACK • LARAVEL • REACT
+            </p>
+            <h2 className="text-display-md font-bold text-text-primary">What I Offer</h2>
+          </motion.div>
+
+          {/* Editorial split: Bio left, skill pillars right */}
+          <div className="grid lg:grid-cols-2 gap-gutter items-start">
+            {/* Left column: Dynamic bio */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+            >
+              <p className="text-base text-text-secondary leading-relaxed">
+                {profile?.bio || 'I specialize in building full-stack web applications with modern technologies. My approach combines solid engineering fundamentals with a focus on maintainability, scalability, and reliability.'}
+              </p>
+            </motion.div>
+
+            {/* Right column: Skill pillars (4-6 cards) */}
+            <div className="space-y-4">
+              {skillsByCategory && Object.entries(skillsByCategory).slice(0, 6).map(([category, items], idx) => (
+                <motion.div
+                  key={category}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.6,
+                    ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                    delay: idx * 0.05,
+                  }}
+                  className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:border-border-hover transition-all duration-300"
+                >
+                  <h3 className="text-display-md font-bold text-text-primary mb-1">{category}</h3>
+                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-mono">
+                    {(items as any[]).map((s) => s.name).slice(0, 3).join(' • ')}
+                  </p>
+                </motion.div>
+              ))}
             </div>
-            <Link to="/projects" className="hidden md:inline-flex items-center gap-1 text-foreground/60 hover:text-foreground text-sm font-medium group">
-              View all
-              <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-            </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Skills & Technologies Matrix */}
+      <section className="py-section relative">
+        <div className="section-container">
+          {/* Section header */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="mb-16"
+          >
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+              TECHNICAL EXPERTISE • SYSTEMS & ARCHITECTURE
+            </p>
+            <h2 className="text-display-md font-bold text-text-primary">Skills & Technologies</h2>
+          </motion.div>
+
+          {/* Categorized grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {skillsByCategory && Object.entries(skillsByCategory).map(([category, items], catIdx) => (
+              <motion.div
+                key={category}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{
+                  duration: 0.6,
+                  ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                  delay: catIdx * 0.05,
+                }}
+                className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-5 hover:border-border-hover transition-all duration-300 group hover:shadow-glow-cyan"
+              >
+                {/* Header */}
+                <h3 className="text-display-md font-bold text-text-primary mb-2">{category}</h3>
+                
+                {/* Monospace subtext */}
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-mono mb-4">
+                  {category.replace(/\s+/g, '_').toUpperCase()}
+                </p>
+
+                {/* Tech badges */}
+                <div className="flex flex-wrap gap-2">
+                  {(items as any[]).slice(0, 5).map((skill, idx) => (
+                    <motion.span
+                      key={skill.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{
+                        duration: 0.4,
+                        delay: (catIdx * 0.05) + (idx * 0.03),
+                      }}
+                      className="inline-flex px-3 py-2 border border-border-subtle rounded text-xs uppercase tracking-[0.12em] text-text-secondary hover:border-border-hover hover:text-text-primary transition-all duration-300 cursor-default"
+                    >
+                      {skill.name}
+                    </motion.span>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Projects */}
+      <section className="py-section relative">
+        <div className="section-container">
+          {/* Section header */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="mb-16"
+          >
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+                  FEATURED WORK • ARCHITECTURE & DESIGN
+                </p>
+                <h2 className="text-display-md font-bold text-text-primary">Selected Projects</h2>
+              </div>
+              <Link to="/projects" className="hidden md:inline-flex items-center gap-1 text-text-secondary hover:text-text-primary text-sm font-medium group">
+                View all
+                <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </motion.div>
 
           {projectsLoading ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -164,57 +296,104 @@ export function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {displayProjects.map((project, i) => (
+            <div className="space-y-8">
+              {/* Featured flagship card */}
+              {displayProjects.length > 0 && (
                 <motion.div
-                  key={project.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
+                  transition={{ duration: 0.6 }}
                 >
                   <Link
-                    to={`/projects/${project.slug}`}
-                    className="group block glass rounded-2xl overflow-hidden card-hover"
+                    to={`/projects/${displayProjects[0].slug}`}
+                    className="group block overflow-hidden rounded-lg border border-border-subtle bg-surface-base/50 hover:border-border-hover transition-all duration-300"
                   >
-                    <div className="aspect-[4/3] overflow-hidden bg-foreground/5 relative">
-                      {project.cover_image_url && (
+                    <div className="aspect-video overflow-hidden bg-surface-elevated relative">
+                      {displayProjects[0].cover_image_url && (
                         <img
-                          src={project.cover_image_url}
-                          alt={project.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          src={displayProjects[0].cover_image_url}
+                          alt={displayProjects[0].title}
+                          loading="lazy"
+                          className="w-full h-full object-cover transition-transform duration-600 group-hover:scale-105"
                         />
                       )}
-                      <div className="absolute top-3 right-3">
-                        <span className={`badge ${project.status === 'Live' ? '!bg-success-500/20 !text-success-400 !border-success-500/30' : '!bg-warning-500/20 !text-warning-400 !border-warning-500/30'}`}>
-                          {project.status}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="p-5">
-                      <div className="flex items-center gap-2 mb-2">
-                        {project.category && (
-                          <span className="text-xs font-medium" style={{ color: project.category.color }}>
-                            {project.category.name}
-                          </span>
-                        )}
-                        <span className="text-foreground/20">·</span>
-                      </div>
-                      <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-accent-400 transition-colors">
-                        {project.title}
-                      </h3>
-                      <p className="text-sm text-foreground/50 line-clamp-2">{project.excerpt || project.description}</p>
-                      <div className="mt-4 flex flex-wrap gap-1.5">
-                        {(project.technologies || []).slice(0, 4).map((tech) => (
-                          <span key={tech.id} className="badge !text-xs !py-0.5">
-                            {tech.name}
-                          </span>
-                        ))}
+                      {/* Dark gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-void-950 via-transparent to-transparent" />
+                      
+                      {/* Metadata and title overlay */}
+                      <div className="absolute inset-0 flex flex-col justify-end p-8">
+                        <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-3">
+                          {displayProjects[0].category?.name || 'PROJECT'} • {new Date(displayProjects[0].created_at).getFullYear()}
+                        </p>
+                        <h3 className="text-display-md font-bold text-text-primary mb-2">{displayProjects[0].title}</h3>
+                        <p className="text-text-secondary text-sm line-clamp-2">{displayProjects[0].excerpt || displayProjects[0].description}</p>
                       </div>
                     </div>
                   </Link>
                 </motion.div>
-              ))}
+              )}
+
+              {/* Secondary grid */}
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {displayProjects.slice(1).map((project, i) => (
+                  <motion.div
+                    key={project.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      duration: 0.5,
+                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      delay: (i + 1) * 0.05,
+                    }}
+                  >
+                    <Link
+                      to={`/projects/${project.slug}`}
+                      className="group block border border-border-subtle bg-surface-base/50 rounded-lg overflow-hidden hover:border-border-hover hover:shadow-glow-cyan transition-all duration-300"
+                    >
+                      {/* Image */}
+                      <div className="aspect-[4/3] overflow-hidden bg-surface-elevated relative">
+                        {project.cover_image_url && (
+                          <img
+                            src={project.cover_image_url}
+                            alt={project.title}
+                            loading="lazy"
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-5">
+                        {/* Metadata */}
+                        <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-mono mb-3">
+                          {project.category?.name || 'PROJECT'} • {new Date(project.created_at).getFullYear()} • {(project.technologies || []).map((t) => t.name).join(', ').substring(0, 20)}
+                        </p>
+
+                        {/* Title */}
+                        <h3 className="text-lg font-bold text-text-primary mb-2 group-hover:text-accent-primary transition-colors">
+                          {project.title}
+                        </h3>
+
+                        {/* Description */}
+                        <p className="text-sm text-text-secondary line-clamp-2 mb-4">
+                          {project.excerpt || project.description}
+                        </p>
+
+                        {/* Tech stack badges */}
+                        <div className="flex flex-wrap gap-1.5">
+                          {(project.technologies || []).slice(0, 3).map((tech) => (
+                            <span key={tech.id} className="inline-flex px-2 py-1 border border-border-subtle rounded text-xs uppercase tracking-[0.12em] text-text-secondary hover:border-border-hover transition-all">
+                              {tech.name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -226,56 +405,23 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Skills */}
-      <section className="py-24 relative">
-        <div className="section-container">
-          <div className="text-center mb-12">
-            <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">Tech Stack</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">Skills & Expertise</h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Object.entries(skillsByCategory).map(([category, items], catIdx) => (
-              <motion.div
-                key={category}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: catIdx * 0.1 }}
-                className="glass rounded-2xl p-6"
-              >
-                <h3 className="text-foreground font-semibold mb-4 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-accent-400" />
-                  {category}
-                </h3>
-                <div className="space-y-3">
-                  {(items as any[]).map((skill) => (
-                    <div key={skill.id} className="flex items-center gap-3">
-                      {skill.icon_url ? (
-                        <img src={skill.icon_url} alt={skill.name} className="h-6 w-6 rounded object-contain shrink-0" />
-                      ) : (
-                        <span className="h-6 w-6 rounded bg-accent-500/15 text-accent-400 flex items-center justify-center text-xs font-bold shrink-0">
-                          {skill.name.trim().charAt(0).toUpperCase()}
-                        </span>
-                      )}
-                      <span className="text-sm text-foreground/70">{skill.name.trim()}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Services */}
       {(services || []).length > 0 && (
-        <section className="py-24 relative">
+        <section className="py-section relative">
           <div className="section-container">
-            <div className="text-center mb-12">
-              <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">What I Do</p>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground">Services</h2>
-            </div>
+            {/* Section header */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="mb-16"
+            >
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+                END-TO-END DELIVERY • ENGINEERING MINDSET
+              </p>
+              <h2 className="text-display-md font-bold text-text-primary">Services</h2>
+            </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {(services || []).map((service, i) => {
@@ -286,19 +432,23 @@ export function HomePage() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="glass rounded-2xl p-6 card-hover"
+                    transition={{
+                      duration: 0.6,
+                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      delay: i * 0.05,
+                    }}
+                    className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:border-border-hover hover:shadow-glow-cyan transition-all duration-300 group"
                   >
-                    <div className="h-12 w-12 rounded-xl bg-accent-500/10 flex items-center justify-center mb-4">
-                      <Icon size={24} className="text-accent-400" />
+                    <div className="h-12 w-12 rounded-lg bg-accent-primary/10 flex items-center justify-center mb-4">
+                      <Icon size={24} className="text-accent-primary" />
                     </div>
-                    <h3 className="text-foreground font-bold mb-2">{service.title}</h3>
-                    <p className="text-sm text-foreground/50 mb-4">{service.description}</p>
+                    <h3 className="text-text-primary font-bold mb-2">{service.title}</h3>
+                    <p className="text-sm text-text-secondary mb-4">{service.description}</p>
                     {(service.included_items || []).length > 0 && (
                       <ul className="space-y-1.5">
-                        {(service.included_items || []).map((item, idx) => (
-                          <li key={idx} className="text-xs text-foreground/60 flex items-start gap-2">
-                            <CheckCircle2 size={14} className="text-accent-400 shrink-0 mt-0.5" />
+                        {(service.included_items || []).slice(0, 3).map((item, idx) => (
+                          <li key={idx} className="text-xs text-text-tertiary flex items-start gap-2">
+                            <CheckCircle2 size={14} className="text-status-emerald shrink-0 mt-0.5" />
                             {item}
                           </li>
                         ))}

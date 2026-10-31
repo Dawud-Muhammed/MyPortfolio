@@ -24,169 +24,235 @@ export function AboutPage() {
 
       <div className="pt-32 pb-20">
         <div className="section-container">
-          {/* Hero */}
+          {/* Hero Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="grid lg:grid-cols-3 gap-12 items-start mb-20"
+            className="grid lg:grid-cols-2 gap-gutter items-start mb-section"
           >
-            <div className="lg:col-span-1">
-              {profile?.profile_picture_url && (
-                <div className="aspect-square rounded-3xl overflow-hidden glass">
-                  <img src={profile.profile_picture_url} alt={profile.name} className="w-full h-full object-cover" />
-                </div>
-              )}
-            </div>
-            <div className="lg:col-span-2">
-              <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">About Me</p>
-              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">{profile?.name || 'Dawud Muhammed'}</h1>
-              <p className="text-xl text-accent-400 font-medium mb-6">{profile?.title || 'Full-Stack Software Engineer'}</p>
-              <p className="text-foreground/60 text-lg leading-relaxed mb-6">{profile?.bio}</p>
+            {/* Left: Profile picture */}
+            {profile?.profile_picture_url && (
+              <div className="aspect-square rounded-lg overflow-hidden border border-border-subtle bg-surface-elevated">
+                <img src={profile.profile_picture_url} alt={profile.name} className="w-full h-full object-cover" />
+              </div>
+            )}
 
-              <div className="flex flex-wrap gap-4 mb-6">
+            {/* Right: Bio and info */}
+            <div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="mb-8"
+              >
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">ABOUT ME</p>
+                <h1 className="text-display-md font-bold text-text-primary mb-4">{profile?.name || 'Dawud Muhammed'}</h1>
+                <p className="text-lg text-accent-primary font-medium mb-6">{profile?.title || 'Full-Stack Software Engineer'}</p>
+                <p className="text-base text-text-secondary leading-relaxed">{profile?.bio}</p>
+              </motion.div>
+
+              {/* Contact info grid */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="space-y-3 mb-8"
+              >
                 {profile?.email && (
-                  <a href={`mailto:${profile.email}`} className="inline-flex items-center gap-2 text-foreground/60 hover:text-foreground text-sm">
-                    <Mail size={16} className="text-accent-400" />
+                  <a href={`mailto:${profile.email}`} className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary text-sm transition-colors">
+                    <Mail size={16} className="text-accent-primary" />
                     {profile.email}
                   </a>
                 )}
                 {profile?.phone && (
-                  <span className="inline-flex items-center gap-2 text-foreground/60 text-sm">
-                    <Phone size={16} className="text-accent-400" />
+                  <a href={`tel:${profile.phone}`} className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary text-sm transition-colors">
+                    <Phone size={16} className="text-accent-primary" />
                     {profile.phone}
-                  </span>
+                  </a>
                 )}
                 {profile?.location && (
-                  <span className="inline-flex items-center gap-2 text-foreground/60 text-sm">
-                    <MapPin size={16} className="text-accent-400" />
+                  <div className="inline-flex items-center gap-2 text-text-secondary text-sm">
+                    <MapPin size={16} className="text-accent-primary" />
                     {profile.location}
-                  </span>
+                  </div>
                 )}
-              </div>
+              </motion.div>
 
+              {/* Availability indicator */}
               {profile?.availability && (
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-status-emerald/10 border border-status-emerald/30 mb-8"
+                >
                   <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-success-500" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-emerald opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-status-emerald" />
                   </span>
-                  <span className="text-foreground/80 text-sm font-medium">Available for work</span>
-                </div>
+                  <span className="font-mono text-xs uppercase tracking-[0.18em] text-status-emerald">Available for work</span>
+                </motion.div>
               )}
 
-              <div>
-                {profile?.resume_url ? (
-                  <a
-                    href={profile.resume_url}
-                    download
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-primary"
-                  >
-                    <Download size={16} />
-                    Download Resume
-                  </a>
-                ) : (
-                  <button disabled className="btn-primary opacity-50 cursor-not-allowed" title="No resume uploaded yet">
-                    <Download size={16} />
-                    Download Resume
-                  </button>
-                )}
-              </div>
+              {/* Resume button */}
+              {profile?.resume_url && (
+                <motion.a
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  href={profile.resume_url}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 border border-border-subtle bg-text-primary text-void-950 rounded-lg font-semibold uppercase text-xs tracking-[0.12em] hover:bg-text-primary/90 transition-all"
+                >
+                  <Download size={16} />
+                  Download Resume
+                </motion.a>
+              )}
             </div>
           </motion.div>
 
-          {/* Skills */}
-          <section className="mb-20">
-            <h2 className="text-3xl font-bold text-foreground mb-8 text-center">Skills & Expertise</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Object.entries(skillsByCategory).map(([category, items], catIdx) => (
-                <motion.div
-                  key={category}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: catIdx * 0.1 }}
-                  className="glass rounded-2xl p-6"
-                >
-                  <h3 className="text-foreground font-semibold mb-4 flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-accent-400" />
-                    {category}
-                  </h3>
-                  <div className="space-y-3">
-                    {items.map((skill) => (
-                      <div key={skill.id} className="flex items-center gap-2">
-                        <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
-                        <span className="text-sm text-foreground/70">{skill.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </section>
+          {/* Experience Section */}
+          {(experience || []).length > 0 && (
+            <section className="mb-section">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="mb-16"
+              >
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+                  CAREER & EDUCATION • PROFESSIONAL TIMELINE
+                </p>
+                <h2 className="text-display-md font-bold text-text-primary">Work Experience</h2>
+              </motion.div>
 
-          {/* Experience */}
-          <section className="mb-20">
-            <h2 className="text-3xl font-bold text-foreground mb-8 text-center flex items-center justify-center gap-2">
-              <Briefcase size={28} className="text-accent-400" />
-              Work Experience
-            </h2>
-            <div className="max-w-3xl mx-auto">
-              {(experience || []).map((exp, i) => (
-                <motion.div
-                  key={exp.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="relative pl-8 pb-12 last:pb-0"
-                >
-                  {i < (experience || []).length - 1 && (
-                    <div className="absolute left-2.5 top-2 bottom-0 w-px bg-foreground/10" />
-                  )}
-                  <div className="absolute left-0 top-1.5 h-5 w-5 rounded-full bg-accent-500/20 border-2 border-accent-400 flex items-center justify-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-accent-400" />
-                  </div>
-                  <div className="glass rounded-2xl p-5 card-hover">
-                    <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-                      <div>
-                        <h3 className="text-foreground font-bold text-lg">{exp.role}</h3>
-                        <p className="text-accent-400 text-sm font-medium">{exp.company}</p>
-                      </div>
-                      <span className="text-xs text-foreground/40 flex items-center gap-1">
-                        <Calendar size={12} />
-                        {exp.start_date} — {exp.is_current ? 'Present' : exp.end_date}
-                      </span>
+              <div className="max-w-3xl">
+                {(experience || []).map((exp, i) => (
+                  <motion.div
+                    key={exp.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      duration: 0.6,
+                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      delay: i * 0.05,
+                    }}
+                    className="relative pl-8 pb-12 last:pb-0 group"
+                  >
+                    {i < (experience || []).length - 1 && (
+                      <div className="absolute left-2.5 top-6 bottom-0 w-px bg-border-subtle group-hover:bg-border-hover transition-colors" />
+                    )}
+                    <div className="absolute left-0 top-1.5 h-5 w-5 rounded-full bg-surface-elevated border-2 border-accent-primary flex items-center justify-center">
+                      <div className="h-1.5 w-1.5 rounded-full bg-accent-primary" />
                     </div>
-                    <p className="text-sm text-foreground/50 mt-2 leading-relaxed">{exp.description}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </section>
 
-          {/* Education */}
+                    <div className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:border-border-hover transition-all">
+                      {/* Metadata bar */}
+                      <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-mono mb-2">
+                        {exp.role} • {exp.start_date} — {exp.is_current ? 'Present' : exp.end_date} • {exp.company}
+                      </p>
+
+                      {/* Title */}
+                      <h3 className="text-text-primary font-bold text-lg mb-1">{exp.role}</h3>
+                      <p className="text-accent-primary text-sm font-medium mb-4">{exp.company}</p>
+
+                      {/* Description */}
+                      <p className="text-sm text-text-secondary leading-relaxed">{exp.description}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Education Section */}
           {(education || []).length > 0 && (
-            <section className="mb-20">
-              <h2 className="text-3xl font-bold text-foreground mb-8 text-center flex items-center justify-center gap-2">
-                <GraduationCap size={28} className="text-accent-400" />
-                Education
-              </h2>
-              <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <section className="mb-section">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="mb-16"
+              >
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+                  ACADEMIC BACKGROUND • CONTINUOUS LEARNING
+                </p>
+                <h2 className="text-display-md font-bold text-text-primary">Education</h2>
+              </motion.div>
+
+              <div className="grid md:grid-cols-2 gap-6 max-w-3xl">
                 {(education || []).map((edu, i) => (
                   <motion.div
                     key={edu.id}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="glass rounded-2xl p-6 card-hover"
+                    transition={{
+                      duration: 0.6,
+                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      delay: i * 0.05,
+                    }}
+                    className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:border-border-hover transition-all"
                   >
-                    <h3 className="text-foreground font-bold mb-1">{edu.institution}</h3>
-                    <p className="text-accent-400 text-sm font-medium mb-2">{edu.degree}</p>
-                    <p className="text-foreground/40 text-sm">{edu.field}</p>
-                    <p className="text-foreground/30 text-xs mt-2">{edu.start_date} — {edu.end_date || 'Present'}</p>
+                    <h3 className="text-text-primary font-bold mb-1">{edu.institution}</h3>
+                    <p className="text-accent-primary text-sm font-medium mb-2">{edu.degree}</p>
+                    <p className="text-text-secondary text-sm mb-3">{edu.field}</p>
+                    <p className="font-mono text-xs uppercase tracking-[0.12em] text-text-mono">
+                      {edu.start_date} — {edu.end_date || 'Present'}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Skills Matrix */}
+          {Object.keys(skillsByCategory).length > 0 && (
+            <section className="mb-section">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="mb-16"
+              >
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+                  TECHNICAL EXPERTISE • SYSTEMS & ARCHITECTURE
+                </p>
+                <h2 className="text-display-md font-bold text-text-primary">Skills & Technologies</h2>
+              </motion.div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {Object.entries(skillsByCategory).map(([category, items], catIdx) => (
+                  <motion.div
+                    key={category}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      duration: 0.6,
+                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      delay: catIdx * 0.05,
+                    }}
+                    className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-5 hover:border-border-hover hover:shadow-glow-cyan transition-all"
+                  >
+                    <h3 className="text-text-primary font-bold mb-2">{category}</h3>
+                    <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-mono mb-4">
+                      {category.replace(/\s+/g, '_').toUpperCase()}
+                    </p>
+                    <div className="space-y-2">
+                      {(items as any[]).slice(0, 6).map((skill) => (
+                        <div key={skill.id} className="flex items-center gap-2">
+                          <span className="h-1.5 w-1.5 rounded-full bg-status-emerald" />
+                          <span className="text-xs text-text-secondary">{skill.name}</span>
+                        </div>
+                      ))}
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -195,11 +261,20 @@ export function AboutPage() {
 
           {/* Certifications */}
           {(certifications || []).length > 0 && (
-            <section className="mb-20">
-              <h2 className="text-3xl font-bold text-foreground mb-8 text-center flex items-center justify-center gap-2">
-                <Award size={28} className="text-accent-400" />
-                Certifications
-              </h2>
+            <section className="mb-section">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="mb-16"
+              >
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+                  CREDENTIALS • PROFESSIONAL CERTIFICATIONS
+                </p>
+                <h2 className="text-display-md font-bold text-text-primary">Certifications</h2>
+              </motion.div>
+
               <div className="grid md:grid-cols-3 gap-6">
                 {(certifications || []).map((cert, i) => (
                   <motion.div
@@ -207,15 +282,21 @@ export function AboutPage() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="glass rounded-2xl p-6 card-hover"
+                    transition={{
+                      duration: 0.6,
+                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      delay: i * 0.05,
+                    }}
+                    className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:border-border-hover transition-all"
                   >
-                    <h3 className="text-foreground font-bold mb-1">{cert.title}</h3>
-                    <p className="text-accent-400 text-sm font-medium mb-2">{cert.issuer}</p>
-                    <p className="text-foreground/40 text-xs">{cert.issue_date}{cert.expiry_date ? ` — ${cert.expiry_date}` : ''}</p>
+                    <h3 className="text-text-primary font-bold mb-1">{cert.title}</h3>
+                    <p className="text-accent-primary text-sm font-medium mb-2">{cert.issuer}</p>
+                    <p className="font-mono text-xs uppercase tracking-[0.12em] text-text-mono mb-3">
+                      {cert.issue_date}{cert.expiry_date ? ` — ${cert.expiry_date}` : ''}
+                    </p>
                     {cert.verify_url && (
-                      <a href={cert.verify_url} target="_blank" rel="noopener noreferrer" className="text-accent-400 text-xs mt-2 inline-block hover:underline">
-                        Verify credential
+                      <a href={cert.verify_url} target="_blank" rel="noopener noreferrer" className="text-accent-primary text-xs font-medium hover:underline">
+                        Verify credential →
                       </a>
                     )}
                   </motion.div>
@@ -226,11 +307,20 @@ export function AboutPage() {
 
           {/* Achievements */}
           {(achievements || []).length > 0 && (
-            <section className="mb-20">
-              <h2 className="text-3xl font-bold text-foreground mb-8 text-center flex items-center justify-center gap-2">
-                <Star size={28} className="text-accent-400" />
-                Achievements & Awards
-              </h2>
+            <section>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="mb-16"
+              >
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+                  RECOGNITION • ACHIEVEMENTS & AWARDS
+                </p>
+                <h2 className="text-display-md font-bold text-text-primary">Achievements & Awards</h2>
+              </motion.div>
+
               <div className="grid md:grid-cols-3 gap-6">
                 {(achievements || []).map((ach, i) => (
                   <motion.div
@@ -238,16 +328,20 @@ export function AboutPage() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="glass rounded-2xl p-6 card-hover"
+                    transition={{
+                      duration: 0.6,
+                      ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      delay: i * 0.05,
+                    }}
+                    className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:border-border-hover transition-all"
                   >
                     {ach.image_url && (
-                      <img src={ach.image_url} alt={ach.title} className="h-12 w-12 rounded-xl object-cover mb-3" />
+                      <img src={ach.image_url} alt={ach.title} className="h-12 w-12 rounded-lg object-cover mb-4" />
                     )}
-                    <h3 className="text-foreground font-bold mb-1">{ach.title}</h3>
-                    <p className="text-accent-400 text-sm font-medium mb-2">{ach.issuer}</p>
-                    <p className="text-foreground/40 text-xs mb-2">{ach.date}</p>
-                    {ach.description && <p className="text-foreground/50 text-sm leading-relaxed">{ach.description}</p>}
+                    <h3 className="text-text-primary font-bold mb-1">{ach.title}</h3>
+                    <p className="text-accent-primary text-sm font-medium mb-2">{ach.issuer}</p>
+                    <p className="font-mono text-xs uppercase tracking-[0.12em] text-text-mono mb-3">{ach.date}</p>
+                    {ach.description && <p className="text-text-secondary text-sm leading-relaxed">{ach.description}</p>}
                   </motion.div>
                 ))}
               </div>

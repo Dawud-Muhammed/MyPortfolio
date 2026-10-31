@@ -56,161 +56,178 @@ export function ContactPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
+            className="mb-16"
           >
-            <p className="text-accent-400 font-mono text-sm tracking-widest mb-2 uppercase">Get in Touch</p>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Let's Talk</h1>
-            <p className="text-foreground/50 max-w-2xl mx-auto">
-              Have a project in mind, a question, or just want to say hello? I'd love to hear from you. Fill out the form below or reach me directly.
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+              GET IN TOUCH • LET'S COLLABORATE
+            </p>
+            <h1 className="text-display-md font-bold text-text-primary mb-4">Contact</h1>
+            <p className="text-base text-text-secondary max-w-2xl">
+              Have a project in mind, a question, or just want to say hello? I'd love to hear from you. Fill out the form below or reach out directly through any of the channels.
             </p>
           </motion.div>
 
           <div className="grid lg:grid-cols-5 gap-8">
-            {/* Contact info */}
+            {/* Left column: Social links (terminal-inspired) */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="lg:col-span-2 space-y-4"
+              className="lg:col-span-2 space-y-3"
             >
+              {/* Email */}
               {profile?.email && (
-                <a href={`mailto:${profile.email}`} className="glass rounded-2xl p-6 flex items-start gap-4 card-hover block">
-                  <div className="h-12 w-12 rounded-xl bg-accent-500/10 flex items-center justify-center shrink-0">
-                    <Mail size={20} className="text-accent-400" />
+                <a
+                  href={`mailto:${profile.email}`}
+                  className="block border-b border-border-subtle hover:border-border-hover hover:bg-surface-elevated/30 px-4 py-4 text-text-secondary hover:text-text-primary transition-all group"
+                >
+                  <div className="font-mono text-xs uppercase tracking-[0.12em] text-text-mono group-hover:text-accent-primary transition-colors">
+                    EMAIL
                   </div>
-                  <div>
-                    <h3 className="text-foreground font-semibold mb-1">Email</h3>
-                    <p className="text-foreground/50 text-sm">{profile.email}</p>
-                  </div>
+                  <div className="text-sm mt-1">{profile.email}</div>
                 </a>
               )}
 
+              {/* Phone */}
               {profile?.phone && (
-                <a href={`tel:${profile.phone}`} className="glass rounded-2xl p-6 flex items-start gap-4 card-hover block">
-                  <div className="h-12 w-12 rounded-xl bg-accent-500/10 flex items-center justify-center shrink-0">
-                    <Phone size={20} className="text-accent-400" />
+                <a
+                  href={`tel:${profile.phone}`}
+                  className="block border-b border-border-subtle hover:border-border-hover hover:bg-surface-elevated/30 px-4 py-4 text-text-secondary hover:text-text-primary transition-all group"
+                >
+                  <div className="font-mono text-xs uppercase tracking-[0.12em] text-text-mono group-hover:text-accent-primary transition-colors">
+                    PHONE
                   </div>
-                  <div>
-                    <h3 className="text-foreground font-semibold mb-1">Phone</h3>
-    <p className="text-foreground/50 text-sm">{profile.phone}</p>
-                  </div>
+                  <div className="text-sm mt-1">{profile.phone}</div>
                 </a>
               )}
 
+              {/* Location */}
               {profile?.location && (
-                <div className="glass rounded-2xl p-6 flex items-start gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-accent-500/10 flex items-center justify-center shrink-0">
-                    <MapPin size={20} className="text-accent-400" />
+                <div className="block border-b border-border-subtle px-4 py-4 text-text-secondary">
+                  <div className="font-mono text-xs uppercase tracking-[0.12em] text-text-mono">
+                    LOCATION
                   </div>
-                  <div>
-                    <h3 className="text-foreground font-semibold mb-1">Location</h3>
-                    <p className="text-foreground/50 text-sm">{profile.location}</p>
-                  </div>
+                  <div className="text-sm mt-1">{profile.location}</div>
                 </div>
               )}
 
               {/* Social links */}
-              <div className="glass rounded-2xl p-6">
-                <h3 className="text-foreground font-semibold mb-4">Follow Me</h3>
-                <div className="flex gap-3">
-                  {visibleSocials.map((s) => {
-                    const Icon = platformIcons[s.platform.toLowerCase()] || Mail;
-                    return (
-                      <a
-                        key={s.id}
-                        href={s.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="h-10 w-10 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 flex items-center justify-center text-foreground/60 hover:text-foreground transition-all hover:scale-110"
-                        aria-label={s.platform}
-                      >
-                        <Icon size={18} />
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Map */}
-              {settings?.map_embed_url && (
-                <div className="glass rounded-2xl p-2 overflow-hidden">
-                  <iframe
-                    src={settings.map_embed_url}
-                    width="100%"
-                    height="200"
-                    style={{ border: 0, borderRadius: '1rem' }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="Location map"
-                  />
+              {visibleSocials.length > 0 && (
+                <div>
+                  <p className="font-mono text-xs uppercase tracking-[0.12em] text-text-mono mb-4 px-4">
+                    FOLLOW
+                  </p>
+                  <div className="flex gap-3 px-4">
+                    {visibleSocials.map((s) => {
+                      const Icon = platformIcons[s.platform.toLowerCase()] || Mail;
+                      return (
+                        <a
+                          key={s.id}
+                          href={s.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="h-10 w-10 rounded-lg border border-border-subtle hover:border-border-hover hover:bg-surface-elevated/60 flex items-center justify-center text-text-secondary hover:text-accent-primary transition-all hover:scale-110"
+                          aria-label={s.platform}
+                          title={s.platform}
+                        >
+                          <Icon size={18} />
+                        </a>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </motion.div>
 
-            {/* Contact form */}
+            {/* Right column: Contact Form */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               className="lg:col-span-3"
             >
-              <div className="glass rounded-3xl p-8">
+              <div className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-8">
                 {sent ? (
                   <div className="text-center py-12">
-                    <div className="h-16 w-16 rounded-full bg-success-500/20 flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle2 size={32} className="text-success-400" />
+                    <div className="h-16 w-16 rounded-full bg-status-emerald/10 border border-status-emerald/30 flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle2 size={32} className="text-status-emerald" />
                     </div>
-                    <h3 className="text-2xl font-bold text-foreground mb-2">Message Sent!</h3>
-                    <p className="text-foreground/50 mb-6">Thanks for reaching out. I'll get back to you as soon as possible.</p>
-                    <button onClick={() => setSent(false)} className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10">
+                    <h3 className="text-xl font-bold text-text-primary mb-2">Message Sent!</h3>
+                    <p className="text-text-secondary text-sm mb-6">Thanks for reaching out. I'll get back to you as soon as possible.</p>
+                    <button
+                      onClick={() => setSent(false)}
+                      className="inline-flex items-center gap-2 px-6 py-3 border border-border-subtle rounded-lg text-text-secondary hover:text-text-primary hover:border-border-hover transition-all"
+                    >
                       Send Another Message
                     </button>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-5">
-                    <div className="grid md:grid-cols-2 gap-5">
+                    {/* Name & Email row */}
+                    <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <label className="text-foreground/70 text-sm font-medium mb-2 block">Name</label>
+                        <label className="block font-mono text-xs uppercase tracking-[0.12em] text-text-mono mb-3">
+                          Name
+                        </label>
                         <input
                           type="text"
                           value={form.name}
                           onChange={(e) => setForm({ ...form, name: e.target.value })}
                           placeholder="Your name"
-                          className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50"
+                          className="w-full bg-transparent border-b border-border-subtle focus:border-border-hover text-text-primary placeholder-text-tertiary focus:outline-none pb-2 transition-colors"
                         />
                       </div>
                       <div>
-                        <label className="text-foreground/70 text-sm font-medium mb-2 block">Email</label>
+                        <label className="block font-mono text-xs uppercase tracking-[0.12em] text-text-mono mb-3">
+                          Email
+                        </label>
                         <input
                           type="email"
                           value={form.email}
                           onChange={(e) => setForm({ ...form, email: e.target.value })}
                           placeholder="your@email.com"
-                          className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50"
+                          className="w-full bg-transparent border-b border-border-subtle focus:border-border-hover text-text-primary placeholder-text-tertiary focus:outline-none pb-2 transition-colors"
                         />
                       </div>
                     </div>
+
+                    {/* Subject */}
                     <div>
-                      <label className="text-foreground/70 text-sm font-medium mb-2 block">Subject</label>
+                      <label className="block font-mono text-xs uppercase tracking-[0.12em] text-text-mono mb-3">
+                        Subject
+                      </label>
                       <input
                         type="text"
                         value={form.subject}
                         onChange={(e) => setForm({ ...form, subject: e.target.value })}
                         placeholder="What's this about?"
-                        className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50"
+                        className="w-full bg-transparent border-b border-border-subtle focus:border-border-hover text-text-primary placeholder-text-tertiary focus:outline-none pb-2 transition-colors"
                       />
                     </div>
+
+                    {/* Message */}
                     <div>
-                      <label className="text-foreground/70 text-sm font-medium mb-2 block">Message</label>
+                      <label className="block font-mono text-xs uppercase tracking-[0.12em] text-text-mono mb-3">
+                        Message
+                      </label>
                       <textarea
                         value={form.message}
                         onChange={(e) => setForm({ ...form, message: e.target.value })}
                         placeholder="Tell me about your project..."
                         rows={6}
-                        className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground !placeholder-foreground-muted/50 resize-none"
+                        className="w-full bg-transparent border-b border-border-subtle focus:border-border-hover text-text-primary placeholder-text-tertiary focus:outline-none pb-2 resize-none transition-colors"
                       />
                     </div>
-                    {error && <p className="text-error-400 text-sm">{error}</p>}
-                    <button type="submit" disabled={submitting} className="btn-primary w-full disabled:opacity-50">
+
+                    {/* Error */}
+                    {error && (
+                      <p className="text-danger-400 text-xs font-medium">{error}</p>
+                    )}
+
+                    {/* Submit */}
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="w-full mt-8 inline-flex items-center justify-center gap-2 px-6 py-3 border border-border-subtle bg-text-primary text-void-950 rounded-lg font-semibold uppercase text-xs tracking-[0.12em] hover:bg-text-primary/90 disabled:opacity-50 transition-all"
+                    >
                       <Send size={16} />
                       {submitting ? 'Sending...' : 'Send Message'}
                     </button>
@@ -222,8 +239,20 @@ export function ContactPage() {
 
           {/* FAQs */}
           {(faqs || []).length > 0 && (
-            <div className="mt-20 max-w-3xl mx-auto">
-              <h2 className="text-3xl font-bold text-foreground text-center mb-10">Frequently Asked Questions</h2>
+            <div className="mt-section max-w-3xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="mb-16"
+              >
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
+                  FREQUENTLY ASKED QUESTIONS
+                </p>
+                <h2 className="text-display-md font-bold text-text-primary">FAQs</h2>
+              </motion.div>
+
               <div className="space-y-3">
                 {(faqs || []).map((faq, i) => (
                   <motion.details
@@ -231,14 +260,17 @@ export function ContactPage() {
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.05 }}
-                    className="glass rounded-2xl p-5 group"
+                    transition={{
+                      delay: i * 0.05,
+                      duration: 0.4,
+                    }}
+                    className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-5 group hover:border-border-hover transition-all"
                   >
-                    <summary className="text-foreground font-medium cursor-pointer flex items-center justify-between list-none">
+                    <summary className="text-text-primary font-semibold cursor-pointer flex items-center justify-between list-none">
                       {faq.question}
-                      <span className="text-foreground/40 group-open:rotate-45 transition-transform text-xl">+</span>
+                      <span className="text-text-tertiary group-open:rotate-45 transition-transform text-lg">+</span>
                     </summary>
-                    <p className="text-foreground/50 text-sm mt-3 leading-relaxed">{faq.answer}</p>
+                    <p className="text-text-secondary text-sm mt-3 leading-relaxed">{faq.answer}</p>
                   </motion.details>
                 ))}
               </div>
