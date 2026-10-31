@@ -1,11 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Star, Quote, ArrowUpRight } from 'lucide-react';
-import { useHeroContent, useProjects, useSkills, useTestimonials, useSeoSettings, useExperience, useProfile } from '../lib/queries';
+import { Link } from 'react-router-dom';
+import { Star, Quote, ArrowUpRight } from 'lucide-react';
+import { useHeroContent, useTestimonials, useSeoSettings, useExperience, useProfile } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
 import { motion } from 'framer-motion';
-import { ScrollRevealSection } from '../components/ScrollRevealSection';
-import { SpotlightCard } from '../components/SpotlightCard';
-import { AnimatedButton } from '../components/AnimatedButton';
 
 function computeYearsExperience(experience: { start_date: string; end_date: string | null; is_current: boolean }[]): number {
   if (!experience || experience.length === 0) return 0;
@@ -24,22 +21,11 @@ function computeYearsExperience(experience: { start_date: string; end_date: stri
 }
 
 export function HomePage() {
-  const navigate = useNavigate();
   const { data: hero } = useHeroContent();
   const { data: profile } = useProfile();
-  const { data: projects, loading: projectsLoading } = useProjects();
-  const { data: skills } = useSkills();
   const { data: experience } = useExperience();
   const { data: testimonials } = useTestimonials();
   const { data: seoSettings } = useSeoSettings();
-
-  const featuredProjects = (projects || []).filter((p) => p.is_featured).slice(0, 3);
-  const displayProjects = featuredProjects.length > 0 ? featuredProjects : (projects || []).slice(0, 3);
-  const skillsByCategory = (skills || []).reduce((acc, s) => {
-    if (!acc[s.category]) acc[s.category] = [];
-    acc[s.category].push(s);
-    return acc;
-  }, {} as Record<string, typeof skills>);
 
   const stats = [
     { label: 'Years Experience', value: String(computeYearsExperience(experience || [])) },
@@ -92,26 +78,7 @@ export function HomePage() {
               {profile?.bio || hero?.headline || 'I build scalable, maintainable web systems with modern technologies and engineering best practices.'}
             </p>
 
-            {/* Dual CTA buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-              {/* Primary button: Solid background */}
-              <AnimatedButton
-                variant="primary"
-                onClick={() => navigate(hero?.cta_primary_url || '/projects')}
-              >
-                {hero?.cta_primary_label || 'CONTACT ME'}
-              </AnimatedButton>
-              
-              {/* Secondary button: Bordered */}
-              {hero?.cta_secondary_label && (
-                <AnimatedButton
-                  variant="secondary"
-                  onClick={() => navigate(hero?.cta_secondary_url || '/projects')}
-                >
-                  {hero.cta_secondary_label}
-                </AnimatedButton>
-              )}
-            </div>
+
 
             {/* Quick stats */}
             <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-lg mx-auto">
@@ -141,211 +108,7 @@ export function HomePage() {
 
 
 
-      {/* Skills & Technologies Matrix */}
-      <section className="py-section relative">
-        <div className="section-container">
-          {/* Section header */}
-          <ScrollRevealSection type="combined" duration={0.6}>
-            <div className="mb-16" data-scroll-reveal>
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
-                TECHNICAL EXPERTISE • SYSTEMS & ARCHITECTURE
-              </p>
-              <h2 className="text-display-md font-bold text-text-primary">Skills & Technologies</h2>
-            </div>
-          </ScrollRevealSection>
 
-          {/* Categorized grid: Responsive across breakpoints */}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {skillsByCategory && Object.entries(skillsByCategory).map(([category, items], catIdx) => (
-              <SpotlightCard
-                key={category}
-                className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-5 hover:border-border-hover transition-all duration-300 group hover:shadow-glow-cyan"
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{
-                    duration: 0.6,
-                    delay: catIdx * 0.05,
-                  }}
-                >
-                  {/* Header */}
-                  <h3 className="text-display-md font-bold text-text-primary mb-2">{category}</h3>
-                  
-                  {/* Monospace subtext */}
-                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-mono mb-4">
-                    {category.replace(/\s+/g, '_').toUpperCase()}
-                  </p>
-
-                  {/* Tech badges */}
-                  <div className="flex flex-wrap gap-2">
-                    {(items as any[]).slice(0, 5).map((skill, idx) => (
-                      <motion.span
-                        key={skill.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{
-                          duration: 0.4,
-                          delay: (catIdx * 0.05) + (idx * 0.03),
-                        }}
-                        className="inline-flex px-3 py-2 border border-border-subtle rounded text-xs uppercase tracking-[0.12em] text-text-secondary hover:border-border-hover hover:text-text-primary transition-all duration-300 cursor-default"
-                      >
-                        {skill.name}
-                      </motion.span>
-                    ))}
-                  </div>
-                </motion.div>
-              </SpotlightCard>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Projects */}
-      <section className="py-section relative">
-        <div className="section-container">
-          {/* Section header */}
-          <ScrollRevealSection type="combined" duration={0.6}>
-            <div className="mb-16" data-scroll-reveal>
-              <div className="flex items-end justify-between mb-4">
-                <div>
-                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
-                    FEATURED WORK • ARCHITECTURE & DESIGN
-                  </p>
-                  <h2 className="text-display-md font-bold text-text-primary">Selected Projects</h2>
-                </div>
-                <Link to="/projects" className="hidden md:inline-flex items-center gap-1 text-text-secondary hover:text-text-primary text-sm font-medium group">
-                  View all
-                  <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-                </Link>
-              </div>
-            </div>
-          </ScrollRevealSection>
-
-          {projectsLoading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="aspect-[4/3] rounded-2xl shimmer" />
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-8">
-              {/* Featured flagship card */}
-              {displayProjects.length > 0 && (
-                <SpotlightCard
-                  className="group block overflow-hidden rounded-lg border border-border-subtle bg-surface-base/50 hover:border-border-hover transition-all duration-300"
-                >
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    <Link
-                      to={`/projects/${displayProjects[0].slug}`}
-                      className="group block"
-                    >
-                      <div className="aspect-video overflow-hidden bg-surface-elevated relative">
-                        {displayProjects[0].cover_image_url && (
-                          <img
-                            src={displayProjects[0].cover_image_url}
-                            alt={displayProjects[0].title}
-                            loading="lazy"
-                            className="w-full h-full object-cover transition-transform duration-600 group-hover:scale-105"
-                          />
-                        )}
-                        {/* Dark gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-void-950 via-transparent to-transparent" />
-                        
-                        {/* Metadata and title overlay */}
-                        <div className="absolute inset-0 flex flex-col justify-end p-8">
-                          <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-3">
-                            {displayProjects[0].category?.name || 'PROJECT'} • {new Date(displayProjects[0].created_at).getFullYear()}
-                          </p>
-                          <h3 className="text-display-md font-bold text-text-primary mb-2">{displayProjects[0].title}</h3>
-                          <p className="text-text-secondary text-sm line-clamp-2">{displayProjects[0].excerpt || displayProjects[0].description}</p>
-                        </div>
-                      </div>
-                    </Link>
-                  </motion.div>
-                </SpotlightCard>
-              )}
-
-              {/* Secondary grid: Responsive across all breakpoints */}
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {displayProjects.slice(1).map((project, i) => (
-                  <SpotlightCard
-                    key={project.id}
-                    className="group block border border-border-subtle bg-surface-base/50 rounded-lg overflow-hidden hover:border-border-hover hover:shadow-glow-cyan transition-all duration-300"
-                  >
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{
-                        duration: 0.5,
-                        delay: (i + 1) * 0.05,
-                      }}
-                    >
-                      <Link
-                        to={`/projects/${project.slug}`}
-                        className="group block"
-                      >
-                        {/* Image */}
-                        <div className="aspect-[4/3] overflow-hidden bg-surface-elevated relative">
-                          {project.cover_image_url && (
-                            <img
-                              src={project.cover_image_url}
-                              alt={project.title}
-                              loading="lazy"
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
-                          )}
-                        </div>
-
-                        {/* Content */}
-                        <div className="p-5">
-                          {/* Metadata */}
-                          <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-mono mb-3">
-                            {project.category?.name || 'PROJECT'} • {new Date(project.created_at).getFullYear()} • {(project.technologies || []).map((t) => t.name).join(', ').substring(0, 20)}
-                          </p>
-
-                          {/* Title */}
-                          <h3 className="text-lg font-bold text-text-primary mb-2 group-hover:text-accent-primary transition-colors">
-                            {project.title}
-                          </h3>
-
-                          {/* Description */}
-                          <p className="text-sm text-text-secondary line-clamp-2 mb-4">
-                            {project.excerpt || project.description}
-                          </p>
-
-                          {/* Tech stack badges */}
-                          <div className="flex flex-wrap gap-1.5">
-                            {(project.technologies || []).slice(0, 3).map((tech) => (
-                              <span key={tech.id} className="inline-flex px-2 py-1 border border-border-subtle rounded text-xs uppercase tracking-[0.12em] text-text-secondary hover:border-border-hover transition-all">
-                                {tech.name}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  </SpotlightCard>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="mt-8 md:hidden">
-            <Link to="/projects" className="inline-flex items-center gap-1 text-foreground/60 hover:text-foreground text-sm font-medium">
-              View all <ArrowRight size={14} />
-            </Link>
-          </div>
-        </div>
-      </section>
 
 
 
