@@ -1,17 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Star, Quote, Sparkles, Code2, Zap, CheckCircle2, ArrowUpRight } from 'lucide-react';
-import { useHeroContent, useProjects, useSkills, useTestimonials, useServices, useSeoSettings, useExperience, useProfile } from '../lib/queries';
+import { ArrowRight, Star, Quote, ArrowUpRight, Download } from 'lucide-react';
+import { useHeroContent, useProjects, useSkills, useTestimonials, useSeoSettings, useExperience, useProfile } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
 import { motion } from 'framer-motion';
 import { ScrollRevealSection } from '../components/ScrollRevealSection';
 import { SpotlightCard } from '../components/SpotlightCard';
 import { AnimatedButton } from '../components/AnimatedButton';
-
-const serviceIcons: Record<string, typeof Code2> = {
-  Code: Code2,
-  Zap: Zap,
-  Sparkles: Sparkles,
-};
 
 function computeYearsExperience(experience: { start_date: string; end_date: string | null; is_current: boolean }[]): number {
   if (!experience || experience.length === 0) return 0;
@@ -37,7 +31,6 @@ export function HomePage() {
   const { data: skills } = useSkills();
   const { data: experience } = useExperience();
   const { data: testimonials } = useTestimonials();
-  const { data: services } = useServices();
   const { data: seoSettings } = useSeoSettings();
 
   const featuredProjects = (projects || []).filter((p) => p.is_featured).slice(0, 3);
@@ -118,6 +111,20 @@ export function HomePage() {
                   {hero.cta_secondary_label}
                 </AnimatedButton>
               )}
+
+              {/* Resume download button */}
+              {profile?.resume_url && (
+                <a
+                  href={profile.resume_url}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 border border-border-subtle bg-text-primary text-void-950 rounded-lg font-semibold uppercase text-xs tracking-[0.12em] hover:bg-text-primary/90 transition-all"
+                >
+                  <Download size={16} />
+                  Resume
+                </a>
+              )}
             </div>
 
             {/* Quick stats */}
@@ -146,60 +153,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* About / What I Offer Section */}
-      <section className="py-section relative">
-        <div className="section-container">
-          {/* Section header: Uppercase monospace kicker */}
-          <ScrollRevealSection type="combined" duration={0.6}>
-            <div className="mb-16" data-scroll-reveal>
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
-                ABOUT • FULL-STACK • LARAVEL • REACT
-              </p>
-              <h2 className="text-display-md font-bold text-text-primary">What I Offer</h2>
-            </div>
-          </ScrollRevealSection>
 
-          {/* Editorial split: Bio left, skill pillars right */}
-          <div className="grid lg:grid-cols-2 gap-gutter items-start">
-            {/* Left column: Dynamic bio */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <p className="text-base text-text-secondary leading-relaxed">
-                {profile?.bio || 'I specialize in building full-stack web applications with modern technologies. My approach combines solid engineering fundamentals with a focus on maintainability, scalability, and reliability.'}
-              </p>
-            </motion.div>
-
-            {/* Right column: Skill pillars (4-6 cards) */}
-            <div className="space-y-4">
-              {skillsByCategory && Object.entries(skillsByCategory).slice(0, 6).map(([category, items], idx) => (
-                <SpotlightCard
-                  key={category}
-                  className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:border-border-hover transition-all duration-300"
-                >
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      duration: 0.6,
-                      delay: idx * 0.05,
-                    }}
-                  >
-                    <h3 className="text-display-md font-bold text-text-primary mb-1">{category}</h3>
-                    <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-mono">
-                      {(items as any[]).map((s) => s.name).slice(0, 3).join(' • ')}
-                    </p>
-                  </motion.div>
-                </SpotlightCard>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Skills & Technologies Matrix */}
       <section className="py-section relative">
@@ -407,60 +361,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Services */}
-      {(services || []).length > 0 && (
-        <section className="py-section relative">
-          <div className="section-container">
-            {/* Section header */}
-            <ScrollRevealSection type="combined" duration={0.6}>
-              <div className="mb-16" data-scroll-reveal>
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
-                  END-TO-END DELIVERY • ENGINEERING MINDSET
-                </p>
-                <h2 className="text-display-md font-bold text-text-primary">Services</h2>
-              </div>
-            </ScrollRevealSection>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {(services || []).map((service, i) => {
-                const Icon = serviceIcons[service.icon] || Code2;
-                return (
-                  <SpotlightCard
-                    key={service.id}
-                    className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:border-border-hover hover:shadow-glow-cyan transition-all duration-300 group"
-                  >
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{
-                        duration: 0.6,
-                        delay: i * 0.05,
-                      }}
-                    >
-                      <div className="h-12 w-12 rounded-lg bg-accent-primary/10 flex items-center justify-center mb-4">
-                        <Icon size={24} className="text-accent-primary" />
-                      </div>
-                      <h3 className="text-text-primary font-bold mb-2">{service.title}</h3>
-                      <p className="text-sm text-text-secondary mb-4">{service.description}</p>
-                      {(service.included_items || []).length > 0 && (
-                        <ul className="space-y-1.5">
-                          {(service.included_items || []).slice(0, 3).map((item, idx) => (
-                            <li key={idx} className="text-xs text-text-tertiary flex items-start gap-2">
-                              <CheckCircle2 size={14} className="text-status-emerald shrink-0 mt-0.5" />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </motion.div>
-                  </SpotlightCard>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Testimonials */}
       {(testimonials || []).length > 0 && (

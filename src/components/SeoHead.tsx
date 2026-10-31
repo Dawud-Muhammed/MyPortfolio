@@ -28,8 +28,9 @@ export function SeoHead({ title, description, image, seoSettings }: {
     setMeta('og:title', fullTitle, 'property');
     setMeta('og:description', metaDesc, 'property');
     setMeta('og:type', 'website', 'property');
-    if (image || seoSettings?.og_image_url) {
-      const ogImage = image || seoSettings?.og_image_url || '';
+    
+    const ogImage = image || seoSettings?.og_image_url || '';
+    if (ogImage) {
       setMeta('og:image', ogImage, 'property');
       setMeta('twitter:image', ogImage);
     }

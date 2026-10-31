@@ -118,7 +118,7 @@ export function CrudModule({ config }: { config: CrudConfig }) {
           {filtered.map((item) => (
             <div
               key={item.id}
-              className="glass rounded-xl p-3 sm:p-4 flex items-center gap-3 group hover:border-foreground/20 transition-colors"
+              className="glass rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 group hover:border-foreground/20 transition-colors"
             >
               {config.imageField && item[config.imageField] && (
                 <img
@@ -127,7 +127,7 @@ export function CrudModule({ config }: { config: CrudConfig }) {
                   className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg object-cover shrink-0"
                 />
               )}
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 w-full sm:w-auto">
                 <p className="text-foreground font-medium truncate text-sm sm:text-base">
                   {item[config.displayField]}
                 </p>
@@ -148,17 +148,17 @@ export function CrudModule({ config }: { config: CrudConfig }) {
                   {item[config.statusField]}
                 </span>
               )}
-              <div className="flex gap-1 shrink-0">
+              <div className="flex gap-1 shrink-0 w-full sm:w-auto">
                 <button
                   onClick={() => { setEditing(item); setShowForm(true); }}
-                  className="p-2 rounded-lg text-foreground/50 hover:text-accent-400 hover:bg-foreground/10 transition-all"
+                  className="flex-1 sm:flex-none p-2 rounded-lg text-foreground/50 hover:text-accent-400 hover:bg-foreground/10 transition-all"
                   aria-label="Edit"
                 >
                   <Edit3 size={16} />
                 </button>
                 <button
                   onClick={() => handleDelete(item.id)}
-                  className="p-2 rounded-lg text-foreground/50 hover:text-error-400 hover:bg-error-500/10 transition-all"
+                  className="flex-1 sm:flex-none p-2 rounded-lg text-foreground/50 hover:text-error-400 hover:bg-error-500/10 transition-all"
                   aria-label="Delete"
                 >
                   <Trash2 size={16} />
