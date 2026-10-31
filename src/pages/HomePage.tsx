@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, Star, Quote, Sparkles, Code2, Zap, CheckCircle2 } from 'lucide-react';
-import { useHeroContent, useProjects, useSkills, useTestimonials, useServices, useSeoSettings, useExperience } from '../lib/queries';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, Star, Quote, Sparkles, Code2, Zap, CheckCircle2 } from 'lucide-react';
+import { useHeroContent, useProjects, useSkills, useTestimonials, useServices, useSeoSettings, useExperience, useProfile } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
 import { motion } from 'framer-motion';
 
@@ -27,7 +27,9 @@ function computeYearsExperience(experience: { start_date: string; end_date: stri
 }
 
 export function HomePage() {
+  const navigate = useNavigate();
   const { data: hero } = useHeroContent();
+  const { data: profile } = useProfile();
   const { data: projects, loading: projectsLoading } = useProjects();
   const { data: skills } = useSkills();
   const { data: experience } = useExperience();
@@ -49,10 +51,6 @@ export function HomePage() {
     { label: 'Skills', value: String((skills || []).length) },
   ];
 
-  const headline = hero?.headline || 'I build things for the web';
-  const highlightedWord = hero?.highlighted_word || 'the web';
-  const headlineParts = headline.split(highlightedWord);
-
   return (
     <>
       <SeoHead seoSettings={seoSettings} />
@@ -66,51 +64,61 @@ export function HomePage() {
             transition={{ duration: 0.6 }}
             className="max-w-4xl mx-auto text-center"
           >
-            {/* Availability badge */}
+            {/* Availability status pill: Pulsing green indicator + dynamic location */}
             {hero?.availability_status && (
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 animate-fade-in">
+              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-status-emerald/10 border border-status-emerald/30 mb-8">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-success-500" />
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-emerald opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-status-emerald" />
                 </span>
-                <span className="text-foreground/80 text-sm font-medium">{hero.availability_label || 'Available for work'}</span>
+                <span className="font-mono text-xs uppercase tracking-[0.18em] text-status-emerald">
+                  • {hero.availability_label || 'OPEN TO OPPORTUNITIES'}
+                </span>
               </div>
             )}
 
-            {/* Kicker */}
-            {hero?.kicker && (
-              <p className="text-accent-400 font-mono text-sm tracking-widest mb-6 uppercase">
-                {hero.kicker}
-              </p>
-            )}
-
-            {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-[1.1] tracking-tight text-balance">
-              {headlineParts[0]}
-              <span className="text-gradient">{highlightedWord}</span>
-              {headlineParts[1]}
+            {/* Monumental stacked display title with hollow/outlined effect */}
+            <h1 className="text-display-xl font-bold uppercase mt-6 mb-4 leading-[1.1]" style={{
+              WebkitTextStroke: '1.5px rgba(255, 255, 255, 0.85)',
+              WebkitTextFillColor: 'transparent',
+              color: 'transparent',
+            }}>
+              {profile?.name || 'DAWUD'}
             </h1>
 
-            {/* Subheadline */}
-            <p className="mt-8 text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto leading-relaxed text-balance">
-              {hero?.subheadline || 'Full-stack engineer crafting performant, accessible, and beautiful digital products.'}
+            {/* Sub-headline: Bold engineering value prop */}
+            <h2 className="text-display-md font-bold text-text-primary mb-6 leading-[1.2]">
+              {hero?.subheadline || 'Full-Stack Software Engineer Building Reliable Web Systems'}
+            </h2>
+
+            {/* Bio paragraph: Dynamic from CMS */}
+            <p className="text-base text-text-secondary max-w-2xl mx-auto leading-relaxed mb-10">
+              {profile?.bio || hero?.headline || 'I build scalable, maintainable web systems with modern technologies and engineering best practices.'}
             </p>
 
-            {/* CTAs */}
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to={hero?.cta_primary_url || '/projects'} className="btn-primary group">
-                {hero?.cta_primary_label || 'View Projects'}
-                <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-              </Link>
+            {/* Dual CTA buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+              {/* Primary button: Solid background */}
+              <button
+                onClick={() => navigate(hero?.cta_primary_url || '/projects')}
+                className="font-mono text-xs uppercase tracking-[0.18em] px-8 py-4 bg-text-primary text-void-950 rounded-lg font-bold hover:bg-text-primary/90 transition-all duration-300 cursor-pointer"
+              >
+                {hero?.cta_primary_label || 'CONTACT ME'}
+              </button>
+              
+              {/* Secondary button: Bordered */}
               {hero?.cta_secondary_label && (
-                <Link to="/contact" className="btn-ghost !text-foreground !border-foreground/20 hover:!bg-foreground/10">
+                <button
+                  onClick={() => navigate(hero?.cta_secondary_url || '/projects')}
+                  className="font-mono text-xs uppercase tracking-[0.18em] px-8 py-4 border border-border-subtle rounded-lg text-text-primary hover:bg-surface-elevated/60 hover:border-border-hover transition-all duration-300 cursor-pointer"
+                >
                   {hero.cta_secondary_label}
-                </Link>
+                </button>
               )}
             </div>
 
             {/* Quick stats */}
-            <div className="mt-16 grid grid-cols-3 gap-4 sm:gap-8 max-w-lg mx-auto">
+            <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-lg mx-auto">
               {stats.map((stat, i) => (
                 <motion.div
                   key={stat.label}
@@ -119,8 +127,8 @@ export function HomePage() {
                   transition={{ delay: 0.3 + i * 0.1 }}
                   className="text-center"
                 >
-                  <div className="text-2xl md:text-3xl font-bold text-foreground">{stat.value}</div>
-                  <div className="text-xs text-foreground/40 mt-1">{stat.label}</div>
+                  <div className="text-2xl md:text-3xl font-bold text-text-primary">{stat.value}</div>
+                  <div className="text-xs text-text-tertiary mt-1 font-mono uppercase tracking-[0.12em]">{stat.label}</div>
                 </motion.div>
               ))}
             </div>
@@ -129,8 +137,8 @@ export function HomePage() {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce-subtle">
-          <div className="w-6 h-10 rounded-full border-2 border-foreground/20 flex items-start justify-center p-1.5">
-            <div className="w-1 h-2 rounded-full bg-foreground/40" />
+          <div className="w-6 h-10 rounded-full border-2 border-text-tertiary flex items-start justify-center p-1.5">
+            <div className="w-1 h-2 rounded-full bg-text-tertiary/60" />
           </div>
         </div>
       </section>

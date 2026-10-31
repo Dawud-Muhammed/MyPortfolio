@@ -5,39 +5,85 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['DM Sans', 'Noto Sans Ethiopic', 'system-ui', 'sans-serif'],
+        sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
+        display: ['Space Grotesk', 'system-ui', 'sans-serif'],
       },
       colors: {
+        // Obsidian void background system
+        'void': {
+          50: '#F9FAFB',
+          100: '#F3F4F6',
+          900: '#0A0A0A',
+          950: '#050505',
+        },
+        // Elevated surfaces (charcoal/translucent)
+        'surface': {
+          base: '#0F0F11',
+          elevated: '#141417',
+          hover: '#1A1A1E',
+        },
+        // Text hierarchy
+        'text': {
+          primary: '#FAFAFA',
+          secondary: '#A1A1AA',
+          tertiary: '#71717A',
+          mono: '#64748B',
+        },
+        // Borders (structural hairlines)
+        'border': {
+          subtle: 'rgba(255, 255, 255, 0.08)',
+          hover: 'rgba(255, 255, 255, 0.22)',
+          strong: 'rgba(255, 255, 255, 0.35)',
+        },
+        // Status & accent signals
+        'status': {
+          emerald: '#10B981',
+          'emerald-dark': '#059669',
+        },
+        'accent': {
+          primary: '#38BDF8',  // Cyan accent
+          secondary: '#F97316', // Warm accent
+        },
+        // Legacy color support
         foreground: 'rgb(var(--fg) / <alpha-value>)',
         'foreground-muted': 'rgb(var(--fg-muted) / <alpha-value>)',
         background: 'rgb(var(--bg) / <alpha-value>)',
-        surface: 'rgb(var(--surface) / <alpha-value>)',
-        'surface-elevated': 'rgb(var(--surface-elevated) / <alpha-value>)',
-        border: 'rgb(var(--border) / <alpha-value>)',
-        'border-hover': 'rgb(var(--border-hover) / <alpha-value>)',
+        'surface-old': 'rgb(var(--surface) / <alpha-value>)',
+        'surface-elevated-old': 'rgb(var(--surface-elevated) / <alpha-value>)',
+        'border-old': 'rgb(var(--border) / <alpha-value>)',
+        'border-hover-old': 'rgb(var(--border-hover) / <alpha-value>)',
         primary: {
           DEFAULT: 'rgb(var(--primary) / <alpha-value>)',
           hover: 'rgb(var(--primary-hover) / <alpha-value>)',
           fg: 'rgb(var(--primary-fg) / <alpha-value>)',
         },
-        accent: {
+        'accent-old': {
           DEFAULT: 'rgb(var(--accent) / <alpha-value>)',
           hover: 'rgb(var(--accent-hover) / <alpha-value>)',
         },
         success: {
           DEFAULT: 'rgb(var(--success) / <alpha-value>)',
           fg: 'rgb(var(--success-fg) / <alpha-value>)',
+          400: '#4ade80',
+          500: '#22c55e',
         },
         warning: {
           DEFAULT: 'rgb(var(--warning) / <alpha-value>)',
           fg: 'rgb(var(--warning-fg) / <alpha-value>)',
+          400: '#fbbf24',
+          500: '#f59e0b',
         },
         danger: {
           DEFAULT: 'rgb(var(--danger) / <alpha-value>)',
           fg: 'rgb(var(--danger-fg) / <alpha-value>)',
+          400: '#f87171',
+          500: '#ef4444',
         },
-        // Keep legacy mappings for backward compat
+        error: {
+          400: '#f87171',
+          500: '#ef4444',
+        },
         'accent-50': '#eef2ff',
         'accent-100': '#e0e7ff',
         'accent-200': '#c7d2fe',
@@ -46,15 +92,25 @@ export default {
         'accent-500': '#6366f1',
         'accent-600': '#4f46e5',
         'accent-700': '#4338ca',
-        'success-400': '#4ade80',
-        'success-500': '#22c55e',
-        'warning-400': '#fbbf24',
-        'warning-500': '#f59e0b',
-        'error-400': '#f87171',
-        'error-500': '#ef4444',
       },
       borderRadius: {
-        DEFAULT: 'var(--radius)',
+        DEFAULT: '0.75rem',
+        sm: '0.375rem',
+        lg: '1rem',
+        xl: '1.5rem',
+      },
+      fontSize: {
+        // Display typographic scale
+        'display-xl': ['clamp(3.5rem, 9vw, 7.5rem)', { lineHeight: '1.1', fontWeight: '700', letterSpacing: '-0.02em' }],
+        'display-lg': ['clamp(2.5rem, 7vw, 5rem)', { lineHeight: '1.2', fontWeight: '700', letterSpacing: '-0.02em' }],
+        'display-md': ['clamp(1.875rem, 5vw, 3.5rem)', { lineHeight: '1.2', fontWeight: '700', letterSpacing: '-0.015em' }],
+        // Monospace technical labels
+        'mono-label': ['0.75rem', { lineHeight: '1', fontWeight: '600', letterSpacing: '0.18em', textTransform: 'uppercase' }],
+        'mono-sm': ['0.6875rem', { lineHeight: '1.25', fontWeight: '500', letterSpacing: '0.1em' }],
+      },
+      spacing: {
+        gutter: 'clamp(1.5rem, 5vw, 3rem)',
+        section: 'clamp(5rem, 10vw, 8rem)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
@@ -71,6 +127,7 @@ export default {
         'gradient-x': 'gradientX 8s ease infinite',
         'blob-drift': 'blobDrift 18s ease-in-out infinite',
         'blob-drift-2': 'blobDrift2 22s ease-in-out infinite',
+        'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
@@ -93,6 +150,17 @@ export default {
           '33%': { transform: 'translate(-40px, 30px) scale(1.05)' },
           '66%': { transform: 'translate(30px, -20px) scale(0.9)' },
         },
+        pulseGlow: {
+          '0%, 100%': { opacity: '1', boxShadow: '0 0 0 0 rgba(16, 185, 129, 0.7)' },
+          '50%': { opacity: '0.8', boxShadow: '0 0 0 8px rgba(16, 185, 129, 0)' },
+        },
+      },
+      boxShadow: {
+        // Architectural spotlight effect
+        'spotlight-sm': 'inset 0 0 20px rgba(56, 189, 248, 0.1)',
+        'spotlight-md': 'inset 0 0 40px rgba(56, 189, 248, 0.15)',
+        'glow-emerald': '0 0 20px rgba(16, 185, 129, 0.3)',
+        'glow-cyan': '0 0 20px rgba(56, 189, 248, 0.2)',
       },
     },
   },

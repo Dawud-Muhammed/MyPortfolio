@@ -1,48 +1,36 @@
-import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Moon, Sun, ArrowUpRight } from 'lucide-react';
-import { useTheme } from './ThemeProvider';
-import { useNavigationItems, useProfile } from '../lib/queries';
+import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
+import { useNavigationItems, useProfile, useHeroContent } from '../lib/queries';
 
 export function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { theme, toggle } = useTheme();
-  const { data: navItems } = useNavigationItems();
-  const { data: profile } = useProfile();
   const location = useLocation();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
+  const { data: navItems } = useNavigationItems();
+  const { data: profile } = useProfile();
+  const { data: hero } = useHeroContent();
 
   const navbarItems = (navItems || []).filter((n) => n.location === 'navbar' && n.is_visible);
 
   return (
     <>
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? 'glass-strong shadow-lg' : 'bg-transparent'
-        }`}
-      >
-        <nav className="section-container flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center transition-transform group-hover:scale-110">
-              <span className="text-white font-bold text-lg">{(profile?.name || 'Dawud')[0]}</span>
-            </div>
-            <span className="font-bold text-lg tracking-tight text-foreground">
-              {profile?.name?.split(' ')[0] || 'Dawud'}
+      {/* Fixed/sticky translucent navbar with backdrop blur */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-surface-base/70 backdrop-blur-xl border-b border-border-subtle transition-all duration-300">
+        <div className="section-container h-16 flex items-center justify-between">
+          {/* Left: Minimalist monogram logo */}
+          <Link
+            to="/"
+            className="flex items-center gap-2 group transition-opacity hover:opacity-80"
+            aria-label="Dawud - Home"
+          >
+            <span className="font-mono text-xs uppercase tracking-[0.2em] text-text-primary font-bold">
+              {(profile?.name || 'Dawud')[0].toUpperCase()}
             </span>
           </Link>
 
-          {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-1">
+          {/* Center: Navigation links (uppercase, monospace, emerald underline on active) */}
+          <div className="hidden md:flex items-center gap-8">
             {navbarItems.map((item) => {
               const isActive = location.pathname === item.target ||
                 (item.target !== '/' && location.pathname.startsWith(item.target));
@@ -50,10 +38,10 @@ export function Navbar() {
                 <Link
                   key={item.id}
                   to={item.target}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`font-mono text-xs uppercase tracking-[0.18em] transition-colors relative pb-1 ${
                     isActive
-                      ? 'text-foreground bg-foreground/10'
-                      : 'text-foreground/60 hover:text-foreground hover:bg-foreground/5'
+                      ? 'text-text-primary border-b-2 border-status-emerald'
+                      : 'text-text-secondary hover:text-text-primary'
                   }`}
                 >
                   {item.label}
@@ -62,53 +50,69 @@ export function Navbar() {
             })}
           </div>
 
-          {/* Right actions */}
-          <div className="flex items-center gap-2">
+          {/* Right: CTA Button (Desktop) */}
+          <div className="hidden md:flex items-center gap-4">
             <button
-              onClick={toggle}
-              className="p-2 rounded-lg text-foreground/60 hover:text-foreground hover:bg-foreground/10 transition-all"
-              aria-label="Toggle theme"
+              onClick={() => navigate(hero?.cta_primary_url || '/contact')}
+              className="font-mono text-xs uppercase tracking-[0.18em] px-6 py-3 border border-border-subtle rounded-lg text-text-primary hover:bg-surface-elevated/60 hover:border-border-hover transition-all duration-300 cursor-pointer group"
+              title="Get in touch"
             >
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
-            <button
-              onClick={() => navigate('/contact')}
-              className="hidden md:inline-flex btn-primary !py-2 !px-4 !text-xs"
-            >
-              Get in Touch
-              <ArrowUpRight size={14} />
-            </button>
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 rounded-lg text-foreground/60 hover:text-foreground hover:bg-foreground/10"
-            >
-              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+              {hero?.cta_primary_label || 'GET IN TOUCH'}
             </button>
           </div>
-        </nav>
+
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-elevated/50 transition-all"
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          >
+            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </header>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu: Full-screen drawer with staggered entry animations */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <div className="absolute top-16 left-0 right-0 glass-strong border-t border-foreground/10 p-4 animate-fade-down">
-            <div className="flex flex-col gap-1">
-              {navbarItems.map((item) => (
-                <Link
-                  key={item.id}
-                  to={item.target}
-                  className="px-4 py-3 rounded-lg text-foreground/80 hover:text-foreground hover:bg-foreground/10 font-medium transition-all"
-                >
-                  {item.label}
-                </Link>
-              ))}
+        <div className="fixed inset-0 z-40 md:hidden pt-16">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-void-950/80 backdrop-blur-sm"
+            onClick={() => setMobileOpen(false)}
+          />
+
+          {/* Menu panel with staggered animations */}
+          <div className="absolute top-16 left-0 right-0 bg-surface-base/95 backdrop-blur-xl border-t border-border-subtle">
+            <div className="section-container py-6 space-y-2">
+              {navbarItems.map((item, idx) => {
+                const isActive = location.pathname === item.target ||
+                  (item.target !== '/' && location.pathname.startsWith(item.target));
+                return (
+                  <Link
+                    key={item.id}
+                    to={item.target}
+                    onClick={() => setMobileOpen(false)}
+                    className={`block px-4 py-3 rounded-lg font-mono text-xs uppercase tracking-[0.18em] transition-all ${
+                      isActive
+                        ? 'bg-status-emerald/10 border border-status-emerald/30 text-status-emerald'
+                        : 'text-text-secondary hover:bg-surface-elevated/50 hover:text-text-primary'
+                    }`}
+                    style={{
+                      animation: `fadeDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 0.05}s backwards`,
+                    }}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
               <button
-                onClick={() => navigate('/contact')}
-                className="btn-primary mt-2 w-full"
+                onClick={() => {
+                  navigate(hero?.cta_primary_url || '/contact');
+                  setMobileOpen(false);
+                }}
+                className="w-full mt-4 font-mono text-xs uppercase tracking-[0.18em] px-6 py-3 border border-border-subtle rounded-lg text-text-primary bg-surface-elevated/40 hover:bg-surface-elevated/60 hover:border-border-hover transition-all duration-300"
               >
-                Get in Touch
-                <ArrowUpRight size={14} />
+                {hero?.cta_primary_label || 'GET IN TOUCH'}
               </button>
             </div>
           </div>

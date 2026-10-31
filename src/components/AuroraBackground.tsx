@@ -1,26 +1,25 @@
 export function AuroraBackground() {
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-      <div className="absolute inset-0 bg-background" />
-      {/* Dark mode: vibrant aurora blobs */}
-      <div className="dark:block hidden">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-accent-500/20 rounded-full blur-[120px] animate-pulse-slow" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-accent-700/15 rounded-full blur-[100px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-accent-400/10 rounded-full blur-[80px] animate-float" />
-      </div>
-      {/* Light mode: very subtle blue tints */}
-      <div className="dark:hidden block">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full blur-[140px] animate-pulse-slow" style={{ backgroundColor: 'rgba(14, 165, 233, 0.06)' }} />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s', backgroundColor: 'rgba(14, 165, 233, 0.04)' }} />
-        <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] rounded-full blur-[100px] animate-float" style={{ backgroundColor: 'rgba(14, 165, 233, 0.03)' }} />
-      </div>
-      <div
-        className="absolute inset-0 opacity-[0.03]"
+    <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-void-950">
+      {/* Void background */}
+      <div className="absolute inset-0 bg-void-950" />
+
+      {/* Dot-matrix grid pattern overlay */}
+      <div 
+        className="absolute inset-0 opacity-50 pointer-events-none"
         style={{
-          backgroundImage: `linear-gradient(rgb(var(--fg)) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--fg)) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px',
+          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.08) 0.5px, transparent 0.5px)',
+          backgroundSize: '50px 50px',
+          backgroundPosition: '0 0',
         }}
       />
+
+      {/* Ambient spotlight layers - subtle radial glows */}
+      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-gradient-to-br from-accent-cyan/5 to-transparent rounded-full blur-[140px] opacity-30" />
+      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-gradient-to-tl from-status-emerald/5 to-transparent rounded-full blur-[120px] opacity-20" />
+      
+      {/* Far background accent glow */}
+      <div className="absolute top-1/3 right-0 w-[800px] h-[400px] bg-gradient-to-l from-accent-warm/3 to-transparent rounded-full blur-[150px] opacity-15" />
     </div>
   );
 }
