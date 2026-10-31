@@ -214,8 +214,8 @@ export function HomePage() {
             </div>
           </ScrollRevealSection>
 
-          {/* Categorized grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Categorized grid: Responsive across breakpoints */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {skillsByCategory && Object.entries(skillsByCategory).map(([category, items], catIdx) => (
               <SpotlightCard
                 key={category}
@@ -333,8 +333,8 @@ export function HomePage() {
                 </SpotlightCard>
               )}
 
-              {/* Secondary grid */}
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Secondary grid: Responsive across all breakpoints */}
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {displayProjects.slice(1).map((project, i) => (
                   <SpotlightCard
                     key={project.id}
@@ -421,7 +421,7 @@ export function HomePage() {
               </div>
             </ScrollRevealSection>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {(services || []).map((service, i) => {
                 const Icon = serviceIcons[service.icon] || Code2;
                 return (

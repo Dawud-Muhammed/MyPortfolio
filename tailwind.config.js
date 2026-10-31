@@ -4,6 +4,15 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      screens: {
+        // Custom breakpoints aligned with design specs
+        'xs': '320px',   // Extra small phones
+        'sm': '640px',   // Mobile
+        'md': '768px',   // Tablet
+        'lg': '1024px',  // Laptop
+        'xl': '1440px',  // Ultrawide
+        '2xl': '1600px', // Ultra ultrawide
+      },
       fontFamily: {
         sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
@@ -100,10 +109,14 @@ export default {
         xl: '1.5rem',
       },
       fontSize: {
-        // Display typographic scale
+        // Display typographic scale (responsive, no horizontal overflow)
         'display-xl': ['clamp(3.5rem, 9vw, 7.5rem)', { lineHeight: '1.1', fontWeight: '700', letterSpacing: '-0.02em' }],
         'display-lg': ['clamp(2.5rem, 7vw, 5rem)', { lineHeight: '1.2', fontWeight: '700', letterSpacing: '-0.02em' }],
         'display-md': ['clamp(1.875rem, 5vw, 3.5rem)', { lineHeight: '1.2', fontWeight: '700', letterSpacing: '-0.015em' }],
+        // Body text: Responsive for readability across breakpoints
+        'body-base': ['clamp(0.875rem, 1.5vw, 1.125rem)', { lineHeight: '1.6' }],
+        'body-lg': ['clamp(1rem, 1.75vw, 1.25rem)', { lineHeight: '1.6' }],
+        'body-sm': ['clamp(0.75rem, 1.25vw, 0.875rem)', { lineHeight: '1.5' }],
         // Monospace technical labels
         'mono-label': ['0.75rem', { lineHeight: '1', fontWeight: '600', letterSpacing: '0.18em', textTransform: 'uppercase' }],
         'mono-sm': ['0.6875rem', { lineHeight: '1.25', fontWeight: '500', letterSpacing: '0.1em' }],
@@ -111,6 +124,7 @@ export default {
       spacing: {
         gutter: 'clamp(1.5rem, 5vw, 3rem)',
         section: 'clamp(5rem, 10vw, 8rem)',
+        'touch-target': 'clamp(3rem, 8vw, 4rem)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',

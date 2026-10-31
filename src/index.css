@@ -481,6 +481,79 @@
     mask-image: linear-gradient(to right, black 80%, transparent 100%);
     -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
   }
+
+  /* Responsive container queries for component-level responsive adjustments */
+  @supports (container-type: inline-size) {
+    .container-responsive {
+      container-type: inline-size;
+    }
+
+    @container (min-width: 300px) {
+      .sm\@container {
+        @apply block;
+      }
+    }
+
+    @container (min-width: 600px) {
+      .md\@container {
+        @apply block;
+      }
+    }
+
+    @container (min-width: 900px) {
+      .lg\@container {
+        @apply block;
+      }
+    }
+  }
+
+  /* Touch-friendly spacing for clickable elements */
+  .touch-safe {
+    @apply p-3 min-h-12 flex items-center justify-center;
+  }
+
+  /* Responsive aspect ratio utilities for images */
+  .aspect-video-mobile {
+    aspect-ratio: 16 / 9;
+  }
+
+  .aspect-square-mobile {
+    aspect-ratio: 1;
+  }
+
+  .aspect-portrait-mobile {
+    aspect-ratio: 3 / 4;
+  }
+
+  /* Reduced motion utilities */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: more) {
+    .surface-card {
+      border-color: var(--border-strong);
+    }
+
+    .badge {
+      border-color: var(--border-strong);
+    }
+  }
+
+  /* Dark mode optimizations for OLED displays */
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: #000000;
+    }
+
+    .void-950 {
+      background-color: #000000;
+    }
+  }
 }
 
 @layer utilities {
@@ -525,6 +598,23 @@
     letter-spacing: -0.015em;
   }
 
+  /* Responsive body text with improved readability */
+  .text-body-responsive {
+    font-size: clamp(0.875rem, 1.5vw, 1.125rem);
+    line-height: 1.6;
+  }
+
+  /* Mobile-first line-height adjustment for readability on small screens */
+  @media (max-width: 767px) {
+    body {
+      line-height: 1.7;
+    }
+    
+    p {
+      line-height: 1.7;
+    }
+  }
+
   /* Smooth transitions */
   .transition-smooth {
     @apply transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1);
@@ -534,5 +624,162 @@
   .safe-p {
     padding-left: max(1rem, env(safe-area-inset-left));
     padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  /* Touch device utilities: Remove hover effects on touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    /* Touch devices: disable all hover pseudo-elements */
+    button:hover,
+    a:hover,
+    .card-spotlight:hover::before {
+      background-color: transparent;
+      opacity: 0;
+    }
+    
+    .btn-architectural-primary:hover,
+    .btn-architectural-secondary:hover,
+    .btn-architectural-bordered:hover {
+      background-color: inherit;
+      border-color: inherit;
+    }
+
+    .surface-card:hover {
+      border-color: var(--border-subtle);
+      background-color: rgba(20, 20, 23, 0.6);
+    }
+
+    .badge:hover {
+      border-color: var(--border-subtle);
+      color: var(--text-secondary);
+    }
+  }
+
+  /* Touch-friendly button sizing: Minimum 48px tap target */
+  @media (max-width: 1024px) {
+    button {
+      min-height: 3rem;
+      min-width: 3rem;
+      padding: max(0.75rem, calc((3rem - 1em) / 2));
+    }
+  }
+
+  /* Mobile button padding optimization */
+  @media (max-width: 767px) {
+    .btn-architectural {
+      @apply px-6 py-3;
+      min-height: 3rem;
+      min-width: 3rem;
+    }
+
+    /* Hamburger menu icon: Ensure 48x48px minimum */
+    button[aria-label*="menu"],
+    button[aria-label*="Menu"] {
+      min-height: 3rem;
+      min-width: 3rem;
+      padding: 0.375rem;
+    }
+  }
+
+  /* Responsive grid utilities for breakpoints */
+  @media (max-width: 319px) {
+    /* Extra small phones: Single column everything */
+    .grid-responsive-1-2-3 {
+      @apply grid-cols-1;
+    }
+  }
+
+  @media (min-width: 320px) and (max-width: 767px) {
+    /* Mobile (320–767px): Single-column layouts */
+    .grid-responsive-1-2-3 {
+      @apply grid-cols-1;
+    }
+    
+    .grid-responsive-2-3-4 {
+      @apply grid-cols-1;
+    }
+
+    .grid-responsive-3-4-6 {
+      @apply grid-cols-1;
+    }
+
+    /* Hero stacked layout, section padding reduced to gutter minimum */
+    .hero-layout {
+      @apply flex-col;
+    }
+
+    .section-padded {
+      @apply py-[clamp(3rem, 6vw, 5rem)];
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    /* Tablet (768–1023px): 2-column grids */
+    .grid-responsive-1-2-3 {
+      @apply grid-cols-2;
+    }
+    
+    .grid-responsive-2-3-4 {
+      @apply grid-cols-2;
+    }
+
+    .grid-responsive-3-4-6 {
+      @apply grid-cols-2;
+    }
+
+    .hero-layout {
+      @apply flex-row;
+    }
+  }
+
+  @media (min-width: 1024px) and (max-width: 1439px) {
+    /* Laptop (1024–1439px): 3-4 column grids */
+    .grid-responsive-1-2-3 {
+      @apply grid-cols-3;
+    }
+    
+    .grid-responsive-2-3-4 {
+      @apply grid-cols-3;
+    }
+
+    .grid-responsive-3-4-6 {
+      @apply grid-cols-4;
+    }
+
+    .hero-layout {
+      @apply flex-row;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    /* Ultrawide (1440px+): 4-6 column grids with max-width containers */
+    .grid-responsive-1-2-3 {
+      @apply grid-cols-4;
+    }
+    
+    .grid-responsive-2-3-4 {
+      @apply grid-cols-4;
+    }
+
+    .grid-responsive-3-4-6 {
+      @apply grid-cols-6;
+    }
+
+    .hero-layout {
+      @apply flex-row;
+    }
+
+    /* Constrain line length on ultrawide */
+    .section-container {
+      max-width: 1600px;
+    }
+  }
+
+  /* Responsive image utilities */
+  .img-responsive {
+    @apply w-full h-full object-cover;
+  }
+
+  .img-lazy {
+    @apply transition-all duration-300;
   }
 }

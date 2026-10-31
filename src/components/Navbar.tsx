@@ -1,18 +1,63 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useNavigationItems, useProfile, useHeroContent } from '../lib/queries';
 import { AnimatedButton } from './AnimatedButton';
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { data: navItems } = useNavigationItems();
   const { data: profile } = useProfile();
   const { data: hero } = useHeroContent();
 
+  useEffect(() => {
+    // Detect touch device
+    const isTouchDevice = () => {
+      return (
+        (typeof window !== 'undefined' &&
+          ('ontouchstart' in window ||
+            navigator.maxTouchPoints > 0 ||
+            (navigator as any).msMaxTouchPoints > 0)) ||
+        window.matchMedia('(hover: none) and (pointer: coarse)').matches
+      );
+    };
+
+    setIsTouchDevice(isTouchDevice());
+  }, []);
+
+  useEffect(() => {
+    // Close mobile menu on route change
+    setMobileOpen(false);
+  }, [location]);
+
   const navbarItems = (navItems || []).filter((n) => n.location === 'navbar' && n.is_visible);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: -10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.3,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+  };
 
   return (
     <>
@@ -63,62 +108,83 @@ export function Navbar() {
             </AnimatedButton>
           </div>
 
-          {/* Mobile Menu Toggle */}
+          {/* Mobile Menu Toggle: 48x48px minimum touch target */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-elevated/50 transition-all"
+            className="md:hidden p-3 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-elevated/50 transition-all min-h-12 min-w-12 flex items-center justify-center"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
           >
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </header>
 
       {/* Mobile Menu: Full-screen drawer with staggered entry animations */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 md:hidden pt-16">
-          {/* Backdrop */}
-          <div
+        <motion.div
+          className="fixed inset-0 z-40 md:hidden pt-16"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          {/* Backdrop: Touch-friendly dismiss */}
+          <motion.div
             className="absolute inset-0 bg-void-950/80 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           />
 
           {/* Menu panel with staggered animations */}
-          <div className="absolute top-16 left-0 right-0 bg-surface-base/95 backdrop-blur-xl border-t border-border-subtle">
-            <div className="section-container py-6 space-y-2">
-              {navbarItems.map((item, idx) => {
+          <motion.div
+            className="absolute top-16 left-0 right-0 bg-surface-base/95 backdrop-blur-xl border-t border-border-subtle"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -20, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <motion.div
+              className="section-container py-6 space-y-2"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {navbarItems.map((item) => {
                 const isActive = location.pathname === item.target ||
                   (item.target !== '/' && location.pathname.startsWith(item.target));
                 return (
-                  <Link
-                    key={item.id}
-                    to={item.target}
-                    onClick={() => setMobileOpen(false)}
-                    className={`block px-4 py-3 rounded-lg font-mono text-xs uppercase tracking-[0.18em] transition-all ${
-                      isActive
-                        ? 'bg-status-emerald/10 border border-status-emerald/30 text-status-emerald'
-                        : 'text-text-secondary hover:bg-surface-elevated/50 hover:text-text-primary'
-                    }`}
-                    style={{
-                      animation: `fadeDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 0.05}s backwards`,
-                    }}
-                  >
-                    {item.label}
-                  </Link>
+                  <motion.div key={item.id} variants={itemVariants}>
+                    <Link
+                      to={item.target}
+                      onClick={() => setMobileOpen(false)}
+                      className={`block px-4 py-3.5 rounded-lg font-mono text-xs uppercase tracking-[0.18em] transition-all min-h-12 flex items-center ${
+                        isActive
+                          ? 'bg-status-emerald/10 border border-status-emerald/30 text-status-emerald'
+                          : 'text-text-secondary hover:bg-surface-elevated/50 hover:text-text-primary'
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  </motion.div>
                 );
               })}
-              <button
-                onClick={() => {
-                  navigate(hero?.cta_primary_url || '/contact');
-                  setMobileOpen(false);
-                }}
-                className="w-full mt-4 font-mono text-xs uppercase tracking-[0.18em] px-6 py-3 border border-border-subtle rounded-lg text-text-primary bg-surface-elevated/40 hover:bg-surface-elevated/60 hover:border-border-hover transition-all duration-300"
-              >
-                {hero?.cta_primary_label || 'GET IN TOUCH'}
-              </button>
-            </div>
-          </div>
-        </div>
+              <motion.div variants={itemVariants} className="pt-2">
+                <button
+                  onClick={() => {
+                    navigate(hero?.cta_primary_url || '/contact');
+                    setMobileOpen(false);
+                  }}
+                  className="w-full font-mono text-xs uppercase tracking-[0.18em] px-6 py-3.5 border border-border-subtle rounded-lg text-text-primary bg-surface-elevated/40 hover:bg-surface-elevated/60 hover:border-border-hover transition-all duration-300 min-h-12"
+                >
+                  {hero?.cta_primary_label || 'GET IN TOUCH'}
+                </button>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
       )}
     </>
   );

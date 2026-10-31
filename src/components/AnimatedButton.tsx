@@ -1,4 +1,4 @@
-import { ReactNode, useRef, useEffect } from 'react';
+import { ReactNode, useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 
 interface AnimatedButtonProps {
@@ -24,10 +24,26 @@ export function AnimatedButton({
 }: AnimatedButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const fillRef = useRef<HTMLDivElement>(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useEffect(() => {
+    // Detect touch device
+    const isTouchDevice = () => {
+      return (
+        (typeof window !== 'undefined' &&
+          ('ontouchstart' in window ||
+            navigator.maxTouchPoints > 0 ||
+            (navigator as any).msMaxTouchPoints > 0)) ||
+        window.matchMedia('(hover: none) and (pointer: coarse)').matches
+      );
+    };
+
+    setIsTouchDevice(isTouchDevice());
+  }, []);
 
   useEffect(() => {
     const button = buttonRef.current;
-    if (!button) return;
+    if (!button || isTouchDevice) return;
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) return;
@@ -94,11 +110,11 @@ export function AnimatedButton({
       button.removeEventListener('mousedown', handleMouseDown);
       button.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [variant, disabled]);
+  }, [variant, disabled, isTouchDevice]);
 
-  // Base button styles
+  // Base button styles with responsive touch targets (48px minimum)
   const baseClasses =
-    'font-mono text-xs uppercase tracking-[0.18em] px-8 py-4 rounded-lg font-bold transition-all duration-300 cursor-pointer relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed';
+    'font-mono text-xs uppercase tracking-[0.18em] px-8 py-4 rounded-lg font-bold transition-all duration-300 cursor-pointer relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed min-h-[3rem] min-w-[3rem]';
 
   // Variant-specific classes
   let variantClasses = '';
