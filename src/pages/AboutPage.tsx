@@ -31,22 +31,8 @@ export function AboutPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="grid lg:grid-cols-2 gap-gutter items-start mb-section"
+            className="max-w-3xl mb-section"
           >
-            {/* Profile picture */}
-            {profile?.profile_picture_url && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.97 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1, duration: 0.6 }}
-                className="aspect-square rounded-2xl overflow-hidden border border-border-subtle bg-surface-elevated"
-              >
-                <img src={profile.profile_picture_url} alt={profile.name} className="w-full h-full object-cover" loading="lazy" />
-              </motion.div>
-            )}
-
-            {/* Bio */}
-            <div>
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -116,7 +102,6 @@ export function AboutPage() {
                   </MagneticButton>
                 </motion.div>
               )}
-            </div>
           </motion.div>
 
           {/* Experience */}

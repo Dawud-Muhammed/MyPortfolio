@@ -63,89 +63,119 @@ export function HomePage() {
         </div>
 
         <div className="section-container w-full relative z-10">
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            animate="visible"
-            className="max-w-5xl mx-auto"
-          >
-            {/* Availability pill */}
-            {hero?.availability_status && (
-              <motion.div variants={fadeUp} className="flex justify-center lg:justify-start mb-8">
-                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-status-emerald/8 border border-status-emerald/20 backdrop-blur-sm">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-emerald opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-status-emerald" />
-                  </span>
-                  <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-status-emerald">
-                    {hero.availability_label || 'Open to Opportunities'}
-                  </span>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Name - monumental */}
-            <motion.h1
-              variants={fadeUp}
-              className="text-center lg:text-left text-display-xl font-bold uppercase leading-[0.95] mb-6"
-              style={{
-                WebkitTextStroke: '1.5px rgba(255, 255, 255, 0.7)',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              {profile?.name || 'DAWUD'}
-            </motion.h1>
-
-            {/* Role/subheadline */}
-            <motion.h2
-              variants={fadeUp}
-              className="text-center lg:text-left text-display-md font-bold text-text-primary mb-10 max-w-3xl"
-            >
-              {hero?.subheadline || 'Full-Stack Software Engineer Building Reliable Web Systems'}
-            </motion.h2>
-
-            {/* CTA Buttons */}
-            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center lg:items-start gap-4 mb-16">
-              <MagneticButton
-                href={hero?.cta_primary_url || '/contact'}
-                variant="primary"
-              >
-                {hero?.cta_primary_label || 'Get in Touch'}
-                <ArrowUpRight size={16} />
-              </MagneticButton>
-              <MagneticButton
-                href={hero?.cta_secondary_url || '/projects'}
-                variant="secondary"
-              >
-                {hero?.cta_secondary_label || 'View Projects'}
-              </MagneticButton>
-            </motion.div>
-
-            {/* Stats */}
+          <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+            {/* Left Column: Texts and Stats */}
             <motion.div
-              variants={fadeUp}
-              className="flex flex-wrap items-center justify-center lg:justify-start gap-10 lg:gap-16"
+              variants={stagger}
+              initial="hidden"
+              animate="visible"
+              className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left"
             >
-              <div className="text-center lg:text-left">
-                <div className="text-3xl md:text-4xl font-bold text-text-primary">
-                  <CountUp end={yearsExp} suffix="+" />
-                </div>
-                <div className="text-[11px] text-text-tertiary mt-1 font-mono uppercase tracking-[0.15em]">
-                  Years Experience
-                </div>
-              </div>
-              {projectCount > 0 && (
+              {/* Availability pill */}
+              {hero?.availability_status && (
+                <motion.div variants={fadeUp} className="mb-6">
+                  <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-status-emerald/8 border border-status-emerald/20 backdrop-blur-sm">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-emerald opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-status-emerald" />
+                    </span>
+                    <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-status-emerald">
+                      {hero.availability_label || 'Open to Opportunities'}
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Name - decreased font by 50%, aligned to the very left on desktop */}
+              <motion.h1
+                variants={fadeUp}
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-tight mb-4 leading-tight"
+                style={{
+                  WebkitTextStroke: '1px rgba(255, 255, 255, 0.75)',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                {profile?.name || 'DAWUD'}
+              </motion.h1>
+
+              {/* Role/subheadline - decreased font by 50% */}
+              <motion.h2
+                variants={fadeUp}
+                className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-text-primary mb-8 max-w-xl leading-relaxed"
+              >
+                {hero?.subheadline || 'Full-Stack Software Engineer Building Reliable Web Systems'}
+              </motion.h2>
+
+              {/* Stats */}
+              <motion.div
+                variants={fadeUp}
+                className="flex flex-wrap items-center justify-center lg:justify-start gap-8 sm:gap-12"
+              >
                 <div className="text-center lg:text-left">
-                  <div className="text-3xl md:text-4xl font-bold text-text-primary">
-                    <CountUp end={projectCount} suffix="+" />
+                  <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary">
+                    <CountUp end={yearsExp} suffix="+" />
                   </div>
                   <div className="text-[11px] text-text-tertiary mt-1 font-mono uppercase tracking-[0.15em]">
-                    Projects Built
+                    Years Experience
                   </div>
                 </div>
-              )}
+                {projectCount > 0 && (
+                  <div className="text-center lg:text-left">
+                    <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary">
+                      <CountUp end={projectCount} suffix="+" />
+                    </div>
+                    <div className="text-[11px] text-text-tertiary mt-1 font-mono uppercase tracking-[0.15em]">
+                      Projects Built
+                    </div>
+                  </div>
+                )}
+              </motion.div>
             </motion.div>
-          </motion.div>
+
+            {/* Right Column: Premium Circle Encircled with Yellow Lights */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
+              className="lg:col-span-5 flex justify-center lg:justify-end"
+            >
+              <div className="relative group">
+                {/* Ambient Yellow Light Aura (Pulsing Glow) */}
+                <div
+                  className="absolute -inset-4 sm:-inset-6 rounded-full bg-gradient-to-r from-amber-400/30 via-yellow-300/40 to-amber-500/30 blur-2xl opacity-75 animate-pulse"
+                  aria-hidden="true"
+                />
+
+                {/* Outer Yellow Lights Halo Ring */}
+                <div
+                  className="absolute -inset-1.5 rounded-full bg-gradient-to-tr from-amber-400 via-yellow-200 to-amber-500 opacity-90 blur-[2px]"
+                  aria-hidden="true"
+                />
+
+                {/* Main Premium Circle Container (Equal height with left side text block) */}
+                <div
+                  className="relative w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] xl:w-[380px] xl:h-[380px] rounded-full p-[3px] bg-gradient-to-tr from-amber-500 via-yellow-300 to-amber-400 shadow-[0_0_30px_rgba(250,204,21,0.5),0_0_60px_rgba(245,158,11,0.3)] transition-all duration-700 group-hover:shadow-[0_0_40px_rgba(250,204,21,0.7),0_0_80px_rgba(245,158,11,0.45)]"
+                >
+                  <div className="w-full h-full rounded-full overflow-hidden border-2 border-yellow-300/40 bg-surface-elevated relative">
+                    {profile?.profile_picture_url ? (
+                      <img
+                        src={profile.profile_picture_url}
+                        alt={profile.name || 'Profile'}
+                        className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                        loading="eager"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-500/20 via-surface-elevated to-surface-base text-yellow-300 font-bold text-4xl">
+                        {(profile?.name || 'D')[0]}
+                      </div>
+                    )}
+                    {/* Inner soft vignette overlay */}
+                    <div className="absolute inset-0 rounded-full shadow-[inset_0_0_25px_rgba(0,0,0,0.5)] pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
 
         {/* Scroll indicator */}
