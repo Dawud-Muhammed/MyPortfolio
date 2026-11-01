@@ -31,18 +31,18 @@ export function AboutPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="max-w-3xl mb-section"
+            className="w-full max-w-full mb-section"
           >
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
-                className="mb-8"
+                className="mb-8 w-full"
               >
                 <p className="label-mono-accent mb-3">About Me</p>
                 <h1 className="text-display-md font-bold text-text-primary mb-4">{profile?.name || 'Dawud Muhammed'}</h1>
                 <p className="text-lg text-accent-primary font-medium mb-6">{profile?.title || 'Full-Stack Software Engineer'}</p>
-                <p className="text-body-base text-text-secondary leading-relaxed">{profile?.bio}</p>
+                <p className="text-body-base sm:text-body-lg text-text-secondary leading-relaxed w-full max-w-none whitespace-pre-line">{profile?.bio}</p>
               </motion.div>
 
               {/* Contact info */}
@@ -50,7 +50,7 @@ export function AboutPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 }}
-                className="space-y-3 mb-8"
+                className="flex flex-wrap items-center gap-4 sm:gap-6 mb-8"
               >
                 {profile?.email && (
                   <a href={`mailto:${profile.email}`} className="flex items-center gap-3 text-text-secondary hover:text-text-primary text-sm transition-colors group">
@@ -78,30 +78,31 @@ export function AboutPage() {
                 )}
               </motion.div>
 
-              {/* Availability */}
-              {profile?.availability && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.35 }}
-                  className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-status-emerald/8 border border-status-emerald/20 mb-6"
-                >
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-emerald opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-status-emerald" />
-                  </span>
-                  <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-status-emerald">Available for work</span>
-                </motion.div>
-              )}
+              {/* Availability & Resume Actions */}
+              <div className="flex flex-wrap items-center gap-4">
+                {profile?.availability && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.35 }}
+                    className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-status-emerald/8 border border-status-emerald/20"
+                  >
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-emerald opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-status-emerald" />
+                    </span>
+                    <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-status-emerald">Available for work</span>
+                  </motion.div>
+                )}
 
-              {/* Resume */}
-              {profile?.resume_url && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
-                  <MagneticButton href={profile.resume_url} variant="primary">
-                    <Download size={14} /> Download Resume
-                  </MagneticButton>
-                </motion.div>
-              )}
+                {profile?.resume_url && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
+                    <MagneticButton href={profile.resume_url} variant="primary">
+                      <Download size={14} /> Download Resume
+                    </MagneticButton>
+                  </motion.div>
+                )}
+              </div>
           </motion.div>
 
           {/* Experience */}

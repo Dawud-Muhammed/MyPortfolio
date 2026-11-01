@@ -6,20 +6,51 @@ import { PageTransition } from '../components/PageTransition';
 import { CountUp } from '../components/CountUp';
 import { MagneticButton } from '../components/MagneticButton';
 
+function parseExperienceDate(dateStr: string | null | undefined): number | null {
+  if (!dateStr || typeof dateStr !== 'string') return null;
+  const trimmed = dateStr.trim();
+  const direct = new Date(trimmed).getTime();
+  if (!isNaN(direct) && direct > 0) return direct;
+
+  // Try extracting 4-digit year e.g. "2020", "Jan 2021"
+  const yearMatch = trimmed.match(/\b(19\d\d|20\d\d)\b/);
+  if (yearMatch) {
+    const year = parseInt(yearMatch[1], 10);
+    const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    const lower = trimmed.toLowerCase();
+    const monthIdx = monthNames.findIndex(m => lower.includes(m));
+    return new Date(year, monthIdx >= 0 ? monthIdx : 0, 1).getTime();
+  }
+  return null;
+}
+
 function computeYearsExperience(experience: { start_date: string; end_date: string | null; is_current: boolean }[]): number {
   if (!experience || experience.length === 0) return 0;
-  const earliest = experience.reduce((min, exp) => {
-    const start = new Date(exp.start_date).getTime();
-    return start < min ? start : min;
-  }, Infinity);
+  let earliest = Infinity;
+  let latest = 0;
+
+  for (const exp of experience) {
+    const start = parseExperienceDate(exp.start_date);
+    if (start !== null && start < earliest) {
+      earliest = start;
+    }
+
+    if (exp.is_current) {
+      latest = Math.max(latest, Date.now());
+    } else if (exp.end_date) {
+      const end = parseExperienceDate(exp.end_date);
+      if (end !== null && end > latest) {
+        latest = end;
+      }
+    }
+  }
+
   if (earliest === Infinity) return 0;
-  const latest = experience.reduce((max, exp) => {
-    const end = exp.is_current ? Date.now() : (exp.end_date ? new Date(exp.end_date).getTime() : Date.now());
-    return end > max ? end : max;
-  }, 0);
+  if (latest === 0) latest = Date.now();
+
   const diffMs = latest - earliest;
   const years = diffMs / (1000 * 60 * 60 * 24 * 365.25);
-  return Math.max(0, Math.round(years));
+  return Math.max(1, Math.round(years));
 }
 
 const stagger = {
@@ -113,7 +144,7 @@ export function HomePage() {
               >
                 <div className="text-center lg:text-left">
                   <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary">
-                    <CountUp end={yearsExp} suffix="+" />
+                    <CountUp key={yearsExp} end={yearsExp} suffix="+" />
                   </div>
                   <div className="text-[11px] text-text-tertiary mt-1 font-mono uppercase tracking-[0.15em]">
                     Years Experience
@@ -122,7 +153,7 @@ export function HomePage() {
                 {projectCount > 0 && (
                   <div className="text-center lg:text-left">
                     <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary">
-                      <CountUp end={projectCount} suffix="+" />
+                      <CountUp key={projectCount} end={projectCount} suffix="+" />
                     </div>
                     <div className="text-[11px] text-text-tertiary mt-1 font-mono uppercase tracking-[0.15em]">
                       Projects Built
@@ -132,7 +163,7 @@ export function HomePage() {
               </motion.div>
             </motion.div>
 
-            {/* Right Column: Premium Circle Encircled with Yellow Lights */}
+            {/* Right Column: Premium Circle Encircled with White Lights */}
             <motion.div
               initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -140,23 +171,23 @@ export function HomePage() {
               className="lg:col-span-5 flex justify-center lg:justify-end"
             >
               <div className="relative group">
-                {/* Ambient Yellow Light Aura (Pulsing Glow) */}
+                {/* Ambient White Light Aura (Pulsing Glow) */}
                 <div
-                  className="absolute -inset-4 sm:-inset-6 rounded-full bg-gradient-to-r from-amber-400/30 via-yellow-300/40 to-amber-500/30 blur-2xl opacity-75 animate-pulse"
+                  className="absolute -inset-4 sm:-inset-6 rounded-full bg-gradient-to-r from-white/20 via-cyan-100/25 to-white/20 blur-2xl opacity-60 animate-pulse pointer-events-none"
                   aria-hidden="true"
                 />
 
-                {/* Outer Yellow Lights Halo Ring */}
+                {/* Outer White Lights Halo Ring */}
                 <div
-                  className="absolute -inset-1.5 rounded-full bg-gradient-to-tr from-amber-400 via-yellow-200 to-amber-500 opacity-90 blur-[2px]"
+                  className="absolute -inset-1.5 rounded-full bg-gradient-to-tr from-white/80 via-white to-white/70 opacity-90 blur-[2px]"
                   aria-hidden="true"
                 />
 
                 {/* Main Premium Circle Container (Equal height with left side text block) */}
                 <div
-                  className="relative w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] xl:w-[380px] xl:h-[380px] rounded-full p-[3px] bg-gradient-to-tr from-amber-500 via-yellow-300 to-amber-400 shadow-[0_0_30px_rgba(250,204,21,0.5),0_0_60px_rgba(245,158,11,0.3)] transition-all duration-700 group-hover:shadow-[0_0_40px_rgba(250,204,21,0.7),0_0_80px_rgba(245,158,11,0.45)]"
+                  className="relative w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] xl:w-[380px] xl:h-[380px] rounded-full p-[3px] bg-gradient-to-tr from-white/90 via-white to-white/80 shadow-[0_0_35px_rgba(255,255,255,0.45),0_0_70px_rgba(255,255,255,0.25)] transition-all duration-700 group-hover:shadow-[0_0_50px_rgba(255,255,255,0.65),0_0_90px_rgba(255,255,255,0.35)]"
                 >
-                  <div className="w-full h-full rounded-full overflow-hidden border-2 border-yellow-300/40 bg-surface-elevated relative">
+                  <div className="w-full h-full rounded-full overflow-hidden border-2 border-white/60 bg-surface-elevated relative">
                     {profile?.profile_picture_url ? (
                       <img
                         src={profile.profile_picture_url}
@@ -165,12 +196,12 @@ export function HomePage() {
                         loading="eager"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-500/20 via-surface-elevated to-surface-base text-yellow-300 font-bold text-4xl">
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/15 via-surface-elevated to-surface-base text-text-primary font-bold text-4xl">
                         {(profile?.name || 'D')[0]}
                       </div>
                     )}
                     {/* Inner soft vignette overlay */}
-                    <div className="absolute inset-0 rounded-full shadow-[inset_0_0_25px_rgba(0,0,0,0.5)] pointer-events-none" />
+                    <div className="absolute inset-0 rounded-full shadow-[inset_0_0_25px_rgba(0,0,0,0.6)] pointer-events-none" />
                   </div>
                 </div>
               </div>

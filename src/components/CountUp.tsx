@@ -41,28 +41,35 @@ export function CountUp({
     const container = containerRef.current;
     if (!container) return;
 
+    const animateCount = () => {
+      const obj = { value: 0 };
+      gsap.to(obj, {
+        value: end,
+        duration,
+        ease: 'power2.out',
+        onUpdate: () => {
+          setDisplay(
+            `${prefix}${formatNumber(Math.round(obj.value))}${suffix}`
+          );
+        },
+        onComplete: () => {
+          setDisplay(`${prefix}${formatNumber(end)}${suffix}`);
+        },
+      });
+    };
+
+    if (hasAnimated.current) {
+      animateCount();
+      return;
+    }
+
     const trigger = ScrollTrigger.create({
       trigger: container,
       start: 'top 90%',
       once: true,
       onEnter: () => {
-        if (hasAnimated.current) return;
         hasAnimated.current = true;
-
-        const obj = { value: 0 };
-        gsap.to(obj, {
-          value: end,
-          duration,
-          ease: 'power2.out',
-          onUpdate: () => {
-            setDisplay(
-              `${prefix}${formatNumber(Math.round(obj.value))}${suffix}`
-            );
-          },
-          onComplete: () => {
-            setDisplay(`${prefix}${formatNumber(end)}${suffix}`);
-          },
-        });
+        animateCount();
       },
     });
 

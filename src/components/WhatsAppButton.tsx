@@ -9,9 +9,11 @@ export function WhatsAppButton() {
 
   if (!settings?.whatsapp_enabled || !settings?.whatsapp_number) return null;
 
-  const ownerName = (profile?.name || settings?.site_name || '').split(' ')[0];
+  const ownerName = (profile?.name || settings?.site_name || '').split(' ')[0] || 'there';
   const defaultMessage = `Hi ${ownerName}! I came across your portfolio and wanted to connect.`;
-  const messageText = settings.whatsapp_message || defaultMessage;
+  let messageText = settings.whatsapp_message || defaultMessage;
+  // Dynamically replace any hardcoded placeholder name like 'Alex' with the dynamic current name
+  messageText = messageText.replace(/\bAlex\b/gi, ownerName);
   const waUrl = `https://wa.me/${settings.whatsapp_number}?text=${encodeURIComponent(messageText)}`;
 
   return (
@@ -25,7 +27,7 @@ export function WhatsAppButton() {
             <X size={16} />
           </button>
           <p className="text-sm text-foreground font-medium mb-1">Let's talk!</p>
-          <p className="text-xs text-foreground/60">Have a project in mind? Send me a message on WhatsApp.</p>
+          <p className="text-xs text-foreground/60">Have a project in mind? Message {ownerName} on WhatsApp.</p>
         </div>
       )}
       <a
