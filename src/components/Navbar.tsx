@@ -1,9 +1,9 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
-import { useNavigationItems, useProfile, useHeroContent } from '../lib/queries';
+import { useNavigationItems, useProfile } from '../lib/queries';
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -11,10 +11,8 @@ export function Navbar() {
   const [hidden, setHidden] = useState(false);
   const lastScrollY = useRef(0);
   const location = useLocation();
-  const navigate = useNavigate();
   const { data: navItems } = useNavigationItems();
   const { data: profile } = useProfile();
-  const { data: hero } = useHeroContent();
   const navRef = useRef<HTMLElement>(null);
   const logoRef = useRef<HTMLSpanElement>(null);
 
@@ -164,18 +162,6 @@ export function Navbar() {
             })}
           </nav>
 
-          {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-4">
-            <button
-              onClick={() => navigate(hero?.cta_primary_url || '/contact')}
-              className="relative font-mono text-[11px] uppercase tracking-[0.2em] px-6 py-2.5 rounded-full border border-border-subtle text-text-primary hover:border-accent-primary/50 hover:bg-accent-primary/5 transition-all duration-300 group overflow-hidden"
-            >
-              <span className="relative z-10">
-                {hero?.cta_primary_label || 'Get in Touch'}
-              </span>
-            </button>
-          </div>
-
           {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -257,18 +243,6 @@ export function Navbar() {
                   </motion.div>
                 );
               })}
-
-              <motion.div variants={itemVariants} className="mt-8">
-                <button
-                  onClick={() => {
-                    navigate(hero?.cta_primary_url || '/contact');
-                    setMobileOpen(false);
-                  }}
-                  className="font-mono text-xs uppercase tracking-[0.2em] px-8 py-4 border border-accent-primary/40 rounded-full text-accent-primary hover:bg-accent-primary/10 transition-all duration-300"
-                >
-                  {hero?.cta_primary_label || 'Get in Touch'}
-                </button>
-              </motion.div>
             </motion.div>
           </motion.div>
         )}

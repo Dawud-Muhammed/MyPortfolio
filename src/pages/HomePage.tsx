@@ -1,5 +1,4 @@
-import { Link } from 'react-router-dom';
-import { Star, Quote, ArrowUpRight, ArrowRight } from 'lucide-react';
+import { Star, Quote, ArrowUpRight } from 'lucide-react';
 import { useHeroContent, useTestimonials, useSeoSettings, useExperience, useProfile, useProjects } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
 import { motion } from 'framer-motion';
@@ -48,7 +47,6 @@ export function HomePage() {
   const { data: seoSettings } = useSeoSettings();
 
   const yearsExp = computeYearsExperience(experience || []);
-  const featuredProjects = (projects || []).filter(p => p.is_featured).slice(0, 4);
   const projectCount = (projects || []).length;
 
   return (
@@ -101,18 +99,10 @@ export function HomePage() {
             {/* Role/subheadline */}
             <motion.h2
               variants={fadeUp}
-              className="text-center lg:text-left text-display-md font-bold text-text-primary mb-6 max-w-3xl"
+              className="text-center lg:text-left text-display-md font-bold text-text-primary mb-10 max-w-3xl"
             >
               {hero?.subheadline || 'Full-Stack Software Engineer Building Reliable Web Systems'}
             </motion.h2>
-
-            {/* Bio */}
-            <motion.p
-              variants={fadeUp}
-              className="text-center lg:text-left text-body-lg text-text-secondary max-w-2xl mb-10 leading-relaxed"
-            >
-              {profile?.bio || hero?.headline || 'I build scalable, maintainable web systems with modern technologies and engineering best practices.'}
-            </motion.p>
 
             {/* CTA Buttons */}
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center lg:items-start gap-4 mb-16">
@@ -174,92 +164,6 @@ export function HomePage() {
           </motion.div>
         </motion.div>
       </section>
-
-      {/* ─── Featured Projects ─── */}
-      {featuredProjects.length > 0 && (
-        <section className="py-section relative">
-          <div className="section-container">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="flex items-end justify-between mb-12"
-            >
-              <div>
-                <p className="label-mono-accent mb-3">Selected Work</p>
-                <h2 className="heading-section text-text-primary">Featured Projects</h2>
-              </div>
-              <Link
-                to="/projects"
-                className="hidden md:inline-flex items-center gap-2 text-text-secondary hover:text-text-primary text-sm transition-colors group"
-              >
-                View all
-                <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-              </Link>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {featuredProjects.map((project, i) => (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-                >
-                  <Link
-                    to={`/projects/${project.slug}`}
-                    className="group block surface-card rounded-xl overflow-hidden card-spotlight"
-                  >
-                    <div className="aspect-[16/10] overflow-hidden bg-surface-elevated relative">
-                      {project.cover_image_url && (
-                        <img
-                          src={project.cover_image_url}
-                          alt={project.title}
-                          loading="lazy"
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-void-950/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      {project.is_featured && (
-                        <div className="absolute top-4 left-4">
-                          <span className="badge-accent text-[10px]">Featured</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-6">
-                      <div className="flex items-center gap-2 mb-2">
-                        {project.category && (
-                          <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: project.category.color }}>
-                            {project.category.name}
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-lg font-bold text-text-primary mb-2 group-hover:text-accent-primary transition-colors flex items-center gap-2">
-                        {project.title}
-                        <ArrowUpRight size={16} className="opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                      </h3>
-                      <p className="text-sm text-text-secondary line-clamp-2 mb-4">{project.excerpt || project.description}</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {(project.technologies || []).slice(0, 4).map((tech) => (
-                          <span key={tech.id} className="badge text-[10px] !py-0.5">{tech.name}</span>
-                        ))}
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-
-            <div className="mt-8 text-center md:hidden">
-              <Link to="/projects" className="inline-flex items-center gap-2 text-text-secondary text-sm hover:text-text-primary transition-colors">
-                View all projects <ArrowRight size={14} />
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ─── Testimonials ─── */}
       {(testimonials || []).length > 0 && (
