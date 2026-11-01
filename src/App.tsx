@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { ThemeProvider } from './components/ThemeProvider';
 import { LoadingScreen } from './components/LoadingScreen';
 import { AuroraBackground } from './components/AuroraBackground';
@@ -8,6 +9,9 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { WhatsAppButton } from './components/WhatsAppButton';
 import { PageViewTracker } from './components/PageViewTracker';
+import { SmoothScroller } from './components/SmoothScroller';
+import { ScrollProgress } from './components/ScrollProgress';
+import { CursorFollower } from './components/CursorFollower';
 
 import { HomePage } from './pages/HomePage';
 import { ProjectsPage } from './pages/ProjectsPage';
@@ -40,13 +44,60 @@ function ScrollToTop() {
   return null;
 }
 
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* Public routes */}
+        <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
+        <Route path="/projects" element={<PublicLayout><ProjectsPage /></PublicLayout>} />
+        <Route path="/projects/:slug" element={<PublicLayout><ProjectDetailPage /></PublicLayout>} />
+        <Route path="/blog" element={<PublicLayout><BlogPage /></PublicLayout>} />
+        <Route path="/blog/:slug" element={<PublicLayout><BlogDetailPage /></PublicLayout>} />
+        <Route path="/about" element={<PublicLayout><AboutPage /></PublicLayout>} />
+        <Route path="/services" element={<PublicLayout><ServicesPage /></PublicLayout>} />
+        <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
+        <Route path="/gallery" element={<PublicLayout><GalleryPage /></PublicLayout>} />
+
+        {/* Admin routes */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminOverview />} />
+          <Route path="projects" element={<AdminProjects />} />
+          <Route path="blog" element={<AdminBlog />} />
+          <Route path="messages" element={<AdminMessages />} />
+          <Route path="skills" element={<AdminSkills />} />
+          <Route path="experience" element={<AdminExperience />} />
+          <Route path="education" element={<AdminEducation />} />
+          <Route path="certifications" element={<AdminCertifications />} />
+          <Route path="services" element={<AdminServices />} />
+          <Route path="testimonials" element={<AdminTestimonials />} />
+          <Route path="gallery" element={<AdminGallery />} />
+          <Route path="achievements" element={<AdminAchievements />} />
+          <Route path="faqs" element={<AdminFaqs />} />
+          <Route path="social" element={<AdminSocialLinks />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
+
+        {/* 404 */}
+        <Route path="*" element={<PublicLayout><NotFoundPage /></PublicLayout>} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
 function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <AuroraBackground />
       <InteractiveCanvasBackground />
+      <ScrollProgress />
       <Navbar />
-      {children}
+      <main className="relative z-10">
+        {children}
+      </main>
       <Footer />
       <WhatsAppButton />
     </>
@@ -65,43 +116,12 @@ function App() {
     <ThemeProvider>
       {loading && <LoadingScreen />}
       <BrowserRouter>
-        <ScrollToTop />
-        <PageViewTracker />
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
-          <Route path="/projects" element={<PublicLayout><ProjectsPage /></PublicLayout>} />
-          <Route path="/projects/:slug" element={<PublicLayout><ProjectDetailPage /></PublicLayout>} />
-          <Route path="/blog" element={<PublicLayout><BlogPage /></PublicLayout>} />
-          <Route path="/blog/:slug" element={<PublicLayout><BlogDetailPage /></PublicLayout>} />
-          <Route path="/about" element={<PublicLayout><AboutPage /></PublicLayout>} />
-          <Route path="/services" element={<PublicLayout><ServicesPage /></PublicLayout>} />
-          <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
-          <Route path="/gallery" element={<PublicLayout><GalleryPage /></PublicLayout>} />
-
-          {/* Admin routes */}
-          <Route path="/admin/login" element={<AdminLoginPage />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminOverview />} />
-            <Route path="projects" element={<AdminProjects />} />
-            <Route path="blog" element={<AdminBlog />} />
-            <Route path="messages" element={<AdminMessages />} />
-            <Route path="skills" element={<AdminSkills />} />
-            <Route path="experience" element={<AdminExperience />} />
-            <Route path="education" element={<AdminEducation />} />
-            <Route path="certifications" element={<AdminCertifications />} />
-            <Route path="services" element={<AdminServices />} />
-            <Route path="testimonials" element={<AdminTestimonials />} />
-            <Route path="gallery" element={<AdminGallery />} />
-            <Route path="achievements" element={<AdminAchievements />} />
-            <Route path="faqs" element={<AdminFaqs />} />
-            <Route path="social" element={<AdminSocialLinks />} />
-            <Route path="settings" element={<AdminSettings />} />
-          </Route>
-
-          {/* 404 */}
-          <Route path="*" element={<PublicLayout><NotFoundPage /></PublicLayout>} />
-        </Routes>
+        <SmoothScroller>
+          <CursorFollower />
+          <ScrollToTop />
+          <PageViewTracker />
+          <AnimatedRoutes />
+        </SmoothScroller>
       </BrowserRouter>
     </ThemeProvider>
   );

@@ -5,6 +5,7 @@ import { useProfile, useSocialLinks, useSeoSettings, useFaqs } from '../lib/quer
 import { SeoHead } from '../components/SeoHead';
 import { motion } from 'framer-motion';
 import { Github, Twitter, Linkedin } from 'lucide-react';
+import { PageTransition } from '../components/PageTransition';
 
 const platformIcons: Record<string, typeof Github> = {
   GitHub: Github, Twitter, LinkedIn: Linkedin, Email: Mail, gmail: Mail, github: Github, twitter: Twitter, linkedin: Linkedin,
@@ -46,10 +47,10 @@ export function ContactPage() {
   };
 
   return (
-    <>
+    <PageTransition>
       <SeoHead title="Contact" description="Get in touch for collaborations, freelance work, or just to say hi." seoSettings={seoSettings} />
 
-      <div className="pt-32 pb-20">
+      <div className="pt-32 pb-24">
         <div className="section-container">
           {/* Header */}
           <motion.div
@@ -57,79 +58,73 @@ export function ContactPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-16"
           >
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
-              GET IN TOUCH • LET'S COLLABORATE
-            </p>
-            <h1 className="text-display-md font-bold text-text-primary mb-4">Contact</h1>
-            <p className="text-base text-text-secondary max-w-2xl">
-              Have a project in mind, a question, or just want to say hello? I'd love to hear from you. Fill out the form below or reach out directly through any of the channels.
+            <p className="label-mono-accent mb-3">Let's Connect</p>
+            <h1 className="heading-display text-text-primary mb-4">Contact</h1>
+            <p className="text-body-lg text-text-secondary max-w-2xl">
+              Have a project in mind, a question, or just want to say hello? I'd love to hear from you.
             </p>
           </motion.div>
 
-          <div className="grid lg:grid-cols-5 gap-8">
-            {/* Left column: Social links (terminal-inspired) */}
+          <div className="grid lg:grid-cols-5 gap-10">
+            {/* Contact info */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="lg:col-span-2 space-y-3"
+              transition={{ delay: 0.1 }}
+              className="lg:col-span-2 space-y-1"
             >
-              {/* Email */}
               {profile?.email && (
                 <a
                   href={`mailto:${profile.email}`}
-                  className="block border-b border-border-subtle hover:border-border-hover hover:bg-surface-elevated/30 px-4 py-4 text-text-secondary hover:text-text-primary transition-all group"
+                  className="block border-b border-border-subtle hover:border-border-hover hover:bg-surface-elevated/20 px-4 py-5 transition-all group rounded-t-lg"
                 >
-                  <div className="font-mono text-xs uppercase tracking-[0.12em] text-text-mono group-hover:text-accent-primary transition-colors">
-                    EMAIL
+                  <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono group-hover:text-accent-primary transition-colors">
+                    Email
                   </div>
-                  <div className="text-sm mt-1">{profile.email}</div>
+                  <div className="text-sm text-text-secondary group-hover:text-text-primary mt-1 transition-colors">{profile.email}</div>
                 </a>
               )}
-
-              {/* Phone */}
               {profile?.phone && (
                 <a
                   href={`tel:${profile.phone}`}
-                  className="block border-b border-border-subtle hover:border-border-hover hover:bg-surface-elevated/30 px-4 py-4 text-text-secondary hover:text-text-primary transition-all group"
+                  className="block border-b border-border-subtle hover:border-border-hover hover:bg-surface-elevated/20 px-4 py-5 transition-all group"
                 >
-                  <div className="font-mono text-xs uppercase tracking-[0.12em] text-text-mono group-hover:text-accent-primary transition-colors">
-                    PHONE
+                  <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono group-hover:text-accent-primary transition-colors">
+                    Phone
                   </div>
-                  <div className="text-sm mt-1">{profile.phone}</div>
+                  <div className="text-sm text-text-secondary group-hover:text-text-primary mt-1 transition-colors">{profile.phone}</div>
                 </a>
               )}
-
-              {/* Location */}
               {profile?.location && (
-                <div className="block border-b border-border-subtle px-4 py-4 text-text-secondary">
-                  <div className="font-mono text-xs uppercase tracking-[0.12em] text-text-mono">
-                    LOCATION
+                <div className="block border-b border-border-subtle px-4 py-5">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono">
+                    Location
                   </div>
-                  <div className="text-sm mt-1">{profile.location}</div>
+                  <div className="text-sm text-text-secondary mt-1">{profile.location}</div>
                 </div>
               )}
 
-              {/* Social links */}
               {visibleSocials.length > 0 && (
-                <div>
-                  <p className="font-mono text-xs uppercase tracking-[0.12em] text-text-mono mb-4 px-4">
-                    FOLLOW
+                <div className="pt-6 px-4">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono mb-4">
+                    Follow
                   </p>
-                  <div className="flex gap-3 px-4">
+                  <div className="flex gap-3">
                     {visibleSocials.map((s) => {
                       const Icon = platformIcons[s.platform.toLowerCase()] || Mail;
                       return (
-                        <a
+                        <motion.a
                           key={s.id}
                           href={s.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="h-10 w-10 rounded-lg border border-border-subtle hover:border-border-hover hover:bg-surface-elevated/60 flex items-center justify-center text-text-secondary hover:text-accent-primary transition-all hover:scale-110"
+                          className="h-10 w-10 rounded-xl border border-border-subtle hover:border-accent-primary/40 bg-surface-base/30 hover:bg-accent-primary/5 flex items-center justify-center text-text-tertiary hover:text-accent-primary transition-all duration-300"
                           aria-label={s.platform}
-                          title={s.platform}
+                          whileHover={{ scale: 1.1, y: -2 }}
+                          whileTap={{ scale: 0.95 }}
                         >
-                          <Icon size={18} />
-                        </a>
+                          <Icon size={16} />
+                        </motion.a>
                       );
                     })}
                   </div>
@@ -137,97 +132,83 @@ export function ContactPage() {
               )}
             </motion.div>
 
-            {/* Right column: Contact Form */}
+            {/* Contact Form */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.15 }}
               className="lg:col-span-3"
             >
-              <div className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-8">
+              <div className="surface-card rounded-xl p-8">
                 {sent ? (
-                  <div className="text-center py-12">
-                    <div className="h-16 w-16 rounded-full bg-status-emerald/10 border border-status-emerald/30 flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle2 size={32} className="text-status-emerald" />
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-12"
+                  >
+                    <div className="h-16 w-16 rounded-full bg-status-emerald/10 border border-status-emerald/25 flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle2 size={28} className="text-status-emerald" />
                     </div>
                     <h3 className="text-xl font-bold text-text-primary mb-2">Message Sent!</h3>
                     <p className="text-text-secondary text-sm mb-6">Thanks for reaching out. I'll get back to you as soon as possible.</p>
                     <button
                       onClick={() => setSent(false)}
-                      className="inline-flex items-center gap-2 px-6 py-3 border border-border-subtle rounded-lg text-text-secondary hover:text-text-primary hover:border-border-hover transition-all"
+                      className="inline-flex items-center gap-2 px-6 py-3 border border-border-subtle rounded-lg text-text-secondary hover:text-text-primary hover:border-border-hover text-xs font-mono uppercase tracking-[0.12em] transition-all"
                     >
                       Send Another Message
                     </button>
-                  </div>
+                  </motion.div>
                 ) : (
-                  <form onSubmit={handleSubmit} className="space-y-5">
-                    {/* Name & Email row */}
-                    <div className="grid md:grid-cols-2 gap-4">
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-5">
                       <div>
-                        <label className="block font-mono text-xs uppercase tracking-[0.12em] text-text-mono mb-3">
-                          Name
-                        </label>
+                        <label className="block font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono mb-3">Name</label>
                         <input
                           type="text"
                           value={form.name}
                           onChange={(e) => setForm({ ...form, name: e.target.value })}
                           placeholder="Your name"
-                          className="w-full bg-transparent border-b border-border-subtle focus:border-border-hover text-text-primary placeholder-text-tertiary focus:outline-none pb-2 transition-colors"
+                          className="w-full bg-surface-base/50 border-b border-border-subtle focus:border-accent-primary/40 text-text-primary placeholder-text-tertiary focus:outline-none pb-3 text-sm transition-all"
                         />
                       </div>
                       <div>
-                        <label className="block font-mono text-xs uppercase tracking-[0.12em] text-text-mono mb-3">
-                          Email
-                        </label>
+                        <label className="block font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono mb-3">Email</label>
                         <input
                           type="email"
                           value={form.email}
                           onChange={(e) => setForm({ ...form, email: e.target.value })}
                           placeholder="your@email.com"
-                          className="w-full bg-transparent border-b border-border-subtle focus:border-border-hover text-text-primary placeholder-text-tertiary focus:outline-none pb-2 transition-colors"
+                          className="w-full bg-surface-base/50 border-b border-border-subtle focus:border-accent-primary/40 text-text-primary placeholder-text-tertiary focus:outline-none pb-3 text-sm transition-all"
                         />
                       </div>
                     </div>
-
-                    {/* Subject */}
                     <div>
-                      <label className="block font-mono text-xs uppercase tracking-[0.12em] text-text-mono mb-3">
-                        Subject
-                      </label>
+                      <label className="block font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono mb-3">Subject</label>
                       <input
                         type="text"
                         value={form.subject}
                         onChange={(e) => setForm({ ...form, subject: e.target.value })}
                         placeholder="What's this about?"
-                        className="w-full bg-transparent border-b border-border-subtle focus:border-border-hover text-text-primary placeholder-text-tertiary focus:outline-none pb-2 transition-colors"
+                        className="w-full bg-surface-base/50 border-b border-border-subtle focus:border-accent-primary/40 text-text-primary placeholder-text-tertiary focus:outline-none pb-3 text-sm transition-all"
                       />
                     </div>
-
-                    {/* Message */}
                     <div>
-                      <label className="block font-mono text-xs uppercase tracking-[0.12em] text-text-mono mb-3">
-                        Message
-                      </label>
+                      <label className="block font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono mb-3">Message</label>
                       <textarea
                         value={form.message}
                         onChange={(e) => setForm({ ...form, message: e.target.value })}
                         placeholder="Tell me about your project..."
-                        rows={6}
-                        className="w-full bg-transparent border-b border-border-subtle focus:border-border-hover text-text-primary placeholder-text-tertiary focus:outline-none pb-2 resize-none transition-colors"
+                        rows={5}
+                        className="w-full bg-surface-base/50 border-b border-border-subtle focus:border-accent-primary/40 text-text-primary placeholder-text-tertiary focus:outline-none pb-3 resize-none text-sm transition-all"
                       />
                     </div>
-
-                    {/* Error */}
-                    {error && (
-                      <p className="text-danger-400 text-xs font-medium">{error}</p>
-                    )}
-
-                    {/* Submit */}
+                    {error && <p className="text-danger-400 text-xs font-medium">{error}</p>}
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="w-full mt-8 inline-flex items-center justify-center gap-2 px-6 py-3 border border-border-subtle bg-text-primary text-void-950 rounded-lg font-semibold uppercase text-xs tracking-[0.12em] hover:bg-text-primary/90 disabled:opacity-50 transition-all"
+                      className="w-full mt-4 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-text-primary text-void-950 rounded-lg font-mono text-xs uppercase tracking-[0.12em] font-semibold hover:bg-text-primary/90 disabled:opacity-50 transition-all"
                     >
-                      <Send size={16} />
+                      <Send size={14} />
                       {submitting ? 'Sending...' : 'Send Message'}
                     </button>
                   </form>
@@ -243,13 +224,10 @@ export function ContactPage() {
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="mb-16"
+                className="mb-12"
               >
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-secondary mb-2">
-                  FREQUENTLY ASKED QUESTIONS
-                </p>
-                <h2 className="text-display-md font-bold text-text-primary">FAQs</h2>
+                <p className="label-mono-accent mb-3">Common Questions</p>
+                <h2 className="heading-section text-text-primary">FAQs</h2>
               </motion.div>
 
               <div className="space-y-3">
@@ -259,17 +237,14 @@ export function ContactPage() {
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{
-                      delay: i * 0.05,
-                      duration: 0.4,
-                    }}
-                    className="border border-border-subtle bg-surface-base/50 backdrop-filter backdrop-blur-sm rounded-lg p-5 group hover:border-border-hover transition-all"
+                    transition={{ delay: i * 0.05, duration: 0.4 }}
+                    className="surface-card rounded-xl p-5 group"
                   >
-                    <summary className="text-text-primary font-semibold cursor-pointer flex items-center justify-between list-none">
+                    <summary className="text-text-primary font-semibold cursor-pointer flex items-center justify-between list-none text-sm">
                       {faq.question}
-                      <span className="text-text-tertiary group-open:rotate-45 transition-transform text-lg">+</span>
+                      <span className="text-text-tertiary group-open:rotate-45 transition-transform duration-300 text-lg ml-4 flex-shrink-0">+</span>
                     </summary>
-                    <p className="text-text-secondary text-sm mt-3 leading-relaxed">{faq.answer}</p>
+                    <p className="text-text-secondary text-sm mt-4 leading-relaxed">{faq.answer}</p>
                   </motion.details>
                 ))}
               </div>
@@ -277,6 +252,6 @@ export function ContactPage() {
           )}
         </div>
       </div>
-    </>
+    </PageTransition>
   );
 }
