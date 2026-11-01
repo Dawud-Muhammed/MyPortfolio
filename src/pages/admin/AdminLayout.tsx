@@ -52,7 +52,7 @@ export function AdminLayout() {
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 h-screen w-64 bg-background-secondary border-r border-foreground/5 z-50 transition-transform duration-300 flex flex-col ${
+        className={`fixed lg:sticky top-0 left-0 h-dvh lg:h-screen max-h-screen w-64 shrink-0 bg-background-secondary border-r border-foreground/5 z-50 transition-transform duration-300 flex flex-col overflow-hidden ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
@@ -68,7 +68,10 @@ export function AdminLayout() {
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
+        <nav
+          data-lenis-prevent
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-3 space-y-0.5 admin-sidebar-scroll"
+        >
           {navItems.map((item) => (
             <NavLink
               key={item.to}
@@ -119,7 +122,7 @@ export function AdminLayout() {
       )}
 
       {/* Main content */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 max-w-full overflow-x-hidden">
         {/* Mobile header */}
         <div className="lg:hidden h-16 flex items-center justify-between px-4 border-b border-foreground/5 sticky top-0 bg-background z-30">
           <button onClick={() => setSidebarOpen(true)} className="text-foreground/60">
@@ -131,7 +134,7 @@ export function AdminLayout() {
           </button>
         </div>
 
-        <main className="p-4 md:p-8">
+        <main className="p-4 md:p-8 w-full max-w-full overflow-x-hidden">
           <Outlet />
         </main>
       </div>

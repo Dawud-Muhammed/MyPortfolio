@@ -118,51 +118,67 @@ export function CrudModule({ config }: { config: CrudConfig }) {
           {filtered.map((item) => (
             <div
               key={item.id}
-              className="glass rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 group hover:border-foreground/20 transition-colors"
+              className="glass rounded-xl p-3.5 sm:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4 group hover:border-foreground/20 transition-all w-full min-w-0 overflow-hidden"
             >
-              {config.imageField && item[config.imageField] && (
-                <img
-                  src={item[config.imageField]}
-                  alt=""
-                  className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg object-cover shrink-0"
-                />
-              )}
-              <div className="flex-1 min-w-0 w-full sm:w-auto">
-                <p className="text-foreground font-medium truncate text-sm sm:text-base">
-                  {item[config.displayField]}
-                </p>
-                {config.subtitleField && item[config.subtitleField] && (
-                  <p className="text-foreground/40 text-xs sm:text-sm truncate">
-                    {item[config.subtitleField]}
-                  </p>
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                {config.imageField && item[config.imageField] && (
+                  <img
+                    src={item[config.imageField]}
+                    alt=""
+                    className="h-11 w-11 sm:h-12 sm:w-12 rounded-lg object-cover shrink-0 border border-foreground/10 bg-foreground/5"
+                  />
                 )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                    <p className="text-foreground font-semibold truncate text-sm sm:text-base leading-snug">
+                      {item[config.displayField]}
+                    </p>
+                    {item.is_featured && (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider bg-accent-500/15 text-accent-400 border border-accent-500/30 shrink-0">
+                        Featured
+                      </span>
+                    )}
+                  </div>
+                  {config.subtitleField && item[config.subtitleField] && (
+                    <p className="text-foreground/50 text-xs sm:text-sm truncate mt-0.5 line-clamp-1">
+                      {item[config.subtitleField]}
+                    </p>
+                  )}
+                </div>
               </div>
-              {config.statusField && item[config.statusField] && (
-                <span className={`badge !text-xs shrink-0 hidden sm:inline-flex ${
-                  item[config.statusField] === 'Live' || item[config.statusField] === 'Published' || item[config.statusField] === 'approved'
-                    ? '!bg-success-500/20 !text-success-400 !border-success-500/30'
-                    : item[config.statusField] === 'In Progress' || item[config.statusField] === 'Draft' || item[config.statusField] === 'pending'
-                    ? '!bg-warning-500/20 !text-warning-400 !border-warning-500/30'
-                    : ''
-                }`}>
-                  {item[config.statusField]}
-                </span>
-              )}
-              <div className="flex gap-1 shrink-0 w-full sm:w-auto">
-                <button
-                  onClick={() => { setEditing(item); setShowForm(true); }}
-                  className="flex-1 sm:flex-none p-2 rounded-lg text-foreground/50 hover:text-accent-400 hover:bg-foreground/10 transition-all"
-                  aria-label="Edit"
-                >
-                  <Edit3 size={16} />
-                </button>
-                <button
-                  onClick={() => handleDelete(item.id)}
-                  className="flex-1 sm:flex-none p-2 rounded-lg text-foreground/50 hover:text-error-400 hover:bg-error-500/10 transition-all"
-                  aria-label="Delete"
-                >
-                  <Trash2 size={16} />
-                </button>
+
+              <div className="flex items-center justify-between md:justify-end gap-3 shrink-0 pt-2.5 md:pt-0 border-t border-foreground/5 md:border-t-0">
+                {config.statusField && item[config.statusField] && (
+                  <span className={`badge !text-xs shrink-0 ${
+                    item[config.statusField] === 'Live' || item[config.statusField] === 'Published' || item[config.statusField] === 'approved'
+                      ? '!bg-success-500/20 !text-success-400 !border-success-500/30'
+                      : item[config.statusField] === 'In Progress' || item[config.statusField] === 'Draft' || item[config.statusField] === 'pending'
+                      ? '!bg-warning-500/20 !text-warning-400 !border-warning-500/30'
+                      : ''
+                  }`}>
+                    {item[config.statusField]}
+                  </span>
+                )}
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => { setEditing(item); setShowForm(true); }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-accent-400 bg-accent-500/10 hover:bg-accent-500/20 border border-accent-500/30 transition-all hover:scale-105 active:scale-95"
+                    aria-label="Edit"
+                    title="Edit item"
+                  >
+                    <Edit3 size={14} />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-error-400 bg-error-500/10 hover:bg-error-500/20 border border-error-500/30 transition-all hover:scale-105 active:scale-95"
+                    aria-label="Delete"
+                    title="Delete item"
+                  >
+                    <Trash2 size={14} />
+                    <span>Delete</span>
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -249,7 +265,7 @@ function CrudForm({ config, editing, onSave, onClose, saving }: {
         </div>
 
         {/* Scrollable form body */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6" data-lenis-prevent>
           <form onSubmit={handleSubmit} id="crud-form" className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {config.fields.map((field) => (
@@ -315,6 +331,8 @@ function CrudForm({ config, editing, onSave, onClose, saving }: {
                     />
                   )}
                 </div>
+
+
               ))}
             </div>
           </form>

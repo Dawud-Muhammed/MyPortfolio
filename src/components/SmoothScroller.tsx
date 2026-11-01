@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -15,8 +16,18 @@ interface SmoothScrollerProps {
  */
 export function SmoothScroller({ children }: SmoothScrollerProps) {
   const lenisRef = useRef<Lenis | null>(null);
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith('/admin');
 
   useEffect(() => {
+    if (isAdmin) {
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+      }
+      return;
+    }
+
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     ).matches;
@@ -40,18 +51,20 @@ export function SmoothScroller({ children }: SmoothScrollerProps) {
     // Pipe Lenis scroll updates into GSAP ScrollTrigger
     lenis.on('scroll', ScrollTrigger.update);
 
-    // Sync GSAP ticker with Lenis RAF loop
-    gsap.ticker.add((time) => {
+    const tickerCb = (time: number) => {
       lenis.raf(time * 1000);
-    });
+    };
+
+    // Sync GSAP ticker with Lenis RAF loop
+    gsap.ticker.add(tickerCb);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
-      gsap.ticker.remove(lenis.raf as unknown as gsap.TickerCallback);
+      gsap.ticker.remove(tickerCb);
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, []);
+  }, [isAdmin]);
 
   return <>{children}</>;
 }

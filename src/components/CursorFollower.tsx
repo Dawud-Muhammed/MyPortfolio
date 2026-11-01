@@ -29,6 +29,7 @@ export function CursorFollower() {
 
     // Show cursor elements after mount
     setVisible(true);
+    document.documentElement.classList.add('custom-cursor-active');
 
     // Mouse position tracking
     const mouse = { x: 0, y: 0 };
@@ -109,6 +110,7 @@ export function CursorFollower() {
     document.documentElement.addEventListener('mouseenter', onMouseEnter);
 
     return () => {
+      document.documentElement.classList.remove('custom-cursor-active');
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseover', onMouseOver);
       document.removeEventListener('mouseout', onMouseOut);
