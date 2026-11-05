@@ -22,6 +22,27 @@ test('explicit configured custom origins accept whitespace/trailing slash while 
  assert.throws(()=>checkOrigin({headers:{origin:'https://foreign.example',host:'dawud.pro.et'}},{NODE_ENV:'production',SITE_URL:'https://dawud.pro.et'}));
 });
 
+test('all configured site and Vercel aliases are accepted independently',()=>{
+ const env={NODE_ENV:'production',SITE_URL:'https://old.example',VITE_SITE_URL:'https://dawud.pro.et/',
+  VERCEL_URL:'preview.vercel.app',VERCEL_PROJECT_PRODUCTION_URL:'dawud-muhammed.vercel.app'};
+ for(const origin of ['https://old.example','https://dawud.pro.et','https://preview.vercel.app','https://dawud-muhammed.vercel.app']) {
+  assert.doesNotThrow(()=>checkOrigin({headers:{origin}},env));
+ }
+});
+
+test('custom domain aliases require same-origin browser metadata and a matching actual host',()=>{
+ const env={NODE_ENV:'production',SITE_URL:'https://old.example'};
+ const headers={origin:'https://dawud.pro.et',host:'dawud.pro.et','sec-fetch-site':'same-origin'};
+ assert.doesNotThrow(()=>checkOrigin({headers},env));
+ for(const changes of [
+  {'sec-fetch-site':undefined},{'sec-fetch-site':'same-site'},{'sec-fetch-site':'cross-site'},
+  {origin:undefined},{origin:'null'},{origin:'https://foreign.example'},
+  {host:'foreign.example','x-forwarded-host':'dawud.pro.et'},
+  {host:'foreign.example','x-vercel-forwarded-host':'dawud.pro.et'},
+  {host:'foreign.example/path'},{origin:'http://dawud.pro.et'},
+ ]) assert.throws(()=>checkOrigin({headers:{...headers,...changes}},env),{code:'origin_mismatch',status:403});
+});
+
 test('knowledge excludes drafts, private records and ineligible content, including stale sources',()=>{
  const records={projects:[
   {id:'one',title:'Published',slug:'published',publication_status:'published',assistant_eligible:true,role:'API developer'},

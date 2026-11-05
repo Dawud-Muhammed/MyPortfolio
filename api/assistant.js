@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 import { randomUUID } from 'node:crypto';
 import { LIMITS, INSTRUCTIONS, OUTPUT_SCHEMA, PublicError, readConfig, parseQuestion,
   buildKnowledge, makeInput, reservationCost, usageCost, validateAnswer } from '../server/assistant-core.mjs';
-import { database, json, failure, parseBody, checkOrigin, identities, revision, loadKnowledge } from '../server/runtime.mjs';
+import { database, json, failure, parseBody, checkOrigin, canonicalOrigin, identities, revision, loadKnowledge } from '../server/runtime.mjs';
 
 export const config = { maxDuration: 30 };
 const FALLBACK = { enabled: false, availability: 'unavailable', portrait_url: null,
@@ -26,6 +26,14 @@ export function createAssistantHandler(dependencies = {}) {
   let db; let reservation; let reconciled = false; let disconnect; let controller; let stage='server_configuration';
   try {
     if(req.method==='POST') checkOrigin(req,env);
+    // Same-origin browser GETs omit Origin but include Referer. Exercise the POST domain gate
+    // for readiness too, without reserving credit or dispatching a provider request.
+    const browserOrigin=req.headers?.origin || (req.headers?.referer ? canonicalOrigin(req.headers.referer) || 'invalid' : null);
+    if(req.method==='GET' && browserOrigin) {
+      stage='origin_mismatch';
+      checkOrigin({...req,headers:{...req.headers,origin:browserOrigin}},env);
+    }
+    stage='server_configuration';
     db=getDatabase(env);
     stage='settings_configuration';
     const {data:settings,error}=await db.from('assistant_settings').select('enabled,portrait_url,suggested_questions').eq('id',true).single();

@@ -63,6 +63,16 @@ test('successful answer reconciles usage and exposes only approved links',async(
  assert.equal(res.statusCode,200);assert.equal(res.body.sources.length,1);assert.equal(res.body.sources[0].url,'/projects/test');
  assert.equal(f.rpcCalls.at(-1).args.p_actual,23);assert.equal(res.headers['Cache-Control'],'private, no-store, max-age=0');
 });
+test('same-origin chat on a custom domain works with a stale canonical URL; foreign requests never spend',async()=>{
+ const f=fixture(),res=new Response(),req=request();
+ req.headers={...req.headers,origin:'https://dawud.pro.et',host:'dawud.pro.et','sec-fetch-site':'same-origin'};
+ await f.handler(req,res);
+ assert.equal(res.statusCode,200);assert.equal(f.providerCalls,1);
+ const denied=fixture(),blocked=new Response();
+ await denied.handler({...req,headers:{...req.headers,origin:'https://foreign.example','sec-fetch-site':'cross-site'}},blocked);
+ assert.equal(blocked.statusCode,403);assert.equal(blocked.body.code,'origin_mismatch');
+ assert.equal(denied.providerCalls,0);assert.equal(denied.rpcCalls.length,0);
+});
 test('unpublishing while a model runs suppresses the whole stale answer',async()=>{
  const f=fixture({changeContent:true}),res=new Response();await f.handler(request(),res);
  assert.equal(res.statusCode,409);assert.equal(res.body.code,'content_changed');assert.equal(res.body.answer,undefined);
@@ -88,13 +98,26 @@ test('each configuration gate has a distinct nonsecret readiness reason',()=>{
  ]) {const config={...env,...changes};assert.equal(assistantReadiness(config,settings,readConfig(config)),expected);}
 });
 
-test('GET readiness is text-only and optional portrait/FAQ failures do not block configured chat',async()=>{
+test('GET readiness checks the browser domain and remains text-only without provider requests',async()=>{
  const db={from(table){const result=table==='assistant_settings'?{data:{enabled:true,suggested_questions:[]}}:{data:null,error:{message:'private diagnostic'}};
   const query={select(){return query;},eq(){return query;},order(){return query;},limit(){return query;},single:async()=>result,maybeSingle:async()=>result,then:(resolve,reject)=>Promise.resolve(result).then(resolve,reject)};return query;}};
  const res=new Response();await createAssistantHandler({env,database:()=>db,revision:async()=>'7'})({method:'GET'},res);
  assert.equal(res.body.enabled,true);assert.equal(res.body.reason,'ready');assert.equal(res.body.revision,'7');
  assert.deepEqual(res.body.faqs,[]);assert.equal(res.body.greeting,undefined);assert.equal(res.body.audio_is_synthetic,undefined);
  assert(!JSON.stringify(res.body).includes('private diagnostic'));
+ const handler=createAssistantHandler({env,database:()=>db,revision:async()=>'7'});
+ const sameOrigin=new Response();
+ await handler({method:'GET',headers:{referer:'https://dawud.pro.et/admin/assistant',host:'dawud.pro.et','sec-fetch-site':'same-origin'}},sameOrigin);
+ assert.equal(sameOrigin.body.reason,'ready');assert.equal(sameOrigin.body.enabled,true);
+ for(const headers of [
+  {referer:'https://dawud.pro.et/admin/assistant',host:'dawud.pro.et'},
+  {referer:'https://foreign.example/',host:'dawud.pro.et','sec-fetch-site':'cross-site'},
+  {referer:'invalid-url',host:'dawud.pro.et','sec-fetch-site':'same-origin'},
+ ]) {
+  const blocked=new Response();await handler({method:'GET',headers},blocked);
+  assert.equal(blocked.body.reason,'origin_mismatch');assert.equal(blocked.body.enabled,false);
+  assert.equal(blocked.body.availability,'unavailable');
+ }
 });
 
 test('unreadable settings report a settings failure instead of an owner-disabled state',async()=>{

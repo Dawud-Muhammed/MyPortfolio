@@ -26,14 +26,27 @@ export function parseBody(req) {
   if (Buffer.byteLength(body)>LIMITS.body) throw new PublicError('invalid_request','The request is too large.',413);
   try { return JSON.parse(body); } catch { throw new PublicError('invalid_request','Invalid request.',400); }
 }
+export function canonicalOrigin(value) {
+  try { const url=new URL(value.trim()); return ['https:','http:'].includes(url.protocol) && !url.username && !url.password ? url.origin : null; } catch { return null; }
+}
 export function checkOrigin(req, env = process.env) {
-  const origin = req.headers.origin;
-  const canonical = value => { try { const url=new URL(value.trim()); return ['https:','http:'].includes(url.protocol) && !url.username && !url.password ? url.origin : null; } catch { return null; } };
-  const allowed = new Set([canonical(env.SITE_URL || env.VITE_SITE_URL || ''), env.VERCEL_URL ? canonical(`https://${env.VERCEL_URL}`) : null].filter(Boolean));
+  const headers=req.headers || {};
+  const origin=canonicalOrigin(headers.origin);
+  // Treat each configured alias independently: an old SITE_URL must not hide a current VITE_SITE_URL.
+  const allowed = new Set([
+    canonicalOrigin(env.SITE_URL),canonicalOrigin(env.VITE_SITE_URL),
+    ...[env.VERCEL_URL,env.VERCEL_PROJECT_PRODUCTION_URL].map(host=>host?.trim()?canonicalOrigin(`https://${host.trim()}`):null),
+  ].filter(Boolean));
   if (env.NODE_ENV !== 'production') {
     for(const host of ['localhost','127.0.0.1']) for(const port of [5173,3000,3001,4173]) allowed.add(`http://${host}:${port}`);
   }
-  if (!origin || !allowed.has(origin)) throw new PublicError('invalid_request','This request must come from the configured portfolio domain. Please contact Dawud if it continues.',403);
+  // Browser-controlled Fetch Metadata plus the actual request Host supports custom aliases.
+  // Never infer trust from Origin alone or from client-supplied forwarded host headers.
+  const host=headers.host;
+  const ownOrigin=typeof host==='string' && !/[\s/@\\?#]/.test(host)
+    ? canonicalOrigin(`${env.NODE_ENV==='production'?'https':'http'}://${host}`) : null;
+  const sameOrigin=headers['sec-fetch-site']==='same-origin' && ownOrigin && origin===ownOrigin;
+  if (!origin || (!allowed.has(origin) && !sameOrigin)) throw new PublicError('origin_mismatch','This request must come from the configured portfolio domain. Please contact Dawud if it continues.',403);
 }
 export function identities(req, res, env = process.env) {
   const secret = env.ASSISTANT_SESSION_SECRET;
