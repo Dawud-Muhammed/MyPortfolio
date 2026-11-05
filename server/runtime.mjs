@@ -3,9 +3,10 @@ import { createClient } from '@supabase/supabase-js';
 import { PublicError, LIMITS } from './assistant-core.mjs';
 
 export function database(env = process.env) {
-  const endpoint = env.SUPABASE_URL || env.VITE_SUPABASE_URL;
-  if (!endpoint || !env.SUPABASE_SERVICE_ROLE_KEY?.trim()) throw new PublicError('configuration_error', 'This service is not configured yet. Please use the direct contact links.');
-  return createClient(endpoint.trim(), env.SUPABASE_SERVICE_ROLE_KEY.trim(), { auth: { persistSession: false, autoRefreshToken: false },
+  const endpoint = env.SUPABASE_URL?.trim() || env.VITE_SUPABASE_URL?.trim() || env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const serverKey = env.SUPABASE_SERVICE_ROLE_KEY?.trim() || env.SUPABASE_SECRET_KEY?.trim();
+  if (!endpoint || !serverKey) throw new PublicError('configuration_error', 'This service is not configured yet. Please use the direct contact links.');
+  return createClient(endpoint, serverKey, { auth: { persistSession: false, autoRefreshToken: false },
     global: { fetch: (url, init) => fetch(url, { ...init, signal: AbortSignal.timeout(8000) }) } });
 }
 export function json(res, status, data) {

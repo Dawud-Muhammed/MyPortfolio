@@ -41,7 +41,7 @@ export function AdminAssistant() {
     ready:
       "Chat configuration is ready. A real question still needs valid OpenAI account access and working usage controls.",
     server_configuration:
-      "Set SUPABASE_SERVICE_ROLE_KEY and SUPABASE_URL (or VITE_SUPABASE_URL) in Vercel Production, then redeploy. The browser anonymous key cannot replace the server service-role key.",
+      "Configure a Supabase URL (SUPABASE_URL, VITE_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_URL) and a server key (SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SECRET_KEY) in Vercel Production, then redeploy. A public key cannot replace the server key.",
     settings_configuration:
       "The server cannot read assistant_settings. Check that its Supabase key belongs to the correct project and that the Systems Studio migration is applied.",
     content_configuration:
