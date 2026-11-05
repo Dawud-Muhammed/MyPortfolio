@@ -39,7 +39,9 @@ export function AdminAssistant() {
   }, []);
   const readinessMessages: Record<string, string> = {
     ready:
-      "Chat configuration is ready. A real question still needs valid OpenAI account access and working usage controls.",
+      "Chat configuration and this page’s domain check passed. A real question still needs valid OpenAI account access and working usage controls.",
+    origin_mismatch:
+      "This page’s domain is blocked by the server. Set SITE_URL and VITE_SITE_URL to this portfolio’s full HTTPS address in Vercel, then deploy the latest code. Open the CMS and chat on that same domain.",
     server_configuration:
       "Configure a Supabase URL (SUPABASE_URL, VITE_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_URL) and a server key (SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SECRET_KEY) in Vercel Production, then redeploy. A public key cannot replace the server key.",
     settings_configuration:

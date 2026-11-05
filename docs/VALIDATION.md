@@ -1,5 +1,9 @@
 # Validation — 5 November 2026
 
+## Chat domain check follow-up
+
+All **67 automated checks**, type checks, lint and production build pass. Configured SITE_URL/VITE_SITE_URL and Vercel aliases are checked independently. A browser-confirmed same-origin request whose Origin matches the actual HTTPS Host can use a custom domain despite stale canonical settings. Tests cover that request reaching a mocked answer, foreign requests being rejected before budget/provider work, missing metadata, forged forwarded hosts, scheme mismatch, and GET readiness reporting the same domain failure. Browser readiness now checks Origin/Referer; a direct header-free GET only checks server configuration. No paid requests, hosted SQL, environment edits or deployment were performed. The browser suite was not rerun for this server-focused patch.
+
 ## Text-only chat follow-up
 
 Type checks, lint, production build and **63 automated checks pass**. All **19 browser scenarios pass in one run** (3.1 minutes), including ignored legacy audio preferences/configuration, no introduction/playback controls, unavailable-vs-paused behavior, chat replies using a mocked provider, cancellation, retries and source validation. The deployed public endpoint/CMS were checked read-only; owner enablement and the revision record exist, but its legacy server still returned the catch-all fallback. No real paid request or production configuration change was made. See TEXT-CHAT-RELEASE.md for required deployment verification.
