@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Dawud Muhammed — Full-Stack Software Engineer</title>
     <meta name="description" content="Dawud Muhammed — Full-stack software engineer building performant, accessible, and beautiful digital products." />
@@ -19,13 +19,14 @@
         try {
           var stored = localStorage.getItem('theme');
           var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var isDark = stored === 'dark' || (!stored && systemDark);
+          var isDark = stored === 'dark' || (stored !== 'light' && stored !== 'dark' && systemDark);
           if (!isDark) {
             document.documentElement.classList.remove('dark');
           } else {
             document.documentElement.classList.add('dark');
           }
-        } catch(e) {}
+          document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+        } catch(e) { document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches); }
       })();
     </script>
   </head>

@@ -1,401 +1,78 @@
-import { useState, useEffect } from 'react';
-import { Save, Loader2, CheckCircle2, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import { invalidatePublicContent } from '../../lib/queries';
+import { safeUrl } from '../../lib/utils';
 import { FileUploader } from '../../components/admin/FileUploader';
 
+type Field = { name: string; label: string; type?: 'textarea' | 'checkbox' | 'image' | 'document' };
+type Row = Record<string, unknown>;
+const sections: { table: string; title: string; fields: Field[] }[] = [
+  { table: 'profile', title: 'Profile', fields: [
+    { name: 'is_published', label: 'Publish this profile and its public contact information', type: 'checkbox' },
+    { name: 'name', label: 'Name' }, { name: 'title', label: 'Professional focus' }, { name: 'tagline', label: 'Short value statement' }, { name: 'bio', label: 'Biography', type: 'textarea' },
+    { name: 'email', label: 'Public email' }, { name: 'phone', label: 'Public phone' }, { name: 'location', label: 'Location' }, { name: 'timezone', label: 'Timezone' },
+    { name: 'availability', label: 'Available for work', type: 'checkbox' }, { name: 'assistant_eligible', label: 'Approve this public profile and contact information for AI knowledge', type: 'checkbox' },
+    { name: 'profile_picture_url', label: 'Real portrait', type: 'image' }, { name: 'resume_url', label: 'Public résumé PDF', type: 'document' },
+  ] },
+  { table: 'hero_content', title: 'Homepage composition', fields: [
+    { name: 'is_published', label: 'Publish this homepage copy', type: 'checkbox' },
+    { name: 'kicker', label: 'Small introductory line' }, { name: 'headline', label: 'Headline' }, { name: 'highlighted_word', label: 'Highlighted word' }, { name: 'subheadline', label: 'Short supporting copy', type: 'textarea' },
+    { name: 'availability_status', label: 'Show availability line', type: 'checkbox' }, { name: 'availability_label', label: 'Truthful availability or proof line' },
+  ] },
+  { table: 'website_settings', title: 'Website and contact settings', fields: [
+    { name: 'is_published', label: 'Publish these website and contact settings', type: 'checkbox' },
+    { name: 'site_name', label: 'Site name' }, { name: 'logo_url', label: 'Logo', type: 'image' }, { name: 'footer_tagline', label: 'Footer tagline' },
+    { name: 'whatsapp_enabled', label: 'Show WhatsApp on Contact', type: 'checkbox' }, { name: 'whatsapp_number', label: 'WhatsApp number (international digits)' }, { name: 'whatsapp_message', label: 'Suggested WhatsApp message' },
+  ] },
+  { table: 'seo_settings', title: 'Default search metadata', fields: [
+    { name: 'is_published', label: 'Publish this default search metadata', type: 'checkbox' },
+    { name: 'site_title_template', label: 'Site title template' }, { name: 'meta_description', label: 'Default description', type: 'textarea' }, { name: 'og_image_url', label: 'Social preview image', type: 'image' }, { name: 'twitter_handle', label: 'Social handle' }, { name: 'gsc_verification', label: 'Search Console verification value' },
+  ] },
+];
+
 export function AdminSettings() {
-  const [profile, setProfile] = useState<any>(null);
-  const [hero, setHero] = useState<any>(null);
-  const [website, setWebsite] = useState<any>(null);
-  const [seo, setSeo] = useState<any>(null);
-  const [experiences, setExperiences] = useState<any[]>([]);
+  const [rows, setRows] = useState<Record<string, Row>>({});
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [saveError, setSaveError] = useState('');
-
-  useEffect(() => {
-    (async () => {
-      const [p, h, w, s, e] = await Promise.all([
-        supabase.from('profile').select('*').maybeSingle(),
-        supabase.from('hero_content').select('*').maybeSingle(),
-        supabase.from('website_settings').select('*').maybeSingle(),
-        supabase.from('seo_settings').select('*').maybeSingle(),
-        supabase.from('experience').select('*').order('order_index', { ascending: true }),
-      ]);
-      setProfile(p.data);
-      setHero(h.data);
-      setWebsite(w.data);
-      setSeo(s.data);
-      setExperiences(e.data || []);
-      setLoading(false);
-    })();
-  }, []);
-
-  const handleSave = async () => {
-    setSaving(true);
-    setSaveError('');
-    const tasks: PromiseLike<any>[] = [];
-
-    if (profile) {
-      tasks.push(supabase.from('profile').upsert(profile, { onConflict: 'id' }));
+  const [saving, setSaving] = useState<string | null>(null);
+  const [error, setError] = useState('');
+  const [status, setStatus] = useState('');
+  useEffect(() => { let active = true; void (async () => {
+    const results = await Promise.all(sections.map(section => supabase.from(section.table).select('*').order('created_at', { ascending: false }).order('id', { ascending: false }).limit(1).maybeSingle()));
+    if (!active) return;
+    const next: Record<string, Row> = {};
+    results.forEach((result, index) => { if (result.data) next[sections[index].table] = result.data; });
+    setRows(next); setError(results.find(result => result.error)?.error?.message || ''); setLoading(false);
+  })(); return () => { active = false; }; }, []);
+  function update(table: string, name: string, value: unknown) { setRows(previous => ({ ...previous, [table]: { ...previous[table], [name]: value } })); }
+  async function save(event: React.FormEvent, section: typeof sections[number]) {
+    event.preventDefault(); setError(''); setStatus('');
+    const row = rows[section.table];
+    if (!row?.id) { setError(`No ${section.table} singleton exists. Create the initial record through the staging database setup first.`); return; }
+    const values: Row = {};
+    for (const field of section.fields) {
+      const value = row[field.name];
+      if (row.is_published && field.name.endsWith('_url') && value && !safeUrl(String(value))) { setError(`${field.label} must use a safe HTTP(S) URL or internal path.`); return; }
+      values[field.name] = field.type === 'checkbox' ? Boolean(value) : typeof value === 'string' ? value.trim() : value ?? null;
     }
-    if (hero) {
-      tasks.push(supabase.from('hero_content').upsert(hero, { onConflict: 'id' }));
-    }
-    if (website) {
-      tasks.push(supabase.from('website_settings').upsert(website, { onConflict: 'id' }));
-    }
-    if (seo) {
-      tasks.push(supabase.from('seo_settings').upsert(seo, { onConflict: 'id' }));
-    }
-
-    for (const exp of experiences) {
-      if (exp.id) {
-        tasks.push(supabase.from('experience').upsert(exp, { onConflict: 'id' }));
-      } else {
-        const { id, ...insertData } = exp;
-        tasks.push(supabase.from('experience').insert(insertData));
-      }
-    }
-
-    const results = await Promise.all(tasks);
-    const hasError = results.some((r) => r.error);
-
-    setSaving(false);
-    if (hasError) {
-      setSaveError('Some settings failed to save. Please try again.');
-    } else {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
-    }
-  };
-
-  const addExperience = () => {
-    setExperiences([...experiences, {
-      company: '',
-      role: '',
-      location: '',
-      start_date: '',
-      end_date: '',
-      is_current: false,
-      description: '',
-      logo_url: '',
-      order_index: experiences.length,
-    }]);
-  };
-
-  const updateExperience = (index: number, key: string, value: any) => {
-    setExperiences(experiences.map((exp, i) => i === index ? { ...exp, [key]: value } : exp));
-  };
-
-  const removeExperience = async (index: number) => {
-    const exp = experiences[index];
-    if (exp.id && !confirm('Delete this experience entry?')) return;
-    if (exp.id) {
-      await supabase.from('experience').delete().eq('id', exp.id);
-    }
-    setExperiences(experiences.filter((_, i) => i !== index));
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 size={24} className="text-accent-400 animate-spin" />
-      </div>
-    );
+    if (values.is_published && section.table === 'profile' && (!values.name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(values.email)))) { setError('Enter a name and valid public contact email before publishing.'); return; }
+    setSaving(section.table);
+    const { error } = await supabase.from(section.table).update(values).eq('id', row.id);
+    setSaving(null);
+    if (error) setError(error.message); else { invalidatePublicContent(); setStatus(`${section.title} saved. Public pages refresh within 30 seconds and guide knowledge refreshes on the next question.`); }
   }
-
-  const update = (setter: any, key: string, value: any) => {
-    setter((prev: any) => ({ ...prev, [key]: value }));
-  };
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-          <p className="text-foreground/40 text-sm mt-1">Manage your profile, hero content, and site settings</p>
-        </div>
-        <button onClick={handleSave} disabled={saving} className="btn-primary disabled:opacity-50">
-          {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          Save Changes
-        </button>
-      </div>
-
-      {saveError && (
-        <div className="glass rounded-xl p-4 mb-6 flex items-center gap-2 text-error-400 animate-fade-in">
-          <CheckCircle2 size={18} />
-          {saveError}
-        </div>
-      )}
-      {saved && (
-        <div className="glass rounded-xl p-4 mb-6 flex items-center gap-2 text-success-400 animate-fade-in">
-          <CheckCircle2 size={18} />
-          Settings saved successfully!
-        </div>
-      )}
-
-      <div className="space-y-6">
-        {/* Profile */}
-        <section className="glass rounded-2xl p-6">
-          <h2 className="text-lg font-bold text-foreground mb-4">Profile</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Name</label>
-              <input value={profile?.name || ''} onChange={(e) => update(setProfile, 'name', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Title</label>
-              <input value={profile?.title || ''} onChange={(e) => update(setProfile, 'title', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Email</label>
-              <input value={profile?.email || ''} onChange={(e) => update(setProfile, 'email', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Phone</label>
-              <input value={profile?.phone || ''} onChange={(e) => update(setProfile, 'phone', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Location</label>
-              <input value={profile?.location || ''} onChange={(e) => update(setProfile, 'location', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Profile Picture URL</label>
-              <input value={profile?.profile_picture_url || ''} onChange={(e) => update(setProfile, 'profile_picture_url', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <FileUploader
-                bucket="portfolio-images"
-                folder="profile"
-                value={profile?.profile_picture_url || ''}
-                onChange={(url) => update(setProfile, 'profile_picture_url', url)}
-                type="image"
-                label="Or Upload Profile Picture"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <FileUploader
-                bucket="Portfolio-documents"
-                folder="resume"
-                value={profile?.resume_url || ''}
-                onChange={(url) => update(setProfile, 'resume_url', url)}
-                accept=".pdf,.doc,.docx"
-                type="document"
-                label="Resume / CV File"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Tagline</label>
-              <input value={profile?.tagline || ''} onChange={(e) => update(setProfile, 'tagline', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div className="md:col-span-2">
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Bio</label>
-              <textarea value={profile?.bio || ''} onChange={(e) => update(setProfile, 'bio', e.target.value)} rows={4} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground resize-none" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Available for Work</label>
-              <button
-                onClick={() => update(setProfile, 'availability', !profile?.availability)}
-                className={`relative w-12 h-6 rounded-full transition-colors ${profile?.availability ? 'bg-accent-500' : 'bg-foreground/10'}`}
-              >
-                <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${profile?.availability ? 'translate-x-6' : 'translate-x-0.5'}`} />
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* Hero Content */}
-        <section className="glass rounded-2xl p-6">
-          <h2 className="text-lg font-bold text-foreground mb-4">Hero Section</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Kicker</label>
-              <input value={hero?.kicker || ''} onChange={(e) => update(setHero, 'kicker', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Headline</label>
-              <input value={hero?.headline || ''} onChange={(e) => update(setHero, 'headline', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Highlighted Word</label>
-              <input value={hero?.highlighted_word || ''} onChange={(e) => update(setHero, 'highlighted_word', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div className="md:col-span-2">
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Subheadline</label>
-              <textarea value={hero?.subheadline || ''} onChange={(e) => update(setHero, 'subheadline', e.target.value)} rows={3} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground resize-none" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Primary CTA Label</label>
-              <input value={hero?.cta_primary_label || ''} onChange={(e) => update(setHero, 'cta_primary_label', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Primary CTA URL</label>
-              <input value={hero?.cta_primary_url || ''} onChange={(e) => update(setHero, 'cta_primary_url', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Secondary CTA Label</label>
-              <input value={hero?.cta_secondary_label || ''} onChange={(e) => update(setHero, 'cta_secondary_label', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Secondary CTA URL</label>
-              <input value={hero?.cta_secondary_url || ''} onChange={(e) => update(setHero, 'cta_secondary_url', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-          </div>
-        </section>
-
-        {/* Website Settings */}
-        <section className="glass rounded-2xl p-6">
-          <h2 className="text-lg font-bold text-foreground mb-4">Website Settings</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Site Name</label>
-              <input value={website?.site_name || ''} onChange={(e) => update(setWebsite, 'site_name', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">WhatsApp Number</label>
-              <input value={website?.whatsapp_number || ''} onChange={(e) => update(setWebsite, 'whatsapp_number', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div className="md:col-span-2">
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Footer Bio</label>
-              <textarea value={website?.footer_bio || ''} onChange={(e) => update(setWebsite, 'footer_bio', e.target.value)} rows={2} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground resize-none" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Footer Copyright</label>
-              <input value={website?.footer_copyright || ''} onChange={(e) => update(setWebsite, 'footer_copyright', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Footer Tagline</label>
-              <input value={website?.footer_tagline || ''} onChange={(e) => update(setWebsite, 'footer_tagline', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Map Location</label>
-              <input value={website?.map_location || ''} onChange={(e) => update(setWebsite, 'map_location', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div className="md:col-span-2">
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Map Embed URL</label>
-              <input value={website?.map_embed_url || ''} onChange={(e) => update(setWebsite, 'map_embed_url', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">WhatsApp Enabled</label>
-              <button onClick={() => update(setWebsite, 'whatsapp_enabled', !website?.whatsapp_enabled)} className={`relative w-12 h-6 rounded-full transition-colors ${website?.whatsapp_enabled ? 'bg-accent-500' : 'bg-foreground/10'}`}>
-                <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${website?.whatsapp_enabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
-              </button>
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Newsletter Enabled</label>
-              <button onClick={() => update(setWebsite, 'newsletter_enabled', !website?.newsletter_enabled)} className={`relative w-12 h-6 rounded-full transition-colors ${website?.newsletter_enabled ? 'bg-accent-500' : 'bg-foreground/10'}`}>
-                <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${website?.newsletter_enabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
-              </button>
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Maintenance Mode</label>
-              <button onClick={() => update(setWebsite, 'maintenance_mode', !website?.maintenance_mode)} className={`relative w-12 h-6 rounded-full transition-colors ${website?.maintenance_mode ? 'bg-error-500' : 'bg-foreground/10'}`}>
-                <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${website?.maintenance_mode ? 'translate-x-6' : 'translate-x-0.5'}`} />
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* SEO Settings */}
-        <section className="glass rounded-2xl p-6">
-          <h2 className="text-lg font-bold text-foreground mb-4">SEO Settings</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Site Title Template</label>
-              <input value={seo?.site_title_template || ''} onChange={(e) => update(setSeo, 'site_title_template', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" placeholder="%s | Site Name" />
-            </div>
-            <div className="md:col-span-2">
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Meta Description</label>
-              <textarea value={seo?.meta_description || ''} onChange={(e) => update(setSeo, 'meta_description', e.target.value)} rows={2} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground resize-none" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">Twitter Handle</label>
-              <input value={seo?.twitter_handle || ''} onChange={(e) => update(setSeo, 'twitter_handle', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-            <div>
-              <label className="text-foreground/70 text-sm font-medium mb-2 block">OG Image URL</label>
-              <input value={seo?.og_image_url || ''} onChange={(e) => update(setSeo, 'og_image_url', e.target.value)} className="input-field !bg-foreground/5 !border-foreground/10 !text-foreground" />
-            </div>
-          </div>
-        </section>
-
-        {/* Experience Management */}
-        <section className="glass rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-foreground">Experience Management</h2>
-            <button onClick={addExperience} className="btn-ghost !py-1.5 !px-3 !text-xs">
-              <Plus size={14} />
-              Add
-            </button>
-          </div>
-          <p className="text-foreground/40 text-xs mb-4">Manage work experience entries shown in your stats. These are not displayed on the public site.</p>
-          <div className="space-y-4">
-            {experiences.map((exp, i) => (
-              <div key={exp.id || i} className="glass rounded-xl p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-foreground/50 text-xs font-medium">Entry #{i + 1}</span>
-                  <button onClick={() => removeExperience(i)} className="p-1.5 rounded-lg text-foreground/40 hover:text-error-400 hover:bg-error-500/10 transition-all">
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-foreground/60 text-xs mb-1 block">Role</label>
-                    <input value={exp.role || ''} onChange={(e) => updateExperience(i, 'role', e.target.value)} className="input-field !text-sm" placeholder="Software Engineer" />
-                  </div>
-                  <div>
-                    <label className="text-foreground/60 text-xs mb-1 block">Company</label>
-                    <input value={exp.company || ''} onChange={(e) => updateExperience(i, 'company', e.target.value)} className="input-field !text-sm" placeholder="Company" />
-                  </div>
-                  <div>
-                    <label className="text-foreground/60 text-xs mb-1 block">Location</label>
-                    <input value={exp.location || ''} onChange={(e) => updateExperience(i, 'location', e.target.value)} className="input-field !text-sm" placeholder="Remote" />
-                  </div>
-                  <div>
-                    <label className="text-foreground/60 text-xs mb-1 block">Start Date</label>
-                    <input value={exp.start_date || ''} onChange={(e) => updateExperience(i, 'start_date', e.target.value)} className="input-field !text-sm" placeholder="2020-01" />
-                  </div>
-                  <div>
-                    <label className="text-foreground/60 text-xs mb-1 block">End Date</label>
-                    <input value={exp.end_date || ''} onChange={(e) => updateExperience(i, 'end_date', e.target.value)} className="input-field !text-sm" placeholder="2023-12" disabled={exp.is_current} />
-                  </div>
-                  <div>
-                    <label className="text-foreground/60 text-xs mb-1 block">Order</label>
-                    <input type="number" value={exp.order_index ?? 0} onChange={(e) => updateExperience(i, 'order_index', Number(e.target.value))} className="input-field !text-sm" />
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => updateExperience(i, 'is_current', !exp.is_current)}
-                    className={`relative w-10 h-5 rounded-full transition-colors ${exp.is_current ? 'bg-accent-500' : 'bg-foreground/15'}`}
-                  >
-                    <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${exp.is_current ? 'translate-x-5' : 'translate-x-0.5'}`} />
-                  </button>
-                  <span className="text-foreground/60 text-xs">Currently working here</span>
-                </div>
-                <div>
-                  <label className="text-foreground/60 text-xs mb-1 block">Description</label>
-                  <textarea value={exp.description || ''} onChange={(e) => updateExperience(i, 'description', e.target.value)} className="input-field !text-sm resize-none" rows={2} placeholder="Brief description..." />
-                </div>
-              </div>
-            ))}
-            {experiences.length === 0 && (
-              <p className="text-foreground/30 text-sm text-center py-4">No experience entries yet. Click "Add" to create one.</p>
-            )}
-          </div>
-        </section>
-      </div>
-
-      {/* Bottom save button */}
-      <div className="mt-8 flex justify-end">
-        <button onClick={handleSave} disabled={saving} className="btn-primary disabled:opacity-50">
-          {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          Save All Changes
-        </button>
-      </div>
-    </div>
-  );
+  if (loading) return <p role="status">Loading settings…</p>;
+  return <div className="max-w-5xl"><h1 className="text-2xl font-bold">Studio settings</h1><p className="text-foreground/70 mt-2 mb-6">Keep homepage copy concise. Select featured projects and their priority in <Link to="/admin/projects" className="underline">Projects</Link>. Edit career entries in their own collections.</p>
+    {error && <p role="alert" className="border border-error-500 rounded-xl p-4 mb-6">{error}</p>}{status && <p role="status" className="border border-success-500 rounded-xl p-4 mb-6">{status}</p>}
+    <div className="space-y-6">{sections.map(section => <form key={section.table} onSubmit={event => void save(event, section)} className="glass rounded-2xl p-5 md:p-7"><h2 className="text-xl font-semibold mb-5">{section.title}</h2>
+      {section.table === 'hero_content' && <p className="text-sm text-foreground/70 mb-5">The homepage always provides View Selected Work → /projects and Contact Me → /contact. These primary paths are fixed for clear navigation.</p>}
+      {section.table === 'website_settings' && <p className="text-sm text-foreground/70 mb-5">Copyright uses the current year and published profile name once. Only the optional footer tagline is editable.</p>}
+      {!rows[section.table] && <p className="mb-4 text-error-400">The CMS has no record for this section.</p>}
+      <div className="grid md:grid-cols-2 gap-5">{section.fields.map(field => <div key={field.name} className={field.type === 'textarea' ? 'md:col-span-2' : ''}>
+        {field.type === 'image' || field.type === 'document' ? <FileUploader bucket={field.type === 'document' ? 'Portfolio-documents' : 'portfolio-images'} folder={section.table} type={field.type} accept={field.type === 'document' ? 'application/pdf' : 'image/jpeg,image/png,image/webp,image/avif'} label={field.label} value={String(rows[section.table]?.[field.name] || '')} onChange={value => update(section.table,field.name,value)} /> : <label className={field.type === 'checkbox' ? 'flex items-start gap-3 text-sm' : 'block text-sm font-medium'}>
+          {field.type === 'checkbox' ? <><input type="checkbox" className="w-5 h-5" checked={Boolean(rows[section.table]?.[field.name])} onChange={event => update(section.table,field.name,event.target.checked)} />{field.label}</> : <>{field.label}{field.type === 'textarea' ? <textarea rows={4} className="input-field mt-2" value={String(rows[section.table]?.[field.name] || '')} onChange={event => update(section.table,field.name,event.target.value)} /> : <input className="input-field mt-2" value={String(rows[section.table]?.[field.name] || '')} onChange={event => update(section.table,field.name,event.target.value)} />}</>}
+        </label>}
+      </div>)}</div><button className="btn-primary mt-6" disabled={Boolean(saving) || !rows[section.table]}>{saving === section.table ? 'Saving…' : `Save ${section.title.toLowerCase()}`}</button>
+    </form>)}</div>
+  </div>;
 }

@@ -8,7 +8,7 @@ interface FileUploaderProps {
   value: string;
   onChange: (url: string) => void;
   accept?: string;
-  type?: 'image' | 'document';
+  type?: 'image' | 'document' | 'audio';
   label?: string;
 }
 
@@ -27,18 +27,22 @@ export function FileUploader({
 
   const handleUpload = async (file: File) => {
     setError('');
+    const allowed = type === 'image' ? ['image/jpeg', 'image/png', 'image/webp', 'image/avif'] : type === 'audio' ? ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp4'] : ['application/pdf'];
+    const limit = type === 'image' ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
+    if (!allowed.includes(file.type)) { setError(`Unsupported file type. Use ${type === 'image' ? 'JPEG, PNG, WebP or AVIF' : type === 'audio' ? 'MP3, WAV, OGG or M4A' : 'PDF'}.`); return; }
+    if (file.size > limit) { setError(`Maximum upload size is ${limit / 1024 / 1024} MB.`); return; }
     setUploading(true);
     try {
-      const ext = file.name.split('.').pop();
-      const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const ext = ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/avif': 'avif', 'application/pdf': 'pdf', 'audio/mpeg': 'mp3', 'audio/wav': 'wav', 'audio/ogg': 'ogg', 'audio/mp4': 'm4a' } as Record<string, string>)[file.type];
+      const fileName = `${folder}/${crypto.randomUUID()}.${ext}`;
       const { error: uploadError } = await supabase.storage
         .from(bucket)
         .upload(fileName, file, { cacheControl: '3600', upsert: false });
       if (uploadError) throw uploadError;
       const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(fileName);
       onChange(urlData.publicUrl);
-    } catch (err: any) {
-      setError(err.message || 'Upload failed');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed');
     } finally {
       setUploading(false);
     }
@@ -63,6 +67,7 @@ export function FileUploader({
               </div>
             )}
             <button
+              aria-label="Remove file reference (keeps stored file)"
               type="button"
               onClick={handleClear}
               className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-error-500 text-white flex items-center justify-center hover:bg-error-600 transition-colors"
@@ -74,6 +79,7 @@ export function FileUploader({
         <input
           ref={inputRef}
           type="file"
+          aria-label={label || 'Choose file'}
           accept={accept}
           onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f); }}
           className="hidden"
@@ -93,10 +99,11 @@ export function FileUploader({
           )}
           {uploading ? 'Uploading...' : value ? 'Replace' : 'Upload'}
         </button>
-        {error && <p className="text-error-400 text-xs w-full mt-1">{error}</p>}
+        {error && <p role="alert" className="text-error-400 text-xs w-full mt-1">{error}</p>}
       </div>
-      {value && (
+      {(
         <input
+          aria-label={`${label || 'File'} URL`}
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}

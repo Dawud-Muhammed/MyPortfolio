@@ -1,0 +1,15 @@
+# Public rendering and publication freshness
+
+The Vite/React application remains the interactive client. `api/page.js` serves request-time HTML for public routes on Vercel, using `server/render-page.js` and the built `dist/index.html` shell. React mounts over this semantic HTML when JavaScript loads. This is an initial-content renderer, not React hydration: its purpose is crawlability, useful no-JavaScript content, accurate social previews, and per-route HTTP status/metadata without a second frontend framework.
+
+Configure `SITE_URL` to the canonical HTTPS production origin and `SUPABASE_URL` plus `SUPABASE_ANON_KEY` on the server. The public Vite Supabase variables are accepted as fallbacks. This renderer never uses the service-role key or an authenticated administrator session. All reads explicitly filter publication and retain database RLS protections.
+
+Vercel must include `dist/index.html` with the page function and rewrite public routes to `/api/page?path=<original path>`. The same function serves `/robots.txt` and `/sitemap.xml`. Keep `/assets/**`, other `/api/**`, and `/admin/**` out of this rewrite. The root integration owns these rules in `vercel.json`.
+
+Every public request reads current CMS records and sends `Cache-Control`, `CDN-Cache-Control`, and `Vercel-CDN-Cache-Control` with `no-store`. Publishing and unpublishing therefore affect the next HTML/sitemap request; no rebuild webhook or cache purge is needed. Open client tabs use the query layer's invalidation/focus refresh path. The initial renderer escapes all text/attributes, rejects executable media/action links, and does not execute CMS scripts or raw HTML. Article formatting is represented as readable text in initial HTML; the client supplies safe Markdown formatting and interactive controls.
+
+Unpublished/missing slugs return HTTP 404 and `noindex`. CMS failures or missing configuration return HTTP 503 with `Retry-After: 60`, `noindex`, and an honest message. The sitemap fails closed on CMS failure. Robots excludes admin and API paths; RLS and authentication remain the security boundary. Admin responses should separately carry `X-Robots-Tag: noindex`.
+
+Validation: `node --test tests/seo.test.mjs` covers all retained routes, draft exclusion, edit/unpublish freshness, injection, canonical URLs, sitemap, missing configuration, robots, shared article cleanup/reading-time behavior, and link validation using isolated fixtures. It does not claim a live database, Vercel deployment, crawler indexing, or field-performance check. Node 24 was used for validation; the test transpiles shared TypeScript utilities with the installed compiler and does not require native TypeScript stripping.
+
+Tradeoff: no-store adds a database read to each initial document request. Collections are bounded to 500 rows per response; this portfolio currently needs a much smaller editorial dataset. Add pagination before exceeding that threshold. Keep fast function/database regions close together and measure document latency in the authorized preview before release.

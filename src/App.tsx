@@ -1,130 +1,190 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
-import { ThemeProvider } from './components/ThemeProvider';
-import { LoadingScreen } from './components/LoadingScreen';
-import { AuroraBackground } from './components/AuroraBackground';
-import { InteractiveCanvasBackground } from './components/InteractiveCanvasBackground';
-import { Navbar } from './components/Navbar';
-import { Footer } from './components/Footer';
-import { WhatsAppButton } from './components/WhatsAppButton';
-import { PageViewTracker } from './components/PageViewTracker';
-import { SmoothScroller } from './components/SmoothScroller';
-import { ScrollProgress } from './components/ScrollProgress';
-import { CursorFollower } from './components/CursorFollower';
-
-import { HomePage } from './pages/HomePage';
-import { ProjectsPage } from './pages/ProjectsPage';
-import { ProjectDetailPage } from './pages/ProjectDetailPage';
-import { BlogPage } from './pages/BlogPage';
-import { BlogDetailPage } from './pages/BlogDetailPage';
-import { AboutPage } from './pages/AboutPage';
-import { ServicesPage } from './pages/ServicesPage';
-import { ContactPage } from './pages/ContactPage';
-import { GalleryPage } from './pages/GalleryPage';
-import { NotFoundPage } from './pages/NotFoundPage';
-
-import { AdminLoginPage } from './pages/admin/AdminLoginPage';
-import { AdminLayout } from './pages/admin/AdminLayout';
-import { AdminOverview } from './pages/admin/AdminOverview';
-import { AdminProjects } from './pages/admin/AdminProjects';
-import { AdminBlog } from './pages/admin/AdminBlog';
-import { AdminMessages } from './pages/admin/AdminMessages';
-import { AdminSkills } from './pages/admin/AdminSkills';
-import { AdminSettings } from './pages/admin/AdminSettings';
 import {
-  AdminExperience, AdminEducation, AdminCertifications,
-  AdminServices, AdminTestimonials, AdminGallery,
-  AdminAchievements, AdminFaqs, AdminSocialLinks,
-} from './pages/admin/AdminCrudPages';
-
+  BrowserRouter,
+  Routes,
+  Route,
+  Outlet,
+  useLocation,
+} from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
+import { ThemeProvider } from "./components/ThemeProvider";
+import { Navbar } from "./components/Navbar";
+import { Footer } from "./components/Footer";
+import { PortfolioGuide } from "./components/PortfolioGuide";
+import { HomePage } from "./pages/HomePage";
+const AboutPage = lazy(() =>
+  import("./pages/AboutPage").then((m) => ({ default: m.AboutPage })),
+);
+const ProjectsPage = lazy(() =>
+  import("./pages/ProjectsPage").then((m) => ({ default: m.ProjectsPage })),
+);
+const ProjectDetailPage = lazy(() =>
+  import("./pages/ProjectDetailPage").then((m) => ({
+    default: m.ProjectDetailPage,
+  })),
+);
+const ServicesPage = lazy(() =>
+  import("./pages/ServicesPage").then((m) => ({ default: m.ServicesPage })),
+);
+const BlogPage = lazy(() =>
+  import("./pages/BlogPage").then((m) => ({ default: m.BlogPage })),
+);
+const BlogDetailPage = lazy(() =>
+  import("./pages/BlogDetailPage").then((m) => ({ default: m.BlogDetailPage })),
+);
+const GalleryPage = lazy(() =>
+  import("./pages/GalleryPage").then((m) => ({ default: m.GalleryPage })),
+);
+const ContactPage = lazy(() =>
+  import("./pages/ContactPage").then((m) => ({ default: m.ContactPage })),
+);
+const NotFoundPage = lazy(() =>
+  import("./pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
+);
+const AdminLoginPage = lazy(() =>
+  import("./pages/admin/AdminLoginPage").then((m) => ({
+    default: m.AdminLoginPage,
+  })),
+);
+const AdminLayout = lazy(() =>
+  import("./pages/admin/AdminLayout").then((m) => ({ default: m.AdminLayout })),
+);
+const AdminOverview = lazy(() =>
+  import("./pages/admin/AdminOverview").then((m) => ({
+    default: m.AdminOverview,
+  })),
+);
+const AdminProjects = lazy(() =>
+  import("./pages/admin/AdminProjects").then((m) => ({
+    default: m.AdminProjects,
+  })),
+);
+const AdminBlog = lazy(() =>
+  import("./pages/admin/AdminBlog").then((m) => ({ default: m.AdminBlog })),
+);
+const AdminMessages = lazy(() =>
+  import("./pages/admin/AdminMessages").then((m) => ({
+    default: m.AdminMessages,
+  })),
+);
+const AdminSkills = lazy(() =>
+  import("./pages/admin/AdminSkills").then((m) => ({ default: m.AdminSkills })),
+);
+const AdminSettings = lazy(() =>
+  import("./pages/admin/AdminSettings").then((m) => ({
+    default: m.AdminSettings,
+  })),
+);
+const AdminAssistant = lazy(() =>
+  import("./pages/admin/AdminAssistant").then((m) => ({
+    default: m.AdminAssistant,
+  })),
+);
+const AdminCollections = lazy(() =>
+  import("./pages/admin/AdminCollections").then((m) => ({
+    default: m.AdminCollections,
+  })),
+);
+const adminCollections = [
+  "Experience",
+  "Education",
+  "Certifications",
+  "Services",
+  "Testimonials",
+  "Gallery",
+  "Achievements",
+  "Faqs",
+  "SocialLinks",
+  "Navigation",
+] as const;
+const collections = adminCollections.map((name) => ({
+  path: name === "SocialLinks" ? "social" : name.toLowerCase(),
+  Component: lazy(() =>
+    import("./pages/admin/AdminCrudPages").then((m) => ({
+      default: m[`Admin${name}`],
+    })),
+  ),
+}));
 function ScrollToTop() {
   const { pathname } = useLocation();
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
   return null;
 }
-
-function AnimatedRoutes() {
-  const location = useLocation();
-
-  return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        {/* Public routes */}
-        <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
-        <Route path="/projects" element={<PublicLayout><ProjectsPage /></PublicLayout>} />
-        <Route path="/projects/:slug" element={<PublicLayout><ProjectDetailPage /></PublicLayout>} />
-        <Route path="/blog" element={<PublicLayout><BlogPage /></PublicLayout>} />
-        <Route path="/blog/:slug" element={<PublicLayout><BlogDetailPage /></PublicLayout>} />
-        <Route path="/about" element={<PublicLayout><AboutPage /></PublicLayout>} />
-        <Route path="/services" element={<PublicLayout><ServicesPage /></PublicLayout>} />
-        <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
-        <Route path="/gallery" element={<PublicLayout><GalleryPage /></PublicLayout>} />
-
-        {/* Admin routes */}
-        <Route path="/admin/login" element={<AdminLoginPage />} />
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminOverview />} />
-          <Route path="projects" element={<AdminProjects />} />
-          <Route path="blog" element={<AdminBlog />} />
-          <Route path="messages" element={<AdminMessages />} />
-          <Route path="skills" element={<AdminSkills />} />
-          <Route path="experience" element={<AdminExperience />} />
-          <Route path="education" element={<AdminEducation />} />
-          <Route path="certifications" element={<AdminCertifications />} />
-          <Route path="services" element={<AdminServices />} />
-          <Route path="testimonials" element={<AdminTestimonials />} />
-          <Route path="gallery" element={<AdminGallery />} />
-          <Route path="achievements" element={<AdminAchievements />} />
-          <Route path="faqs" element={<AdminFaqs />} />
-          <Route path="social" element={<AdminSocialLinks />} />
-          <Route path="settings" element={<AdminSettings />} />
-        </Route>
-
-        {/* 404 */}
-        <Route path="*" element={<PublicLayout><NotFoundPage /></PublicLayout>} />
-      </Routes>
-    </AnimatePresence>
-  );
-}
-
-function PublicLayout({ children }: { children: React.ReactNode }) {
+function PublicLayout() {
+  const { pathname } = useLocation();
   return (
     <>
-      <AuroraBackground />
-      <InteractiveCanvasBackground />
-      <ScrollProgress />
+      {import.meta.env.MODE === "public-preview" && (
+        <p className="preview-notice">
+          Local review · Read-only public CMS snapshot · Live AI and submissions
+          disabled
+        </p>
+      )}
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
       <Navbar />
-      <main className="relative z-10">
-        {children}
+      <main id="main-content" tabIndex={-1}>
+        <Suspense
+          fallback={
+            <p className="route-loading" role="status">
+              Loading page…
+            </p>
+          }
+        >
+          <div className="route-frame" key={pathname}>
+            <Outlet />
+          </div>
+        </Suspense>
       </main>
       <Footer />
-      <WhatsAppButton />
+      <PortfolioGuide />
     </>
   );
 }
-
-function App() {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1500);
-    return () => clearTimeout(timer);
-  }, []);
-
+export default function App() {
   return (
     <ThemeProvider>
-      {loading && <LoadingScreen />}
       <BrowserRouter>
-        <SmoothScroller>
-          <CursorFollower />
-          <ScrollToTop />
-          <PageViewTracker />
-          <AnimatedRoutes />
-        </SmoothScroller>
+        <ScrollToTop />
+        <Suspense
+          fallback={
+            <p className="route-loading" role="status">
+              Loading…
+            </p>
+          }
+        >
+          <Routes>
+            <Route element={<PublicLayout />}>
+              <Route index element={<HomePage />} />
+              <Route path="about" element={<AboutPage />} />
+              <Route path="projects" element={<ProjectsPage />} />
+              <Route path="projects/:slug" element={<ProjectDetailPage />} />
+              <Route path="services" element={<ServicesPage />} />
+              <Route path="blog" element={<BlogPage />} />
+              <Route path="blog/:slug" element={<BlogDetailPage />} />
+              <Route path="gallery" element={<GalleryPage />} />
+              <Route path="contact" element={<ContactPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+            <Route path="admin/login" element={<AdminLoginPage />} />
+            <Route path="admin" element={<AdminLayout />}>
+              <Route index element={<AdminOverview />} />
+              <Route path="projects" element={<AdminProjects />} />
+              <Route path="blog" element={<AdminBlog />} />
+              <Route path="messages" element={<AdminMessages />} />
+              <Route path="skills" element={<AdminSkills />} />
+              <Route path="settings" element={<AdminSettings />} />
+              <Route path="assistant" element={<AdminAssistant />} />
+              <Route path="collections" element={<AdminCollections />} />
+              {collections.map(({ path, Component }) => (
+                <Route key={path} path={path} element={<Component />} />
+              ))}
+            </Route>
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </ThemeProvider>
   );
 }
-
-export default App;

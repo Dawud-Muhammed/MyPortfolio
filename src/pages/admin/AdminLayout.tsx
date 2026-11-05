@@ -4,9 +4,10 @@ import {
   LogOut, Code2, Briefcase, GraduationCap, Award, Wrench,
   Star, Image, HelpCircle, Trophy, Link2, Eye, Menu, X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../lib/useAuth';
 import { useContactMessages } from '../../lib/queries';
+import { useTheme } from '../../components/ThemeProvider';
 
 const navItems = [
   { to: '/admin', label: 'Overview', icon: LayoutDashboard, end: true },
@@ -24,14 +25,42 @@ const navItems = [
   { to: '/admin/faqs', label: 'FAQs', icon: HelpCircle },
   { to: '/admin/social', label: 'Social Links', icon: Link2 },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
+  { to: '/admin/navigation', label: 'Navigation', icon: Link2 },
+  { to: '/admin/assistant', label: 'AI Guide', icon: HelpCircle },
+  { to: '/admin/collections', label: 'Collections', icon: FolderKanban },
 ];
 
 export function AdminLayout() {
-  const { session, loading, signOut } = useAuth();
+  const { preference, setPreference } = useTheme();
+  const { session, loading, isAdmin, error, signOut } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sidebar = useRef<HTMLElement>(null);
+  const content = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
   const { data: messages } = useContactMessages();
   const unreadCount = (messages || []).filter((m) => !m.is_read).length;
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const contentElement = content.current;
+    const triggerElement = trigger.current;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    contentElement?.setAttribute('inert', '');
+    sidebar.current?.querySelector<HTMLElement>('button')?.focus();
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSidebarOpen(false);
+      if (event.key !== 'Tab') return;
+      const focusable = sidebar.current?.querySelectorAll<HTMLElement>('a[href], button, select');
+      if (!focusable?.length) return;
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    const resize = () => { if (window.innerWidth >= 1024) setSidebarOpen(false); };
+    document.addEventListener('keydown', keydown); window.addEventListener('resize', resize);
+    return () => { document.body.style.overflow = previousOverflow; contentElement?.removeAttribute('inert'); document.removeEventListener('keydown', keydown); window.removeEventListener('resize', resize); triggerElement?.focus(); };
+  }, [sidebarOpen]);
 
   if (loading) {
     return (
@@ -42,6 +71,7 @@ export function AdminLayout() {
   }
 
   if (!session) return <Navigate to="/admin/login" replace />;
+  if (!isAdmin) return <main className="min-h-screen grid place-content-center p-8 gap-4"><h1 className="text-2xl">Administrator access required</h1><p>{error || 'This account is signed in but is not an approved CMS administrator.'}</p><button className="btn-primary" onClick={() => void signOut()}>Sign out</button></main>;
 
   const handleSignOut = async () => {
     await signOut();
@@ -52,6 +82,11 @@ export function AdminLayout() {
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside
+        ref={sidebar}
+        id="admin-navigation"
+        role={sidebarOpen ? 'dialog' : undefined}
+        aria-modal={sidebarOpen || undefined}
+        aria-label="CMS navigation"
         className={`fixed lg:sticky top-0 left-0 h-dvh lg:h-screen max-h-screen w-64 shrink-0 bg-background-secondary border-r border-foreground/5 z-50 transition-transform duration-300 flex flex-col overflow-hidden ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
@@ -63,7 +98,7 @@ export function AdminLayout() {
             </div>
             <span className="text-foreground font-bold text-sm">Admin Panel</span>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-foreground/40">
+          <button aria-label="Close admin navigation" onClick={() => setSidebarOpen(false)} className="lg:hidden text-foreground/40">
             <X size={20} />
           </button>
         </div>
@@ -98,6 +133,7 @@ export function AdminLayout() {
         </nav>
 
         <div className="shrink-0 p-3 border-t border-foreground/5 space-y-1">
+          <label className="block px-3 py-2 text-sm">Color theme<select className="input-field mt-2" value={preference} onChange={event => setPreference(event.target.value as 'light' | 'dark' | 'system')}><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
           <a
             href="/"
             target="_blank"
@@ -122,14 +158,14 @@ export function AdminLayout() {
       )}
 
       {/* Main content */}
-      <div className="flex-1 min-w-0 max-w-full overflow-x-hidden">
+      <div ref={content} className="flex-1 min-w-0 max-w-full overflow-x-hidden">
         {/* Mobile header */}
         <div className="lg:hidden h-16 flex items-center justify-between px-4 border-b border-foreground/5 sticky top-0 bg-background z-30">
-          <button onClick={() => setSidebarOpen(true)} className="text-foreground/60">
+          <button ref={trigger} aria-label="Open admin navigation" aria-controls="admin-navigation" aria-expanded={sidebarOpen} onClick={() => setSidebarOpen(true)} className="text-foreground/60">
             <Menu size={24} />
           </button>
           <span className="text-foreground font-bold text-sm">Admin</span>
-          <button onClick={handleSignOut} className="text-error-400">
+          <button aria-label="Sign out" onClick={handleSignOut} className="text-error-400">
             <LogOut size={20} />
           </button>
         </div>
