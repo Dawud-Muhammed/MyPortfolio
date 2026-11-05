@@ -46,7 +46,7 @@ export function createAssistantHandler(dependencies = {}) {
       stage='content_configuration';
       const [portrait,faqs,currentRevision]=await Promise.all([
         db.from('profile').select('profile_picture_url').eq('is_published',true).order('created_at',{ascending:false}).order('id',{ascending:false}).limit(1).maybeSingle(),
-        db.from('faqs').select('id,question,answer').eq('is_published',true).eq('assistant_eligible',true).order('order_index').limit(8),
+        db.from('faqs').select('id,question,answer').eq('is_published',true).order('order_index').limit(8),
         getRevision(db),
       ]);
       return json(res,200,{ enabled:ready,availability:ready?'ready':'paused',reason,
@@ -57,9 +57,9 @@ export function createAssistantHandler(dependencies = {}) {
     const question=parseQuestion(parseBody(req));
     const identity=identities(req,res,env);
     const startingRevision=await getRevision(db);
-    const sources=buildKnowledge(await getKnowledge(db));
+    const sources=buildKnowledge(await getKnowledge(db),question);
     if(startingRevision!==await getRevision(db)) throw new PublicError('content_changed','Portfolio content has just changed. Please try again.',409);
-    if(!sources.length) return json(res,200,{answer:'Dawud has not approved portfolio knowledge for the guide yet. Please contact him to discuss his work.',sources:[{id:'contact',title:'Contact Dawud',url:'/contact'}],revision:startingRevision});
+    if(!sources.length) return json(res,200,{answer:'Hi! Dawud’s published portfolio information is not available yet. Please contact him to learn more about his work.',sources:[{id:'contact',title:'Contact Dawud',url:'/contact'}],revision:startingRevision});
     const input=makeInput(question,sources);
     const estimate=reservationCost(input,configuration.pricing);
     if(req.aborted || res.destroyed) return;

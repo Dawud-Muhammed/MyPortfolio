@@ -1,6 +1,6 @@
 import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
-import { PublicError, LIMITS } from './assistant-core.mjs';
+import { PublicError, LIMITS, KNOWLEDGE_TABLES } from './assistant-core.mjs';
 
 export function database(env = process.env) {
   const endpoint = env.SUPABASE_URL?.trim() || env.VITE_SUPABASE_URL?.trim() || env.NEXT_PUBLIC_SUPABASE_URL?.trim();
@@ -72,17 +72,17 @@ export async function revision(db) {
   return String(data.revision);
 }
 export async function loadKnowledge(db) {
-  const fields = {
-    profile:'id,name,title,bio,location,tagline,email,phone,is_published,assistant_eligible',
-    projects:'id,title,slug,excerpt,description,role,team_contribution,problem,intended_users,decisions,implementation,challenges,evidence,outcomes,status,publication_status,assistant_eligible',
-    services:'id,title,description,is_published,assistant_eligible',
-    experience:'id,role,company,description,start_date,end_date,is_published,assistant_eligible',
-    faqs:'id,question,answer,is_published,assistant_eligible',
-  };
-  const entries = await Promise.all(Object.entries(fields).map(async ([table,select]) => {
-    let query=db.from(table).select(select).eq('assistant_eligible',true);
-    query=table==='projects'?query.eq('publication_status','published'):query.eq('is_published',true);
-    const {data,error}=await query.order(table==='profile'?'id':'order_index',{ascending:true}).limit(30);
+  const entries = await Promise.all(Object.entries(KNOWLEDGE_TABLES).map(async ([table,spec]) => {
+    const markers=table==='projects'?'publication_status':table==='blog_posts'?'status':'is_published';
+    const select=[...new Set(['id',...spec.fields,markers,...(table==='social_links'?['is_visible']:[]),...(spec.singleton?['created_at']:[])])].join(',')+(spec.relation?`,${spec.relation}`:'');
+    let query=db.from(table).select(select);
+    if(table==='projects') query=query.eq('publication_status','published');
+    else if(table==='blog_posts') query=query.eq('status','Published').or(`published_at.is.null,published_at.lte.${new Date().toISOString()}`);
+    else query=query.eq('is_published',true);
+    if(table==='social_links') query=query.eq('is_visible',true);
+    // One current singleton, otherwise a bounded published catalog; relevance is chosen per question.
+    query=spec.singleton?query.order('created_at',{ascending:false}).order('id',{ascending:false}):query.order('id',{ascending:true});
+    const {data,error}=await query.limit(spec.singleton?1:250);
     if(error) throw new PublicError('configuration_error','The published knowledge could not be loaded. Please use the contact page.');
     return [table,data];
   }));

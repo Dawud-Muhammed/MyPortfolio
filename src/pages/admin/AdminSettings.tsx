@@ -12,7 +12,7 @@ const sections: { table: string; title: string; fields: Field[] }[] = [
     { name: 'is_published', label: 'Publish this profile and its public contact information', type: 'checkbox' },
     { name: 'name', label: 'Name' }, { name: 'title', label: 'Professional focus' }, { name: 'tagline', label: 'Short value statement' }, { name: 'bio', label: 'Biography', type: 'textarea' },
     { name: 'email', label: 'Public email' }, { name: 'phone', label: 'Public phone' }, { name: 'location', label: 'Location' }, { name: 'timezone', label: 'Timezone' },
-    { name: 'availability', label: 'Available for work', type: 'checkbox' }, { name: 'assistant_eligible', label: 'Approve this public profile and contact information for AI knowledge', type: 'checkbox' },
+    { name: 'availability', label: 'Available for work', type: 'checkbox' },
     { name: 'profile_picture_url', label: 'Real portrait', type: 'image' }, { name: 'resume_url', label: 'Public résumé PDF', type: 'document' },
   ] },
   { table: 'hero_content', title: 'Homepage composition', fields: [
@@ -65,6 +65,7 @@ export function AdminSettings() {
   return <div className="max-w-5xl"><h1 className="text-2xl font-bold">Studio settings</h1><p className="text-foreground/70 mt-2 mb-6">Keep homepage copy concise. Select featured projects and their priority in <Link to="/admin/projects" className="underline">Projects</Link>. Edit career entries in their own collections.</p>
     {error && <p role="alert" className="border border-error-500 rounded-xl p-4 mb-6">{error}</p>}{status && <p role="status" className="border border-success-500 rounded-xl p-4 mb-6">{status}</p>}
     <div className="space-y-6">{sections.map(section => <form key={section.table} onSubmit={event => void save(event, section)} className="glass rounded-2xl p-5 md:p-7"><h2 className="text-xl font-semibold mb-5">{section.title}</h2>
+      {section.table === 'profile' && <p className="text-sm text-foreground/70 mb-5">Your published profile and public contact details are available to the AI guide automatically. Save edits here to update its knowledge on the next question.</p>}
       {section.table === 'hero_content' && <p className="text-sm text-foreground/70 mb-5">The homepage always provides View Selected Work → /projects and Contact Me → /contact. These primary paths are fixed for clear navigation.</p>}
       {section.table === 'website_settings' && <p className="text-sm text-foreground/70 mb-5">Copyright uses the current year and published profile name once. Only the optional footer tagline is editable.</p>}
       {!rows[section.table] && <p className="mb-4 text-error-400">The CMS has no record for this section.</p>}

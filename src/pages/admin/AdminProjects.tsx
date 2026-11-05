@@ -17,7 +17,6 @@ const config: CrudConfig = {
     { name: 'gallery', label: 'Gallery (JSON array of URLs)', type: 'json', full: true },
     { name: 'gallery_captions', label: 'Screenshot captions (JSON array, same order as gallery)', type: 'json', full: true },
     { name: 'publication_status', label: 'Publication', type: 'select', defaultValue: 'draft', options: [{ value: 'draft', label: 'Draft — private' }, { value: 'published', label: 'Published' }] },
-    { name: 'assistant_eligible', label: 'Approved for AI guide knowledge', type: 'boolean' },
     { name: 'demo_url', label: 'Demo URL', type: 'text', placeholder: 'https://...' },
     { name: 'github_url', label: 'GitHub URL', type: 'text', placeholder: 'https://github.com/...' },
     { name: 'video_demo_url', label: 'Video Demo URL', type: 'text', placeholder: 'https://...' },

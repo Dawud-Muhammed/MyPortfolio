@@ -27,7 +27,7 @@ function fixture(options={}) {
  }
  const handler=createAssistantHandler({env:{...env,...options.env},database:()=>db,OpenAI:Provider,
   revision:async()=>{revisionCalls++;return options.changeContent && revisionCalls===3?'2':'1';},
-  loadKnowledge:async()=>({projects:options.noKnowledge?[]:[{id:'one',slug:'test',title:'Test',role:'API developer',publication_status:'published',assistant_eligible:true}]}),
+  loadKnowledge:async()=>({projects:options.noKnowledge?[]:[{id:'one',slug:'test',title:'Test',role:'API developer',publication_status:'published',assistant_eligible:false}]}),
  });
  return {handler,rpcCalls,get providerCalls(){return providerCalls;}};
 }
@@ -38,9 +38,10 @@ test('no-key and disabled requests never reserve or contact provider',async()=>{
   assert.equal(res.body.code,'disabled');assert.equal(f.providerCalls,0);assert.equal(f.rpcCalls.length,0);
  }
 });
-test('missing eligible knowledge gives a free contact fallback',async()=>{
+test('missing published knowledge gives a free contact fallback without approval instructions',async()=>{
  const f=fixture({noKnowledge:true}),res=new Response();await f.handler(request(),res);
  assert.equal(res.statusCode,200);assert.equal(res.body.sources[0].url,'/contact');assert.equal(f.providerCalls,0);
+ assert(!res.body.answer.includes('approved'));
 });
 test('rate limits, budget exhaustion and unavailable metering fail before provider calls',async()=>{
  for(const option of [{reservation:{ok:false,code:'rate_limited'}},{reservation:{ok:false,code:'budget_exhausted'}},{meterFailure:{message:'offline'}}]){
@@ -58,7 +59,7 @@ test('cancellation aborts provider and retains unknown cost',async()=>{
  const res=new Response(),f=fixture({cancel:true,res});await f.handler(request(),res);
  assert.equal(f.providerCalls,1);assert.equal(f.rpcCalls.at(-1).args.p_actual,null);
 });
-test('successful answer reconciles usage and exposes only approved links',async()=>{
+test('published content with a legacy false approval flag reaches the provider and exposes only current links',async()=>{
  const f=fixture(),res=new Response();await f.handler(request(),res);
  assert.equal(res.statusCode,200);assert.equal(res.body.sources.length,1);assert.equal(res.body.sources[0].url,'/projects/test');
  assert.equal(f.rpcCalls.at(-1).args.p_actual,23);assert.equal(res.headers['Cache-Control'],'private, no-store, max-age=0');

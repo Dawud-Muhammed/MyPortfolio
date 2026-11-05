@@ -3,6 +3,52 @@ import assert from 'node:assert/strict';
 import {readFile,readdir} from 'node:fs/promises';
 import {PGlite} from '@electric-sql/pglite';
 import {createContactHandler} from '../api/contact.js';
+import {loadKnowledge,revision} from '../server/runtime.mjs';
+import {buildKnowledge} from '../server/assistant-core.mjs';
+
+// Execute the retrieval queries against the real migrated schema with privileged access,
+// as in the server. Unsupported query shapes fail the test instead of silently passing.
+function knowledgeAdapter(db, reads) {
+ const identifier=value=>{assert.match(value,/^[a-z_]+$/);return `"${value}"`;};
+ return {from(table) {
+  reads.push(table);
+  let columns='*',take=1000,skip=0;const where=[],params=[],sort=[];
+  const bind=value=>{params.push(value);return `$${params.length}`;};
+  const run=async(single=false)=>{
+   try {
+    const result=await db.query(`SELECT ${columns} FROM ${identifier(table)}${where.length?` WHERE ${where.join(' AND ')}`:''}${sort.length?` ORDER BY ${sort.join(',')}`:''} LIMIT ${take} OFFSET ${skip}`,params);
+    return {data:single?result.rows[0] || null:result.rows,error:null};
+   } catch(error) {return {data:null,error};}
+  };
+  const query={
+   select(value){
+    assert(!value.includes('*'));assert(!value.includes('assistant_eligible'));
+    const relations={
+     'technologies:project_technologies(technology:technologies(name,is_published))':`(SELECT coalesce(json_agg(json_build_object('technology',(SELECT json_build_object('name',related.name,'is_published',related.is_published) FROM technologies related WHERE related.id=link.technology_id))),'[]'::json) FROM project_technologies link WHERE link.project_id=projects.id) AS technologies`,
+     'tags:blog_post_tags(tag:blog_tags(name,is_published))':`(SELECT coalesce(json_agg(json_build_object('tag',(SELECT json_build_object('name',related.name,'is_published',related.is_published) FROM blog_tags related WHERE related.id=link.tag_id))),'[]'::json) FROM blog_post_tags link WHERE link.post_id=blog_posts.id) AS tags`,
+    };
+    const flat=[];let depth=0,start=0;
+    for(let i=0;i<=value.length;i++) {
+     if(value[i]==='(')depth++;if(value[i]===')')depth--;
+     if(i===value.length || value[i]===',' && depth===0){const field=value.slice(start,i);flat.push(relations[field] || identifier(field));start=i+1;}
+    }
+    columns=flat.join(',');return query;
+   },
+   eq(key,value){where.push(`${identifier(key)}=${bind(value)}`);return query;},
+   ilike(key,value){where.push(`${identifier(key)} ILIKE ${bind(value)}`);return query;},
+   lte(key,value){where.push(`${identifier(key)}<=${bind(value)}`);return query;},
+   or(value){where.push(`(${value.split(',').map(term=>{
+    const [,key,operator,argument]=term.match(/^([a-z_]+)\.(is|lte)\.(.+)$/) || [];
+    if(operator==='is'){assert.equal(argument,'null');return `${identifier(key)} IS NULL`;}
+    assert.equal(operator,'lte');return `${identifier(key)}<=${bind(argument)}`;
+   }).join(' OR ')})`);return query;},
+   order(key,options={}){sort.push(`${identifier(key)} ${options.ascending===false?'DESC':'ASC'}${options.nullsFirst===false?' NULLS LAST':options.nullsFirst===true?' NULLS FIRST':''}`);return query;},
+   limit(value){assert(Number.isSafeInteger(value)&&value>0);take=value;return query;},
+   range(start,end){assert(Number.isSafeInteger(start)&&Number.isSafeInteger(end));skip=start;take=end-start+1;return query;},
+   maybeSingle(){return run(true);},single(){return run(true);},then(resolve,reject){return run().then(resolve,reject);},
+  };return query;
+ }};
+}
 
 // Real embedded PostgreSQL, fresh in-memory database. Never connects to any Supabase project.
 test('additive migration, RLS, publication, relationships, durable accounting and throttles in PostgreSQL',async t=>{
@@ -191,6 +237,58 @@ test('additive migration, RLS, publication, relationships, durable accounting an
     assert.equal((await db.query('SELECT * FROM published_blog_comments')).rows.length,0);
   });
   assert.equal((await db.query('SELECT published_at FROM blog_posts WHERE id=$1',[legacyId])).rows[0].published_at,null);
+ });
+ await t.test('automatic public knowledge uses the real schema, ignores legacy approval and follows edits/unpublish',async()=>{
+  await db.exec(`INSERT INTO profile(name,bio,email,is_published,assistant_eligible) VALUES
+    ('Published test profile','Biography from public CMS','public-owner@example.test',true,false);
+    INSERT INTO projects(title,slug,description,publication_status,assistant_eligible) VALUES
+      ('Automatic backend example','automatic-backend','A published PostgreSQL backend.','published',false);
+    INSERT INTO faqs(question,answer,is_published,assistant_eligible) VALUES
+      ('What does the owner build?','Published API and web systems.',true,false),
+      ('Hidden FAQ','PRIVATE_KNOWLEDGE_SENTINEL',false,true);
+    INSERT INTO skills(name,is_published) VALUES('PostgreSQL test skill',true),('PRIVATE_KNOWLEDGE_SENTINEL',false);
+    INSERT INTO experience(company,role,start_date,description,is_published,assistant_eligible)
+      VALUES('Test company','Backend test engineer','2024','Published work history.',true,false);
+    INSERT INTO education(institution,degree,field,start_date,is_published)
+      VALUES('Test institute','Test degree','Software','2024',true);
+    INSERT INTO certifications(title,issuer,issue_date,is_published)
+      VALUES('Published test certificate','Test issuer','2024',true);
+    INSERT INTO services(title,description,is_published,assistant_eligible)
+      VALUES('Published API service','API implementation.',true,false);
+    INSERT INTO testimonials(name,quote,is_published) VALUES('Published test reviewer','Published test feedback.',true);
+    INSERT INTO achievements(title,issuer,date,is_published) VALUES('Published test award','Test issuer','2024',true);
+    INSERT INTO social_links(platform,url,is_published,is_visible) VALUES
+      ('GitHub','https://github.com/fixture',true,true),('Hidden social','https://private.invalid',true,false);
+    INSERT INTO gallery_items(image_url,caption,is_published) VALUES('https://fixture.invalid/public.webp','Published gallery caption.',true);
+    INSERT INTO hero_content(headline,is_published) VALUES('Published test headline',true);
+    INSERT INTO website_settings(site_name,custom_head_script,is_published)
+      VALUES('Published test site','PRIVATE_KNOWLEDGE_SENTINEL',true);
+    INSERT INTO blog_posts(title,slug,status,content,published_at,assistant_eligible) VALUES
+      ('Automatic legacy article','automatic-legacy','Published','Public article with no recorded date.',NULL,false),
+      ('Automatic dated article','automatic-dated','Published','Public PostgreSQL article.','2020-01-01',false),
+      ('Scheduled private article','automatic-future','Published','PRIVATE_KNOWLEDGE_SENTINEL','2999-01-01',true);
+  `);
+  const reads=[],adapter=knowledgeAdapter(db,reads);
+  const collections=await loadKnowledge(adapter);
+  for(const table of ['profile','projects','faqs','skills','experience','education','certifications','services','testimonials','achievements','social_links','gallery_items','hero_content','website_settings','blog_posts']) {
+   assert(collections[table]?.length>0,`${table} should supply its public records`);
+  }
+  const raw=JSON.stringify(collections);
+  assert(!raw.includes('PRIVATE_KNOWLEDGE_SENTINEL'));assert(!raw.includes('private.invalid'));
+  assert(!raw.includes('Private test submission'));assert(!raw.includes('visitor@example.test'));
+  assert.deepEqual(collections.blog_posts.map(row=>row.slug).sort(),['automatic-dated','automatic-legacy','dated-public']);
+  assert(collections.projects.some(row=>row.slug==='automatic-backend'));
+  for(const table of ['contact_messages','blog_comments','published_blog_comments','newsletter_subscribers','admin_users','assistant_reservations','page_views']) assert(!reads.includes(table));
+  const before=await revision(adapter);
+  await db.exec("UPDATE projects SET description='Fresh automatic knowledge' WHERE slug='automatic-backend'");
+  assert.notEqual(await revision(adapter),before);
+  const changed=await loadKnowledge(adapter);
+  assert(changed.projects.some(row=>row.description==='Fresh automatic knowledge'));
+  assert(buildKnowledge(changed).some(source=>source.id.startsWith('project:')));
+  await db.exec("UPDATE projects SET publication_status='draft' WHERE slug='automatic-backend'; UPDATE blog_posts SET status='Draft' WHERE slug='automatic-legacy'");
+  const unpublished=await loadKnowledge(adapter);
+  assert(!unpublished.projects.some(row=>row.slug==='automatic-backend'));
+  assert(!unpublished.blog_posts.some(row=>row.slug==='automatic-legacy'));
  });
  } finally {await db.close();}
 });

@@ -65,7 +65,6 @@ export interface ProjectCategory {
 
 export interface Project {
   publication_status?: 'draft' | 'published';
-  assistant_eligible?: boolean;
   problem?: string;
   intended_users?: string;
   role?: string;
@@ -188,7 +187,6 @@ export interface Certification {
 
 export interface Service {
   evidence_project_ids?: string[];
-  assistant_eligible?: boolean;
   id: string;
   title: string;
   icon: string;
