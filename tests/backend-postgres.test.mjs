@@ -162,5 +162,35 @@ test('additive migration, RLS, publication, relationships, durable accounting an
   const restored=(await db.query("SELECT * FROM education WHERE id='40000000-0000-4000-8000-000000000001'")).rows[0];
   assert.equal(restored.institution,'Bahirdar Institue of technology');assert.equal(restored.field,'nformation Technology');
  });
+ await t.test('follow-up restores undated published articles without exposing drafts, scheduled posts or comment emails',async()=>{
+  await db.exec(await readFile(new URL('20261105110000_restore_undated_published_articles.sql',dir),'utf8'));
+  await db.exec(`INSERT INTO blog_posts(title,slug,status,published_at) VALUES
+    ('Legacy published','legacy-undated','Published',NULL),
+    ('Dated published','dated-public','Published','2020-01-01'),
+    ('Scheduled','future-private','Published','2999-01-01');
+    INSERT INTO blog_comments(post_id,name,email,comment,status)
+      SELECT id,'Test reader','private@example.test','Approved test comment','approved'
+      FROM blog_posts WHERE slug IN ('legacy-undated','future-private','draft');`);
+  const legacyId=(await db.query("SELECT id FROM blog_posts WHERE slug='legacy-undated'")).rows[0].id;
+  await role('anon',null,async()=>{
+    assert.deepEqual((await db.query('SELECT slug FROM blog_posts ORDER BY slug')).rows.map(r=>r.slug),['dated-public','legacy-undated']);
+    const comments=(await db.query('SELECT * FROM published_blog_comments')).rows;
+    assert.equal(comments.length,1);assert.equal(comments[0].post_id,legacyId);
+    assert.equal('email' in comments[0],false);
+    const deniedUpdate=await db.query("UPDATE blog_posts SET status='Published' WHERE slug='draft' RETURNING id");
+    assert.equal(deniedUpdate.rows.length,0);
+  });
+  assert.equal((await db.query("SELECT status FROM blog_posts WHERE slug='draft'")).rows[0].status,'Draft');
+  await role('authenticated',outsider,async()=>{
+    assert.equal((await db.query("SELECT count(*)::int AS n FROM blog_posts")).rows[0].n,2);
+    await assert.rejects(db.query("INSERT INTO blog_posts(title,slug) VALUES('Denied','denied')"));
+  });
+  await role('authenticated',owner,()=>db.query("UPDATE blog_posts SET status='Draft' WHERE id=$1",[legacyId]));
+  await role('anon',null,async()=>{
+    assert.equal((await db.query('SELECT * FROM blog_posts WHERE id=$1',[legacyId])).rows.length,0);
+    assert.equal((await db.query('SELECT * FROM published_blog_comments')).rows.length,0);
+  });
+  assert.equal((await db.query('SELECT published_at FROM blog_posts WHERE id=$1',[legacyId])).rows[0].published_at,null);
+ });
  } finally {await db.close();}
 });

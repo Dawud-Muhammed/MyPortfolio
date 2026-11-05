@@ -3,6 +3,13 @@ import assert from 'node:assert/strict';
 import { buildKnowledge, parseQuestion, readConfig, makeInput, reservationCost, usageCost, validateAnswer, validateContact, MODEL_CATALOG } from '../server/assistant-core.mjs';
 import { identities,checkOrigin } from '../server/runtime.mjs';
 
+test('explicit configured custom origins accept whitespace/trailing slash while foreign origins remain denied',()=>{
+ const req={headers:{origin:'https://dawud.pro.et'}};
+ checkOrigin(req,{NODE_ENV:'production',SITE_URL:' https://dawud.pro.et/ '});
+ checkOrigin(req,{NODE_ENV:'production',VITE_SITE_URL:'https://dawud.pro.et'});
+ assert.throws(()=>checkOrigin({headers:{origin:'https://foreign.example',host:'dawud.pro.et'}},{NODE_ENV:'production',SITE_URL:'https://dawud.pro.et'}));
+});
+
 test('knowledge excludes drafts, private records and ineligible content, including stale sources',()=>{
  const records={projects:[
   {id:'one',title:'Published',slug:'published',publication_status:'published',assistant_eligible:true,role:'API developer'},

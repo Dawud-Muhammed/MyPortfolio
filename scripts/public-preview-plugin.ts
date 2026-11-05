@@ -62,11 +62,7 @@ export function publicPreviewPlugin(): Plugin {
           res.end(
             JSON.stringify({
               enabled: false,
-              greeting:
-                "Hey, I’m Dawud Muhammed’s AI portfolio guide. What would you like to know about his projects, experience, or how he could help with your project?",
               portrait_url: tables.profile?.[0]?.profile_picture_url || null,
-              greeting_audio_url: "/audio/introduction.wav",
-              audio_is_synthetic: true,
               faqs: [],
               suggested_questions: [],
               revision: snapshot.checkedAt,

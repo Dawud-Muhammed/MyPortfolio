@@ -8,6 +8,8 @@ The security audit found all authenticated accounts had write policies and blog 
 
 Existing public rows retain their visibility during migration. New content defaults to draft (`is_published=false`, or project `publication_status='draft'`); publishing is an explicit owner action. Legacy projects whose status already says Draft/Private remain draft.
 
+Apply `20261105110000_restore_undated_published_articles.sql` after the base release migration. The base date rule hid legacy Published articles whose historical publication date was unknown. This follow-up restores those explicit publications, their published tags and approved email-free comments. Drafts and future-dated articles remain private; owner-only writes and all assistant controls are unchanged. No dates, statuses or article content are rewritten. Undated articles display “Publication date not recorded.”
+
 For local API development run `node scripts/dev-server.mjs`, alongside Vite, which proxies `/api` to loopback port 3001. Optional local configuration: `node --env-file=.env.local scripts/dev-server.mjs`. The API binds only to `127.0.0.1`, caps request bodies at 20 KB, and accepts development origins on localhost/127.0.0.1 ports 5173, 4173, 3000 and 3001. With no credentials, the guide returns its disabled/free greeting state and contact writes fail closed. Localhost HTTP smoke verification was blocked by the tool sandbox; root handles browser verification. The local adapter does not serve production SSR HTML.
 
 ## Apply to local/staging, then prepare production
