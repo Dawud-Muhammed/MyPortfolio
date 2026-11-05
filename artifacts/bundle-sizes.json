@@ -1,0 +1,23 @@
+{
+  "initial": [
+    {
+      "file": "index-DGfWQJFx.js",
+      "gzipBytes": 15590
+    },
+    {
+      "file": "vendor-react-yZW8NHw2.js",
+      "gzipBytes": 59174
+    },
+    {
+      "file": "vendor-supabase-CelhU-Wa.js",
+      "gzipBytes": 59146
+    }
+  ],
+  "scene": [],
+  "css": [
+    {
+      "file": "index-DFuJO2Je.css",
+      "gzipBytes": 12506
+    }
+  ]
+}

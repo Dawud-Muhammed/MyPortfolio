@@ -1,14 +1,24 @@
 import { FolderKanban, FileText, Mail, Star, Inbox } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useProjects, useBlogPosts, useContactMessages, useTestimonials } from '../../lib/queries';
+import { useContactMessages } from '../../lib/queries';
+import { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabase';
+import type { Project, BlogPost, Testimonial } from '../../lib/types';
 import { useAuth } from '../../lib/useAuth';
 import { formatRelativeTime } from '../../lib/utils';
 export function AdminOverview() {
   const { session } = useAuth();
-  const { data: projects } = useProjects();
-  const { data: posts } = useBlogPosts();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [error, setError] = useState('');
   const { data: messages } = useContactMessages();
-  const { data: testimonials } = useTestimonials();
+  useEffect(() => { let active = true; void (async () => {
+    const [projects, posts, testimonials] = await Promise.all([supabase.from('projects').select('*').order('order_index'), supabase.from('blog_posts').select('*').order('published_at', { ascending: false }), supabase.from('testimonials').select('*')]);
+    if (!active) return;
+    setProjects(projects.data || []); setPosts(posts.data || []); setTestimonials(testimonials.data || []);
+    setError(projects.error?.message || posts.error?.message || testimonials.error?.message || '');
+  })(); return () => { active = false; }; }, []);
 
   const publishedPosts = (posts || []).filter((p) => p.status === 'Published');
   const unreadMessages = (messages || []).filter((m) => !m.is_read);
@@ -23,6 +33,7 @@ export function AdminOverview() {
 
   return (
     <div>
+      {error && <p role="alert" className="border border-error-500 p-4 rounded-xl mb-6">{error}</p>}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground">Welcome back{session?.user?.email ? `, ${session.user.email.split('@')[0]}` : ''}!</h1>
         <p className="text-foreground/40 text-sm mt-1">Here's what's happening with your portfolio.</p>

@@ -1,192 +1,24 @@
-import { useState, useEffect, useCallback } from 'react';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { Expand } from 'lucide-react';
 import { useGalleryItems, useSeoSettings } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
-import { motion, AnimatePresence } from 'framer-motion';
-import { PageTransition } from '../components/PageTransition';
+import { CollectionState, MediaLightbox, PageHeading } from '../components/PublicContent';
+import { safeUrl } from '../lib/utils';
 
 export function GalleryPage() {
-  const { data: items, loading } = useGalleryItems();
+  const { data: items, loading, error } = useGalleryItems();
   const { data: seoSettings } = useSeoSettings();
+  const [filter, setFilter] = useState('all');
   const [lightbox, setLightbox] = useState<number | null>(null);
-  const [filter, setFilter] = useState<string>('all');
-
-  const allTags = Array.from(new Set((items || []).flatMap((g) => g.tags || [])));
-  const filtered = filter === 'all' ? (items || []) : (items || []).filter((g) => (g.tags || []).includes(filter));
-
-  const openLightbox = (idx: number) => setLightbox(idx);
-  const closeLightbox = () => setLightbox(null);
-  const next = useCallback(() => setLightbox((prev) => prev === null ? null : (prev + 1) % filtered.length), [filtered.length]);
-  const prev = useCallback(() => setLightbox((prev) => prev === null ? null : (prev - 1 + filtered.length) % filtered.length), [filtered.length]);
-
-  // Keyboard navigation for lightbox
-  useEffect(() => {
-    if (lightbox === null) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowRight') next();
-      if (e.key === 'ArrowLeft') prev();
-    };
-    window.addEventListener('keydown', handleKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', handleKey);
-      document.body.style.overflow = '';
-    };
-  }, [lightbox, next, prev]);
-
-  return (
-    <PageTransition>
-      <SeoHead title="Gallery" description="A visual gallery of my work, projects, and moments." seoSettings={seoSettings} />
-
-      <div className="pt-32 pb-24">
-        <div className="section-container">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-12"
-          >
-            <p className="label-mono-accent mb-3">Visual</p>
-            <h1 className="heading-display text-text-primary mb-4">Gallery</h1>
-            <p className="text-body-lg text-text-secondary max-w-2xl">
-              A collection of screenshots, designs, and moments from my journey as a developer.
-            </p>
-          </motion.div>
-
-          {/* Tag filters */}
-          {allTags.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              className="flex flex-wrap items-center gap-2 mb-10"
-            >
-              <button
-                onClick={() => setFilter('all')}
-                className={`px-4 py-2 rounded-full text-xs font-mono uppercase tracking-[0.12em] transition-all duration-300 ${
-                  filter === 'all'
-                    ? 'bg-accent-primary text-void-950'
-                    : 'border border-border-subtle text-text-secondary hover:text-text-primary hover:border-border-hover'
-                }`}
-              >
-                All
-              </button>
-              {allTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => setFilter(tag)}
-                  className={`px-4 py-2 rounded-full text-xs font-mono uppercase tracking-[0.12em] transition-all duration-300 ${
-                    filter === tag
-                      ? 'bg-accent-primary text-void-950'
-                      : 'border border-border-subtle text-text-secondary hover:text-text-primary hover:border-border-hover'
-                  }`}
-                >
-                  {tag}
-                </button>
-              ))}
-            </motion.div>
-          )}
-
-          {/* Grid */}
-          {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                <div key={i} className="aspect-square rounded-xl skeleton" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              <AnimatePresence mode="popLayout">
-                {filtered.map((item, i) => (
-                  <motion.div
-                    key={item.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ delay: i * 0.03, duration: 0.4 }}
-                    onClick={() => openLightbox(i)}
-                    className="aspect-square rounded-xl overflow-hidden border border-border-subtle cursor-pointer group relative"
-                  >
-                    <img
-                      src={item.image_url}
-                      alt={item.caption || ''}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-void-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                      {item.caption && (
-                        <p className="text-text-primary text-sm font-medium">{item.caption}</p>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Lightbox */}
-      <AnimatePresence>
-        {lightbox !== null && filtered[lightbox] && (
-          <motion.div
-            className="fixed inset-0 z-[100] bg-void-950/95 backdrop-blur-sm flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={closeLightbox}
-          >
-            <button
-              className="absolute top-6 right-6 text-text-tertiary hover:text-text-primary p-2 z-10 transition-colors"
-              onClick={closeLightbox}
-              aria-label="Close lightbox"
-            >
-              <X size={24} />
-            </button>
-            <button
-              className="absolute left-4 md:left-8 text-text-tertiary hover:text-text-primary p-2 z-10 transition-colors"
-              onClick={(e) => { e.stopPropagation(); prev(); }}
-              aria-label="Previous image"
-            >
-              <ChevronLeft size={32} />
-            </button>
-
-            <motion.img
-              key={lightbox}
-              src={filtered[lightbox].image_url}
-              alt={filtered[lightbox].caption || ''}
-              className="max-w-full max-h-[85vh] object-contain rounded-xl"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={(e) => e.stopPropagation()}
-            />
-
-            <button
-              className="absolute right-4 md:right-8 text-text-tertiary hover:text-text-primary p-2 z-10 transition-colors"
-              onClick={(e) => { e.stopPropagation(); next(); }}
-              aria-label="Next image"
-            >
-              <ChevronRight size={32} />
-            </button>
-
-            {filtered[lightbox].caption && (
-              <p className="absolute bottom-8 left-1/2 -translate-x-1/2 text-text-secondary text-sm font-medium">
-                {filtered[lightbox].caption}
-              </p>
-            )}
-
-            {/* Counter */}
-            <p className="absolute bottom-8 right-8 font-mono text-[11px] text-text-mono">
-              {lightbox + 1} / {filtered.length}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </PageTransition>
-  );
+  const tags = Array.from(new Set(items.flatMap(item => item.tags || [])));
+  const filtered = items.filter(item => safeUrl(item.image_url) && (filter === 'all' || item.tags?.includes(filter)));
+  const media = filtered.map(item => ({ src: safeUrl(item.image_url)!, alt: item.alt_text || item.caption || 'Image from Dawud’s portfolio gallery', caption: item.caption, href: item.related_url }));
+  return <div className="section-container pt-32 pb-24">
+    <SeoHead title="Gallery" description="A visual record of Dawud Muhammed’s work, projects, and moments." seoSettings={seoSettings} />
+    <PageHeading eyebrow="Visual journal" title="Beyond the code.">The projects, people, and moments around the work. Take a closer look.</PageHeading>
+    {!!tags.length && <div className="flex flex-wrap gap-2 mb-10" role="group" aria-label="Gallery filters">{['all', ...tags].map(tag => <button key={tag} onClick={() => { setFilter(tag); setLightbox(null); }} aria-pressed={filter === tag} className={`min-h-11 px-4 border rounded-lg ${filter === tag ? 'border-accent-primary text-accent-primary' : 'border-border-subtle text-text-secondary'}`}>{tag === 'all' ? 'All images' : tag}</button>)}</div>}
+    <CollectionState loading={loading} error={error} empty={!filtered.length} name="gallery images" />
+    {!loading && !error && <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">{filtered.map((item, index) => <figure key={item.id}><button onClick={() => setLightbox(index)} className="gallery-tile group relative block w-full rounded-2xl overflow-hidden border border-border-subtle bg-surface-elevated" aria-label={`Enlarge ${media[index].alt}`}><img src={media[index].src} alt={media[index].alt} loading="lazy" width={800} height={600} className="w-full aspect-[4/3] object-cover" /><span className="absolute bottom-4 right-4 w-11 h-11 rounded-full bg-surface-base text-text-primary flex items-center justify-center border border-border-subtle" aria-hidden="true"><Expand size={18} /></span></button><figcaption className="text-text-secondary leading-relaxed mt-4">{item.caption || 'Caption to be added.'}{safeUrl(item.related_url) && <a href={safeUrl(item.related_url)} className="text-link inline-flex items-center mt-2 min-h-11">Related work ↗</a>}</figcaption></figure>)}</div>}
+    {lightbox !== null && <MediaLightbox items={media} index={lightbox} onIndexChange={setLightbox} onClose={() => setLightbox(null)} />}
+  </div>;
 }

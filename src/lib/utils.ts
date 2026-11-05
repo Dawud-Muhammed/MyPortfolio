@@ -1,11 +1,42 @@
 export function formatDate(date: string | null, opts?: Intl.DateTimeFormatOptions): string {
   if (!date) return '';
-  return new Date(date).toLocaleDateString('en-US', {
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) return date;
+  return parsed.toLocaleDateString('en-US', {
+    timeZone: 'UTC',
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     ...opts,
   });
+}
+
+/** Strip import artifacts and a repeated opening title, preserving fenced code. */
+export function articleContent(content: string, title = ''): string {
+  let inFence = false;
+  const cleaned = content.split('\n').map(line => {
+    if (/^\s*(```|~~~)/.test(line)) inFence = !inFence;
+    return inFence ? line : line.replace(/\[cite:\s*[\d,\s]+\]/gi, '');
+  }).join('\n').trim();
+  const lines = cleaned.split('\n');
+  const heading = lines[0]?.replace(/^#\s+/, '').replace(/[*_]/g, '').trim();
+  if (/^#\s+/.test(lines[0] || '') && heading.toLocaleLowerCase() === title.trim().toLocaleLowerCase()) lines.shift();
+  return lines.join('\n').trim();
+}
+
+/** Same cleaned article and 200-word/minute estimate on cards, detail and admin. */
+export function readingMinutes(content: string, title = ''): number {
+  const words = articleContent(content, title).replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/<[^>]*>/g, '').match(/\S+/g)?.length || 0;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
+/** CMS links may be relative to this site or HTTPS/HTTP; reject executable schemes. */
+export function safeUrl(value: string | null | undefined): string | undefined {
+  if (!value) return undefined;
+  const text = value.trim();
+  if (/^\/(?!\/)/.test(text) && !text.includes('\\')) return text;
+  try { const url = new URL(text); return ['https:', 'http:'].includes(url.protocol) ? url.href : undefined; }
+  catch { return undefined; }
 }
 
 export function formatRelativeTime(date: string): string {

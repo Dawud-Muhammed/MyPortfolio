@@ -3,16 +3,19 @@ import { Mail, Archive, Trash2, Inbox } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { formatRelativeTime } from '../../lib/utils';
 import { Loader2 } from 'lucide-react';
+import type { ContactMessage } from '../../lib/types';
 
 export function AdminMessages() {
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'unread' | 'archived'>('all');
 
   const fetchMessages = async () => {
     setLoading(true);
-    const { data } = await supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
+    setError(error?.message || '');
     setMessages(data || []);
     setLoading(false);
   };
@@ -20,18 +23,21 @@ export function AdminMessages() {
   useEffect(() => { fetchMessages(); }, []);
 
   const markRead = async (id: string) => {
-    await supabase.from('contact_messages').update({ is_read: true }).eq('id', id);
+    const { error } = await supabase.from('contact_messages').update({ is_read: true }).eq('id', id);
+    if (error) { setError(error.message); return; }
     fetchMessages();
   };
 
   const toggleArchive = async (id: string, current: boolean) => {
-    await supabase.from('contact_messages').update({ is_archived: !current }).eq('id', id);
+    const { error } = await supabase.from('contact_messages').update({ is_archived: !current }).eq('id', id);
+    if (error) { setError(error.message); return; }
     fetchMessages();
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this message?')) return;
-    await supabase.from('contact_messages').delete().eq('id', id);
+    const { error } = await supabase.from('contact_messages').delete().eq('id', id);
+    if (error) { setError(error.message); return; }
     setSelected(null);
     fetchMessages();
   };
@@ -46,6 +52,7 @@ export function AdminMessages() {
 
   return (
     <div>
+      {error && <p role="alert" className="border border-error-500 p-4 rounded-xl mb-5">{error}</p>}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground">Messages</h1>
         <p className="text-foreground/40 text-sm mt-1">{messages.filter((m) => !m.is_read).length} unread</p>

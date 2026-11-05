@@ -20,7 +20,6 @@ export function AdminLoginPage() {
     const { error: err } = await signIn(email, password);
     setLoading(false);
     if (err) {
-      console.error('Supabase login error:', err);
       setError(err.message);
       return;
     }
@@ -40,11 +39,13 @@ export function AdminLoginPage() {
 
         <form onSubmit={handleSubmit} className="glass-strong rounded-3xl p-8 space-y-5">
           <div>
-            <label className="text-foreground/70 text-sm font-medium mb-2 block">Email</label>
+            <label htmlFor="admin-email" className="text-foreground/70 text-sm font-medium mb-2 block">Email</label>
             <div className="relative">
               <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30" />
               <input
                 type="email"
+                id="admin-email"
+                autoComplete="username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@example.com"
@@ -54,11 +55,13 @@ export function AdminLoginPage() {
             </div>
           </div>
           <div>
-            <label className="text-foreground/70 text-sm font-medium mb-2 block">Password</label>
+            <label htmlFor="admin-password" className="text-foreground/70 text-sm font-medium mb-2 block">Password</label>
             <div className="relative">
               <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30" />
               <input
                 type="password"
+                id="admin-password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
@@ -68,7 +71,7 @@ export function AdminLoginPage() {
             </div>
           </div>
           {error && (
-            <div className="flex items-center gap-2 text-error-400 text-sm">
+            <div role="alert" className="flex items-center gap-2 text-error-400 text-sm">
               <AlertCircle size={16} />
               {error}
             </div>

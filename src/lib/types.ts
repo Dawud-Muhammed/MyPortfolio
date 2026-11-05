@@ -64,6 +64,18 @@ export interface ProjectCategory {
 }
 
 export interface Project {
+  publication_status?: 'draft' | 'published';
+  assistant_eligible?: boolean;
+  problem?: string;
+  intended_users?: string;
+  role?: string;
+  team_contribution?: string;
+  decisions?: string;
+  implementation?: string;
+  challenges?: string;
+  evidence?: string;
+  outcomes?: string;
+  gallery_captions?: string[];
   id: string;
   title: string;
   slug: string;
@@ -175,6 +187,8 @@ export interface Certification {
 }
 
 export interface Service {
+  evidence_project_ids?: string[];
+  assistant_eligible?: boolean;
   id: string;
   title: string;
   icon: string;
@@ -261,6 +275,8 @@ export interface Faq {
 }
 
 export interface GalleryItem {
+  alt_text?: string;
+  related_url?: string;
   id: string;
   image_url: string;
   caption: string;
@@ -294,5 +310,15 @@ export interface PageView {
   browser: string | null;
   country: string | null;
   created_at: string;
+}
+
+export interface AssistantSettings {
+  id: boolean;
+  enabled: boolean;
+  portrait_url: string | null;
+  greeting: string;
+  greeting_audio_url: string | null;
+  audio_is_synthetic: boolean;
+  suggested_questions: string[];
 }
 

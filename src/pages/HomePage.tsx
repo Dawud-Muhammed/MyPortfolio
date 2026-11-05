@@ -1,318 +1,210 @@
-import { Star, Quote, ArrowUpRight } from 'lucide-react';
-import { useHeroContent, useTestimonials, useSeoSettings, useExperience, useProfile, useProjects } from '../lib/queries';
-import { SeoHead } from '../components/SeoHead';
-import { motion } from 'framer-motion';
-import { PageTransition } from '../components/PageTransition';
-import { CountUp } from '../components/CountUp';
-import { MagneticButton } from '../components/MagneticButton';
-
-function parseExperienceDate(dateStr: string | null | undefined): number | null {
-  if (!dateStr || typeof dateStr !== 'string') return null;
-  const trimmed = dateStr.trim();
-  const direct = new Date(trimmed).getTime();
-  if (!isNaN(direct) && direct > 0) return direct;
-
-  // Try extracting 4-digit year e.g. "2020", "Jan 2021"
-  const yearMatch = trimmed.match(/\b(19\d\d|20\d\d)\b/);
-  if (yearMatch) {
-    const year = parseInt(yearMatch[1], 10);
-    const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-    const lower = trimmed.toLowerCase();
-    const monthIdx = monthNames.findIndex(m => lower.includes(m));
-    return new Date(year, monthIdx >= 0 ? monthIdx : 0, 1).getTime();
-  }
-  return null;
-}
-
-function computeYearsExperience(experience: { start_date: string; end_date: string | null; is_current: boolean }[]): number {
-  if (!experience || experience.length === 0) return 0;
-  let earliest = Infinity;
-  let latest = 0;
-
-  for (const exp of experience) {
-    const start = parseExperienceDate(exp.start_date);
-    if (start !== null && start < earliest) {
-      earliest = start;
-    }
-
-    if (exp.is_current) {
-      latest = Math.max(latest, Date.now());
-    } else if (exp.end_date) {
-      const end = parseExperienceDate(exp.end_date);
-      if (end !== null && end > latest) {
-        latest = end;
-      }
-    }
-  }
-
-  if (earliest === Infinity) return 0;
-  if (latest === 0) latest = Date.now();
-
-  const diffMs = latest - earliest;
-  const years = diffMs / (1000 * 60 * 60 * 24 * 365.25);
-  return Math.max(1, Math.round(years));
-}
-
-const stagger = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.12, delayChildren: 0.2 },
-  },
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 30, filter: 'blur(6px)' },
-  visible: {
-    opacity: 1, y: 0, filter: 'blur(0px)',
-    transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
-  },
-};
-
+import { Link } from "react-router-dom";
+import { ArrowUpRight, MapPin } from "lucide-react";
+import { useMemo, useState } from "react";
+import {
+  useHeroContent,
+  useProfile,
+  useProjects,
+  useSeoSettings,
+} from "../lib/queries";
+import { SeoHead } from "../components/SeoHead";
+import { GitHubContributionGraph } from "../components/GitHubContributionGraph";
+import { safeUrl } from "../lib/utils";
 export function HomePage() {
-  const { data: hero } = useHeroContent();
   const { data: profile } = useProfile();
-  const { data: experience } = useExperience();
-  const { data: projects } = useProjects();
-  const { data: testimonials } = useTestimonials();
+  const { data: hero } = useHeroContent();
   const { data: seoSettings } = useSeoSettings();
-
-  const yearsExp = computeYearsExperience(experience || []);
-  const projectCount = (projects || []).length;
-
+  const { data: projects, loading, error } = useProjects();
+  const featured = useMemo(
+    () => projects.filter((p) => p.is_featured).slice(0, 3),
+    [projects],
+  );
+  const [selected, setSelected] = useState<string>("");
+  const active = featured.find((p) => p.id === selected) || featured[0];
+  const name = profile?.name || "Dawud Muhammed";
+  const nameParts = name.trim().split(/\s+/);
+  const portrait = safeUrl(profile?.profile_picture_url);
+  const [failedPortrait, setFailedPortrait] = useState<string | null>(null);
   return (
-    <PageTransition>
-      <SeoHead seoSettings={seoSettings} />
-
-      {/* ─── Hero Section ─── */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-        {/* Geometric background accent */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-1/4 right-0 w-[500px] h-[500px] border border-border-subtle/30 rounded-full opacity-20" />
-          <div className="absolute top-1/3 right-12 w-[350px] h-[350px] border border-accent-primary/10 rounded-full opacity-30" />
-          <div className="absolute bottom-1/4 left-0 w-[200px] h-[200px] border border-border-subtle/20 rounded-full opacity-20" />
-        </div>
-
-        <div className="section-container w-full relative z-10">
-          <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-            {/* Left Column: Texts and Stats */}
-            <motion.div
-              variants={stagger}
-              initial="hidden"
-              animate="visible"
-              className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left"
-            >
-              {/* Availability pill */}
-              {hero?.availability_status && (
-                <motion.div variants={fadeUp} className="mb-6">
-                  <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-status-emerald/8 border border-status-emerald/20 backdrop-blur-sm">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-emerald opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-status-emerald" />
-                    </span>
-                    <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-status-emerald">
-                      {hero.availability_label || 'Open to Opportunities'}
-                    </span>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Name - decreased font by 50%, aligned to the very left on desktop */}
-              <motion.h1
-                variants={fadeUp}
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-tight mb-4 leading-tight"
-                style={{
-                  WebkitTextStroke: '1px rgba(255, 255, 255, 0.75)',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
-                {profile?.name || 'DAWUD'}
-              </motion.h1>
-
-              {/* Role/subheadline - decreased font by 50% */}
-              <motion.h2
-                variants={fadeUp}
-                className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-text-primary mb-8 max-w-xl leading-relaxed"
-              >
-                {hero?.subheadline || 'Full-Stack Software Engineer Building Reliable Web Systems'}
-              </motion.h2>
-
-              {/* Stats */}
-              <motion.div
-                variants={fadeUp}
-                className="flex flex-wrap items-center justify-center lg:justify-start gap-8 sm:gap-12"
-              >
-                <div className="text-center lg:text-left">
-                  <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary">
-                    <CountUp key={yearsExp} end={yearsExp} suffix="+" />
-                  </div>
-                  <div className="text-[11px] text-text-tertiary mt-1 font-mono uppercase tracking-[0.15em]">
-                    Years Experience
-                  </div>
-                </div>
-                {projectCount > 0 && (
-                  <div className="text-center lg:text-left">
-                    <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary">
-                      <CountUp key={projectCount} end={projectCount} suffix="+" />
-                    </div>
-                    <div className="text-[11px] text-text-tertiary mt-1 font-mono uppercase tracking-[0.15em]">
-                      Projects Built
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            </motion.div>
-
-            {/* Right Column: Premium Circle Encircled with White Lights */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-              className="lg:col-span-5 flex justify-center lg:justify-end"
-            >
-              <div className="relative group">
-                {/* Ambient White Light Aura (Pulsing Glow) */}
-                <div
-                  className="absolute -inset-4 sm:-inset-6 rounded-full bg-gradient-to-r from-white/20 via-cyan-100/25 to-white/20 blur-2xl opacity-60 animate-pulse pointer-events-none"
-                  aria-hidden="true"
-                />
-
-                {/* Outer White Lights Halo Ring */}
-                <div
-                  className="absolute -inset-1.5 rounded-full bg-gradient-to-tr from-white/80 via-white to-white/70 opacity-90 blur-[2px]"
-                  aria-hidden="true"
-                />
-
-                {/* Main Premium Circle Container (Equal height with left side text block) */}
-                <div
-                  className="relative w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-[340px] lg:h-[340px] xl:w-[380px] xl:h-[380px] rounded-full p-[3px] bg-gradient-to-tr from-white/90 via-white to-white/80 shadow-[0_0_35px_rgba(255,255,255,0.45),0_0_70px_rgba(255,255,255,0.25)] transition-all duration-700 group-hover:shadow-[0_0_50px_rgba(255,255,255,0.65),0_0_90px_rgba(255,255,255,0.35)]"
-                >
-                  <div className="w-full h-full rounded-full overflow-hidden border-2 border-white/60 bg-surface-elevated relative">
-                    {profile?.profile_picture_url ? (
-                      <img
-                        src={profile.profile_picture_url}
-                        alt={profile.name || 'Profile'}
-                        className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                        loading="eager"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/15 via-surface-elevated to-surface-base text-text-primary font-bold text-4xl">
-                        {(profile?.name || 'D')[0]}
-                      </div>
-                    )}
-                    {/* Inner soft vignette overlay */}
-                    <div className="absolute inset-0 rounded-full shadow-[inset_0_0_25px_rgba(0,0,0,0.6)] pointer-events-none" />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+    <>
+      <SeoHead
+        title="Systems Studio"
+        description={
+          seoSettings?.meta_description ||
+          "Dawud Muhammed — Ethiopian developer with a backend focus. Explore the systems, applications, and decisions behind his work."
+        }
+        seoSettings={seoSettings}
+      />
+      <section
+        className="studio-hero section-container"
+        aria-labelledby="hero-title"
+      >
+        <div className="hero-copy">
+          <p className="eyebrow">
+            <span className="tiny-square" />
+            {hero?.kicker || "INDEPENDENT THINKING. CONNECTED SYSTEMS."}
+          </p>
+          <div className="hero-intro">
+            {portrait && failedPortrait !== portrait && (
+              <img
+                src={portrait}
+                alt={name}
+                width={52}
+                height={52}
+                onError={() => setFailedPortrait(portrait)}
+              />
+            )}
+            <div>
+              <span className="hero-hello">Hey, I’m</span>
+              <span className="hero-role">
+                {profile?.title || "Backend developer · Full-stack builder"}
+              </span>
+            </div>
           </div>
+          <h1 id="hero-title">
+            {nameParts.length > 1 ? (
+              <>
+                {nameParts.slice(0, -1).join(" ")}
+                <span className="hero-name-outline">
+                  {nameParts[nameParts.length - 1]}
+                  <span className="hero-name-period">.</span>
+                </span>
+              </>
+            ) : (
+              name
+            )}
+          </h1>
+          <p className="hero-statement">
+            {hero?.headline ? (
+              hero.highlighted_word &&
+              hero.headline.includes(hero.highlighted_word) ? (
+                hero.headline.split(hero.highlighted_word).map((part, i) => (
+                  <span key={i} style={{ color: "inherit" }}>
+                    {i > 0 && <span>{hero.highlighted_word}</span>}
+                    {part}
+                  </span>
+                ))
+              ) : (
+                hero.headline
+              )
+            ) : (
+              <>
+                Thoughtful interfaces.
+                <br />
+                Serious engineering.
+              </>
+            )}
+          </p>
+          <p className="hero-description">
+            {hero?.subheadline ||
+              "An Ethiopian developer with a backend focus. I connect solid architecture with considered interfaces to make useful software."}
+          </p>
+          <div className="hero-actions">
+            <Link to="/projects" className="studio-button primary">
+              View Selected Work <ArrowUpRight size={18} />
+            </Link>
+            <Link to="/contact" className="studio-button">
+              Contact Me <ArrowUpRight size={18} />
+            </Link>
+          </div>
+          {hero?.availability_status && hero.availability_label && (
+            <p className="availability">
+              <span
+                className={
+                  hero.availability_status ? "available-dot" : "tiny-square"
+                }
+              />
+              {hero.availability_label}
+            </p>
+          )}
+          {profile?.location && (
+            <p className="hero-location">
+              <MapPin size={13} aria-hidden="true" />
+              {profile.location}
+              <span>·</span>
+              <Link to="/about">
+                A little about me <ArrowUpRight size={13} />
+              </Link>
+            </p>
+          )}
         </div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 0.6 }}
-        >
-          <motion.div
-            className="w-5 h-8 rounded-full border border-text-tertiary/40 flex items-start justify-center p-1.5"
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <div className="w-0.5 h-1.5 rounded-full bg-text-tertiary/50" />
-          </motion.div>
-        </motion.div>
+        <GitHubContributionGraph />
       </section>
-
-      {/* ─── Testimonials ─── */}
-      {(testimonials || []).length > 0 && (
-        <section className="py-section relative">
-          <div className="section-container">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
+      <section
+        className="selected-work section-container"
+        id="selected-work"
+        aria-labelledby="work-title"
+      >
+        <div className="section-topline">
+          <h2 id="work-title">
+            Selected work{" "}
+            <span>/ {String(featured.length).padStart(2, "0")}</span>
+          </h2>
+          <Link to="/projects">
+            All projects <ArrowUpRight size={15} />
+          </Link>
+        </div>
+        {featured.length > 0 ? (
+          <>
+            <div
+              className="project-selectors"
+              aria-label="Select a featured project"
             >
-              <p className="label-mono-accent mb-3">Kind Words</p>
-              <h2 className="heading-section text-text-primary">What People Say</h2>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              {(testimonials || []).slice(0, 4).map((t, i) => (
-                <motion.div
-                  key={t.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
-                  className="surface-card rounded-xl p-6 relative"
+              {featured.map((project, i) => (
+                <button
+                  key={project.id}
+                  aria-pressed={active?.id === project.id}
+                  onClick={() => setSelected(project.id)}
                 >
-                  <Quote size={28} className="text-accent-primary/10 absolute top-5 right-5" />
-                  <div className="flex gap-1 mb-4">
-                    {Array.from({ length: t.rating }).map((_, idx) => (
-                      <Star key={idx} size={13} className="text-warning-400" fill="currentColor" />
-                    ))}
-                  </div>
-                  <p className="text-text-secondary text-sm leading-relaxed mb-5">"{t.quote}"</p>
-                  <div className="flex items-center gap-3">
-                    {t.avatar_url ? (
-                      <img src={t.avatar_url} alt={t.name} className="h-10 w-10 rounded-full object-cover" loading="lazy" />
-                    ) : (
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-accent-primary/20 to-accent-primary/5 border border-accent-primary/20 flex items-center justify-center text-text-primary font-bold text-xs">
-                        {t.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-text-primary font-medium text-sm">{t.name}</p>
-                      <p className="text-text-tertiary text-xs">{t.role}{t.company ? `, ${t.company}` : ''}</p>
-                    </div>
-                  </div>
-                </motion.div>
+                  <span>0{i + 1}</span>
+                  {project.title}
+                  <ArrowUpRight size={18} />
+                </button>
               ))}
             </div>
-          </div>
-        </section>
-      )}
-
-      {/* ─── CTA ─── */}
-      <section className="py-section relative">
-        <div className="section-container">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.97 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="relative rounded-2xl p-12 md:p-16 text-center max-w-3xl mx-auto overflow-hidden"
-          >
-            {/* Glass bg */}
-            <div className="absolute inset-0 bg-surface-elevated/40 backdrop-blur-xl border border-border-subtle rounded-2xl" />
-            {/* Gradient accent */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[1px] bg-gradient-to-r from-transparent via-accent-primary/50 to-transparent" />
-
-            <div className="relative z-10">
-              <h2 className="text-display-md font-bold text-text-primary mb-4">
-                Let's build something great
-              </h2>
-              <p className="text-text-secondary text-base mb-10 max-w-xl mx-auto">
-                I'm currently available for new projects. Whether you have a question, a project idea, or just want to connect.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <MagneticButton href="/contact" variant="primary">
-                  Get in Touch
-                  <ArrowUpRight size={16} />
-                </MagneticButton>
-                <MagneticButton href="/projects" variant="secondary">
-                  View My Work
-                </MagneticButton>
-              </div>
-            </div>
-          </motion.div>
-        </div>
+            {active && (
+              <article className="selected-project" key={active.id}>
+                <div>
+                  <p className="eyebrow">
+                    {active.category?.name || "SELECTED PROJECT"} ·{" "}
+                    {active.status}
+                  </p>
+                  <h3>
+                    <Link to={`/projects/${active.slug}`}>{active.title}</Link>
+                  </h3>
+                  <p>{active.excerpt || active.description.slice(0, 210)}</p>
+                  <Link className="text-link" to={`/projects/${active.slug}`}>
+                    Explore the case study <ArrowUpRight size={16} />
+                  </Link>
+                </div>
+                {active.cover_image_url && (
+                  <Link
+                    to={`/projects/${active.slug}`}
+                    className="selected-image"
+                  >
+                    <img
+                      src={active.cover_image_url}
+                      alt={`${active.title} interface`}
+                      loading="lazy"
+                      width="720"
+                      height="450"
+                    />
+                  </Link>
+                )}
+              </article>
+            )}
+          </>
+        ) : (
+          <p className="collection-note" role="status">
+            {loading
+              ? "Loading selected work…"
+              : error
+                ? "Selected work is temporarily unavailable. You can still get in touch."
+                : "Selected projects will appear here when published."}{" "}
+            <Link to="/projects">Browse work ↗</Link>
+          </p>
+        )}
       </section>
-    </PageTransition>
+    </>
   );
 }

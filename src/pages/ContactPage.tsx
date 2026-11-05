@@ -1,257 +1,69 @@
-import { Mail, Send, CheckCircle2 } from 'lucide-react';
-import { useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { useProfile, useSocialLinks, useSeoSettings, useFaqs } from '../lib/queries';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { ArrowUpRight, Mail, Send } from 'lucide-react';
+import { useProfile, useSocialLinks, useSeoSettings, useFaqs, useWebsiteSettings } from '../lib/queries';
 import { SeoHead } from '../components/SeoHead';
-import { motion } from 'framer-motion';
-import { Github, Twitter, Linkedin } from 'lucide-react';
-import { PageTransition } from '../components/PageTransition';
-
-const platformIcons: Record<string, typeof Github> = {
-  GitHub: Github, Twitter, LinkedIn: Linkedin, Email: Mail, gmail: Mail, github: Github, twitter: Twitter, linkedin: Linkedin,
-};
+import { PageHeading } from '../components/PublicContent';
+import { safeUrl } from '../lib/utils';
 
 export function ContactPage() {
   const { data: profile } = useProfile();
   const { data: socials } = useSocialLinks();
   const { data: seoSettings } = useSeoSettings();
   const { data: faqs } = useFaqs();
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+  const { data: settings } = useWebsiteSettings();
+  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '', website: '' });
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
-
-  const visibleSocials = (socials || []).filter((s) => s.is_visible);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const startedAt = useRef(Date.now());
+  const controller = useRef<AbortController | null>(null);
+  const feedback = useRef<HTMLDivElement>(null);
+  useEffect(() => () => controller.current?.abort(), []);
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (submitting) return;
     setError('');
-    if (!form.name || !form.email || !form.subject || !form.message) {
-      setError('All fields are required.');
-      return;
-    }
+    if (!navigator.onLine) { setError('You appear to be offline. Reconnect or use the direct contact details.'); return; }
+    if ([form.name, form.email, form.subject, form.message].some(value => !value.trim())) { setError('Please complete all fields.'); return; }
     setSubmitting(true);
-    const { error: err } = await supabase.from('contact_messages').insert({
-      name: form.name,
-      email: form.email,
-      subject: form.subject,
-      message: form.message,
-    });
-    setSubmitting(false);
-    if (err) {
-      setError('Failed to send message. Please try again.');
-      return;
-    }
-    setSent(true);
-    setForm({ name: '', email: '', subject: '', message: '' });
+    controller.current = new AbortController();
+    const timeout = window.setTimeout(() => controller.current?.abort(), 20000);
+    try {
+      const response = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, startedAt: startedAt.current }), signal: controller.current.signal });
+      const result = await response.json().catch(() => null);
+      if (!response.ok || result?.ok !== true) throw new Error(result?.message || 'The contact service is unavailable. Please use a direct contact option.');
+      setSent(true);
+      setForm({ name: '', email: '', subject: '', message: '', website: '' });
+    } catch (cause) {
+      setError(cause instanceof Error && cause.name === 'AbortError' ? 'The request timed out. Delivery is unconfirmed; please use a direct contact option before resending.' : cause instanceof Error ? cause.message : 'Your message could not be submitted. Please try again.');
+    } finally { window.clearTimeout(timeout); setSubmitting(false); window.setTimeout(() => feedback.current?.focus(), 0); }
   };
-
-  return (
-    <PageTransition>
-      <SeoHead title="Contact" description="Get in touch for collaborations, freelance work, or just to say hi." seoSettings={seoSettings} />
-
-      <div className="pt-32 pb-24">
-        <div className="section-container">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-16"
-          >
-            <p className="label-mono-accent mb-3">Let's Connect</p>
-            <h1 className="heading-display text-text-primary mb-4">Contact</h1>
-            <p className="text-body-lg text-text-secondary max-w-2xl">
-              Have a project in mind, a question, or just want to say hello? I'd love to hear from you.
-            </p>
-          </motion.div>
-
-          <div className="grid lg:grid-cols-5 gap-10">
-            {/* Contact info */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-              className="lg:col-span-2 space-y-1"
-            >
-              {profile?.email && (
-                <a
-                  href={`mailto:${profile.email}`}
-                  className="block border-b border-border-subtle hover:border-border-hover hover:bg-surface-elevated/20 px-4 py-5 transition-all group rounded-t-lg"
-                >
-                  <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono group-hover:text-accent-primary transition-colors">
-                    Email
-                  </div>
-                  <div className="text-sm text-text-secondary group-hover:text-text-primary mt-1 transition-colors">{profile.email}</div>
-                </a>
-              )}
-              {profile?.phone && (
-                <a
-                  href={`tel:${profile.phone}`}
-                  className="block border-b border-border-subtle hover:border-border-hover hover:bg-surface-elevated/20 px-4 py-5 transition-all group"
-                >
-                  <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono group-hover:text-accent-primary transition-colors">
-                    Phone
-                  </div>
-                  <div className="text-sm text-text-secondary group-hover:text-text-primary mt-1 transition-colors">{profile.phone}</div>
-                </a>
-              )}
-              {profile?.location && (
-                <div className="block border-b border-border-subtle px-4 py-5">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono">
-                    Location
-                  </div>
-                  <div className="text-sm text-text-secondary mt-1">{profile.location}</div>
-                </div>
-              )}
-
-              {visibleSocials.length > 0 && (
-                <div className="pt-6 px-4">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono mb-4">
-                    Follow
-                  </p>
-                  <div className="flex gap-3">
-                    {visibleSocials.map((s) => {
-                      const Icon = platformIcons[s.platform.toLowerCase()] || Mail;
-                      return (
-                        <motion.a
-                          key={s.id}
-                          href={s.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="h-10 w-10 rounded-xl border border-border-subtle hover:border-accent-primary/40 bg-surface-base/30 hover:bg-accent-primary/5 flex items-center justify-center text-text-tertiary hover:text-accent-primary transition-all duration-300"
-                          aria-label={s.platform}
-                          whileHover={{ scale: 1.1, y: -2 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <Icon size={16} />
-                        </motion.a>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </motion.div>
-
-            {/* Contact Form */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.15 }}
-              className="lg:col-span-3"
-            >
-              <div className="surface-card rounded-xl p-8">
-                {sent ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center py-12"
-                  >
-                    <div className="h-16 w-16 rounded-full bg-status-emerald/10 border border-status-emerald/25 flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle2 size={28} className="text-status-emerald" />
-                    </div>
-                    <h3 className="text-xl font-bold text-text-primary mb-2">Message Sent!</h3>
-                    <p className="text-text-secondary text-sm mb-6">Thanks for reaching out. I'll get back to you as soon as possible.</p>
-                    <button
-                      onClick={() => setSent(false)}
-                      className="inline-flex items-center gap-2 px-6 py-3 border border-border-subtle rounded-lg text-text-secondary hover:text-text-primary hover:border-border-hover text-xs font-mono uppercase tracking-[0.12em] transition-all"
-                    >
-                      Send Another Message
-                    </button>
-                  </motion.div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-5">
-                      <div>
-                        <label className="block font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono mb-3">Name</label>
-                        <input
-                          type="text"
-                          value={form.name}
-                          onChange={(e) => setForm({ ...form, name: e.target.value })}
-                          placeholder="Your name"
-                          className="w-full bg-surface-base/50 border-b border-border-subtle focus:border-accent-primary/40 text-text-primary placeholder-text-tertiary focus:outline-none pb-3 text-sm transition-all"
-                        />
-                      </div>
-                      <div>
-                        <label className="block font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono mb-3">Email</label>
-                        <input
-                          type="email"
-                          value={form.email}
-                          onChange={(e) => setForm({ ...form, email: e.target.value })}
-                          placeholder="your@email.com"
-                          className="w-full bg-surface-base/50 border-b border-border-subtle focus:border-accent-primary/40 text-text-primary placeholder-text-tertiary focus:outline-none pb-3 text-sm transition-all"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono mb-3">Subject</label>
-                      <input
-                        type="text"
-                        value={form.subject}
-                        onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                        placeholder="What's this about?"
-                        className="w-full bg-surface-base/50 border-b border-border-subtle focus:border-accent-primary/40 text-text-primary placeholder-text-tertiary focus:outline-none pb-3 text-sm transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-mono text-[10px] uppercase tracking-[0.15em] text-text-mono mb-3">Message</label>
-                      <textarea
-                        value={form.message}
-                        onChange={(e) => setForm({ ...form, message: e.target.value })}
-                        placeholder="Tell me about your project..."
-                        rows={5}
-                        className="w-full bg-surface-base/50 border-b border-border-subtle focus:border-accent-primary/40 text-text-primary placeholder-text-tertiary focus:outline-none pb-3 resize-none text-sm transition-all"
-                      />
-                    </div>
-                    {error && <p className="text-danger-400 text-xs font-medium">{error}</p>}
-                    <button
-                      type="submit"
-                      disabled={submitting}
-                      className="w-full mt-4 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-text-primary text-void-950 rounded-lg font-mono text-xs uppercase tracking-[0.12em] font-semibold hover:bg-text-primary/90 disabled:opacity-50 transition-all"
-                    >
-                      <Send size={14} />
-                      {submitting ? 'Sending...' : 'Send Message'}
-                    </button>
-                  </form>
-                )}
-              </div>
-            </motion.div>
-          </div>
-
-          {/* FAQs */}
-          {(faqs || []).length > 0 && (
-            <div className="mt-section max-w-3xl mx-auto">
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="mb-12"
-              >
-                <p className="label-mono-accent mb-3">Common Questions</p>
-                <h2 className="heading-section text-text-primary">FAQs</h2>
-              </motion.div>
-
-              <div className="space-y-3">
-                {(faqs || []).map((faq, i) => (
-                  <motion.details
-                    key={faq.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.05, duration: 0.4 }}
-                    className="surface-card rounded-xl p-5 group"
-                  >
-                    <summary className="text-text-primary font-semibold cursor-pointer flex items-center justify-between list-none text-sm">
-                      {faq.question}
-                      <span className="text-text-tertiary group-open:rotate-45 transition-transform duration-300 text-lg ml-4 flex-shrink-0">+</span>
-                    </summary>
-                    <p className="text-text-secondary text-sm mt-4 leading-relaxed">{faq.answer}</p>
-                  </motion.details>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+  const whatsapp = settings?.whatsapp_enabled && settings.whatsapp_number?.replace(/\D/g, '');
+  const contactFaqs = faqs.filter(faq => /contact|service|general/i.test(faq.category)).slice(0, 6);
+  const fieldClass = 'w-full min-h-12 rounded-lg border border-border-subtle bg-surface-base text-text-primary px-4 py-3';
+  return <div className="section-container pt-32 pb-24">
+    <SeoHead title="Contact" description="Contact Dawud Muhammed about backend development, full-stack projects, and collaboration." seoSettings={seoSettings} />
+    <PageHeading eyebrow="Start a conversation" title="Let’s build something useful.">Tell me about your project, the problem you’re solving, and where you could use a hand.</PageHeading>
+    <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-12 lg:gap-24">
+      <aside className="min-w-0"><h2 className="text-xl text-text-primary font-medium mb-6">Reach me directly</h2>
+        {profile?.email && <a href={`mailto:${profile.email}`} className="flex items-start gap-3 text-accent-primary py-4 min-h-11 break-all"><Mail size={20} className="shrink-0 mt-0.5" />{profile.email}</a>}
+        {profile?.phone && <a href={`tel:${profile.phone.replace(/[^+\d]/g, '')}`} className="block text-text-primary min-h-11 py-3">{profile.phone}</a>}
+        {whatsapp && <a href={`https://wa.me/${whatsapp}${settings?.whatsapp_message?.trim() ? `?text=${encodeURIComponent(settings.whatsapp_message)}` : ''}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 min-h-11 text-accent-primary">Message on WhatsApp <ArrowUpRight size={16} /></a>}
+        {profile?.location && <p className="text-text-secondary py-4">{profile.location}{profile.timezone && <span className="block text-sm mt-2">{profile.timezone}</span>}</p>}
+        <div className="flex flex-wrap gap-x-5 gap-y-2 mt-6">{socials.filter(item => item.is_visible && safeUrl(item.url)).map(item => <a key={item.id} href={safeUrl(item.url)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 min-h-11 text-text-secondary hover:text-accent-primary">{item.platform}<ArrowUpRight size={14} /></a>)}</div>
+      </aside>
+      <div className="min-w-0">
+        {sent ? <div ref={feedback} tabIndex={-1} role="status" className="border border-border-subtle rounded-xl p-8"><h2 className="text-2xl text-text-primary mb-4">Message received.</h2><p className="text-text-secondary leading-relaxed">Your message has been saved in my portfolio inbox. Thanks for getting in touch.</p><button className="mt-6 text-accent-primary underline min-h-11" onClick={() => { setSent(false); startedAt.current = Date.now(); }}>Write another message</button></div> : <form onSubmit={handleSubmit} className="surface-card rounded-2xl border border-border-subtle bg-surface-base p-6 md:p-8 space-y-5" aria-describedby="contact-privacy">
+          <div className="grid sm:grid-cols-2 gap-5"><div><label htmlFor="contact-name" className="block text-sm text-text-primary mb-2">Your name</label><input id="contact-name" name="name" autoComplete="name" required minLength={2} maxLength={100} value={form.name} onChange={event => setForm({ ...form, name: event.target.value })} className={fieldClass} /></div><div><label htmlFor="contact-email" className="block text-sm text-text-primary mb-2">Email address</label><input id="contact-email" name="email" type="email" autoComplete="email" required maxLength={254} value={form.email} onChange={event => setForm({ ...form, email: event.target.value })} className={fieldClass} /></div></div>
+          <div><label htmlFor="contact-subject" className="block text-sm text-text-primary mb-2">What is it about?</label><input id="contact-subject" name="subject" required minLength={3} maxLength={160} value={form.subject} onChange={event => setForm({ ...form, subject: event.target.value })} className={fieldClass} /></div>
+          <div><label htmlFor="contact-message" className="block text-sm text-text-primary mb-2">Your message</label><textarea id="contact-message" name="message" required minLength={10} maxLength={5000} rows={6} value={form.message} onChange={event => setForm({ ...form, message: event.target.value })} className={fieldClass + ' resize-y'} /><p className="mt-2 text-xs text-text-secondary text-right">{form.message.length} / 5,000 characters</p></div>
+          <div hidden aria-hidden="true"><label htmlFor="contact-website">Leave this field empty</label><input id="contact-website" name="website" tabIndex={-1} autoComplete="off" value={form.website} onChange={event => setForm({ ...form, website: event.target.value })} /></div>
+          <p id="contact-privacy" className="text-sm text-text-secondary leading-relaxed">Your details are used to respond to this enquiry and stored in my private portfolio inbox. Please don’t include passwords or other sensitive information.</p>
+          {error && <div ref={feedback} role="alert" tabIndex={-1} className="text-danger rounded-lg border border-danger/40 p-4">{error}</div>}
+          <button type="submit" disabled={submitting} className="studio-button primary inline-flex min-h-12 items-center justify-center gap-3 px-6 disabled:opacity-50"><Send size={17} />{submitting ? 'Sending…' : 'Send message'}</button>
+        </form>}
       </div>
-    </PageTransition>
-  );
+    </div>
+    {!!contactFaqs.length && <section className="mt-20 border-t border-border-subtle pt-10 max-w-3xl"><h2 className="text-2xl font-medium text-text-primary mb-6">A few useful details</h2>{contactFaqs.map(faq => <details key={faq.id} className="border-b border-border-subtle py-5"><summary className="min-h-11 cursor-pointer text-text-primary">{faq.question}</summary><p className="text-text-secondary leading-relaxed whitespace-pre-line mt-3">{faq.answer}</p></details>)}</section>}
+  </div>;
 }

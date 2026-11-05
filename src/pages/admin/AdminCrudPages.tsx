@@ -11,8 +11,8 @@ export function AdminExperience() {
       { name: 'role', label: 'Role', type: 'text', placeholder: 'Senior Engineer' },
       { name: 'company', label: 'Company', type: 'text', placeholder: 'Company name' },
       { name: 'location', label: 'Location', type: 'text', placeholder: 'San Francisco, CA' },
-      { name: 'start_date', label: 'Start Date', type: 'text', placeholder: 'Jan 2022' },
-      { name: 'end_date', label: 'End Date', type: 'text', placeholder: 'Dec 2023' },
+      { name: 'start_date', label: 'Start Date', type: 'date', placeholder: 'Jan 2022' },
+      { name: 'end_date', label: 'End Date', type: 'date', placeholder: 'Dec 2023' },
       { name: 'is_current', label: 'Current Position', type: 'boolean' },
       { name: 'logo_url', label: 'Company Logo', type: 'image', placeholder: 'https://...' },
       { name: 'order_index', label: 'Order', type: 'number' },
@@ -33,8 +33,8 @@ export function AdminEducation() {
       { name: 'institution', label: 'Institution', type: 'text' },
       { name: 'degree', label: 'Degree', type: 'text' },
       { name: 'field', label: 'Field', type: 'text' },
-      { name: 'start_date', label: 'Start Date', type: 'text' },
-      { name: 'end_date', label: 'End Date', type: 'text' },
+      { name: 'start_date', label: 'Start Date', type: 'date' },
+      { name: 'end_date', label: 'End Date', type: 'date' },
       { name: 'logo_url', label: 'Institution Logo', type: 'image' },
       { name: 'order_index', label: 'Order', type: 'number' },
     ],
@@ -52,8 +52,8 @@ export function AdminCertifications() {
     fields: [
       { name: 'title', label: 'Title', type: 'text' },
       { name: 'issuer', label: 'Issuer', type: 'text' },
-      { name: 'issue_date', label: 'Issue Date', type: 'text' },
-      { name: 'expiry_date', label: 'Expiry Date', type: 'text' },
+      { name: 'issue_date', label: 'Issue Date', type: 'date' },
+      { name: 'expiry_date', label: 'Expiry Date', type: 'date' },
       { name: 'credential_id', label: 'Credential ID', type: 'text' },
       { name: 'verify_url', label: 'Verify URL', type: 'text', full: true },
       { name: 'badge_url', label: 'Badge Image', type: 'image', full: true },
@@ -79,6 +79,7 @@ export function AdminServices() {
       { name: 'order_index', label: 'Order', type: 'number' },
       { name: 'description', label: 'Description', type: 'textarea', full: true },
       { name: 'included_items', label: 'Included Items (JSON array)', type: 'json', full: true },
+      { name: 'evidence_project_ids', label: 'Related project IDs (JSON array)', type: 'json', full: true },
     ],
   };
   return <CrudModule config={config} />;
@@ -116,6 +117,8 @@ export function AdminGallery() {
     fields: [
       { name: 'image_url', label: 'Image', type: 'image', full: true },
       { name: 'caption', label: 'Caption', type: 'text', full: true },
+      { name: 'alt_text', label: 'Alternative text', type: 'text', full: true },
+      { name: 'related_url', label: 'Related event or project URL', type: 'text', full: true },
       { name: 'tags', label: 'Tags (JSON array)', type: 'json', full: true },
       { name: 'order_index', label: 'Order', type: 'number' },
     ],
@@ -176,3 +179,12 @@ export function AdminSocialLinks() {
   return <CrudModule config={config} />;
 }
 
+export function AdminNavigation() {
+  return <CrudModule config={{ table: 'navigation_items', label: 'Navigation', displayField: 'label', orderField: 'order_index', fields: [
+    { name: 'label', label: 'Label', type: 'text' },
+    { name: 'target', label: 'Internal path', type: 'text', placeholder: '/projects' },
+    { name: 'location', label: 'Location', type: 'select', defaultValue: 'navbar', options: [{ value: 'navbar', label: 'Header' }, { value: 'footer', label: 'Footer' }] },
+    { name: 'is_visible', label: 'Visible', type: 'boolean', defaultValue: true },
+    { name: 'order_index', label: 'Order (Home 0, About 1, Projects 2, Services 3, Blog 4, Gallery 5, Contact 6)', type: 'number' },
+  ] }} />;
+}

@@ -1,0 +1,25 @@
+{
+  "measuredAt": "2026-11-05T09:42:24.391Z",
+  "browser": "156.0.4314.58",
+  "conditions": "One cold navigation each, Edge headless, 390x844 DPR1, 4x CPU, 150ms latency, 1.6Mbps download; non-GET requests blocked. Local production build lacks CMS credentials; no field/INP claim.",
+  "results": [
+    {
+      "name": "live-baseline",
+      "url": "https://dawud-muhammed.vercel.app/",
+      "lcp": 11140,
+      "cls": 0.06726969593253025,
+      "title": "Dawud Muhammed — Full-Stack Software Engineer",
+      "heading": "Dawud Muhammed",
+      "jsTransferred": 99466
+    },
+    {
+      "name": "local-production-no-cms",
+      "url": "http://127.0.0.1:4173/",
+      "lcp": 2200,
+      "cls": 0.000722272074752681,
+      "title": "Systems Studio | Dawud Muhammed",
+      "heading": "Thoughtfully built.From the inside out.",
+      "jsTransferred": 154406
+    }
+  ]
+}

@@ -1,8 +1,47 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "functions": { "api/page.js": { "includeFiles": "dist/index.html" } },
   "rewrites": [
+    { "source": "/", "destination": "/api/page?path=/" },
+    {
+      "source": "/(about|projects|services|blog|gallery|contact)",
+      "destination": "/api/page?path=/$1"
+    },
+    {
+      "source": "/projects/:slug",
+      "destination": "/api/page?path=/projects/:slug"
+    },
+    { "source": "/blog/:slug", "destination": "/api/page?path=/blog/:slug" },
+    {
+      "source": "/(sitemap.xml|robots.txt)",
+      "destination": "/api/page?path=/$1"
+    },
+    { "source": "/admin/:path*", "destination": "/index.html" },
+    {
+      "source": "/((?!api/|assets/|audio/|favicon.svg).*)",
+      "destination": "/api/page?path=/$1"
+    }
+  ],
+  "headers": [
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        { "key": "X-Frame-Options", "value": "DENY" }
+      ]
+    },
+    {
+      "source": "/admin/:path*",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
     }
   ]
 }

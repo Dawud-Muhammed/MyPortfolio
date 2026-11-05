@@ -23,36 +23,36 @@ export default {
         'void': {
           50: '#F9FAFB',
           100: '#F3F4F6',
-          900: '#0A0A0A',
-          950: '#050505',
+          900: 'var(--bg-secondary)',
+          950: 'var(--bg-primary)',
         },
         // Elevated surfaces (charcoal/translucent)
         'surface': {
-          base: '#0F0F11',
-          elevated: '#141417',
-          hover: '#1A1A1E',
+          base: 'var(--surface-base)',
+          elevated: 'var(--surface-elevated)',
+          hover: 'var(--surface-hover)',
         },
         // Text hierarchy
         'text': {
-          primary: '#FAFAFA',
-          secondary: '#A1A1AA',
-          tertiary: '#71717A',
-          mono: '#64748B',
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          tertiary: 'var(--text-tertiary)',
+          mono: 'var(--text-mono)',
         },
         // Borders (structural hairlines)
         'border': {
-          subtle: 'rgba(255, 255, 255, 0.08)',
-          hover: 'rgba(255, 255, 255, 0.22)',
-          strong: 'rgba(255, 255, 255, 0.35)',
+          subtle: 'var(--border-subtle)',
+          hover: 'var(--border-hover)',
+          strong: 'var(--border-strong)',
         },
         // Status & accent signals
         'status': {
-          emerald: '#10B981',
-          'emerald-dark': '#059669',
+          emerald: 'var(--status-emerald)',
+          'emerald-dark': 'var(--status-emerald-dark)',
         },
         'accent': {
-          primary: '#38BDF8',  // Cyan accent
-          secondary: '#F97316', // Warm accent
+          primary: 'var(--accent-cyan)',
+          secondary: 'var(--accent-warm)',
         },
         // Legacy color support
         foreground: 'rgb(var(--fg) / <alpha-value>)',
