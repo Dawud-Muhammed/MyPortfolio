@@ -24,12 +24,13 @@ function database(tables) {
     const query = {
       select() { return query; },
       eq(key, value) { filters.push([key, value]); return query; },
-      order(key, { ascending }) { ordering.push([key, ascending]); return query; },
+      order(key, { ascending, nullsFirst }) { ordering.push([key, ascending, nullsFirst]); return query; },
       async limit(count) {
         const rows = (tables[table] || []).filter(row => filters.every(([key, value]) => row[key] === value));
         rows.sort((left, right) => {
-          for (const [key, ascending] of ordering) {
+          for (const [key, ascending, nullsFirst] of ordering) {
             if (left[key] === right[key]) continue;
+            if (nullsFirst !== undefined && (left[key] == null || right[key] == null)) return left[key] == null ? (nullsFirst ? -1 : 1) : (nullsFirst ? 1 : -1);
             const comparison = left[key] == null ? 1 : right[key] == null ? -1 : left[key] < right[key] ? -1 : 1;
             return ascending ? comparison : -comparison;
           }
@@ -42,6 +43,41 @@ function database(tables) {
   } };
 }
 function render(path, tables = fixture()) { return renderResponse({ path, db: database(tables), template, origin: 'https://portfolio.example' }); }
+
+test('blog initial HTML features the latest cover once and keeps remaining notes newest first', async () => {
+  const tables = fixture();
+  tables.blog_posts = [
+    { id: 'undated', title: 'Undated legacy note', slug: 'legacy', excerpt: 'Unknown historical date.', status: 'Published', published_at: null, created_at: '2026-11-06' },
+    { id: 'old', title: 'Oldest dated note', slug: 'old', excerpt: 'Old note.', status: 'Published', published_at: '2024-01-01' },
+    { id: 'new', title: 'Newest published note', slug: 'new', excerpt: 'Latest note.', status: 'Published', published_at: '2026-11-05', cover_image_url: 'https://fixtures.example/latest.webp' },
+    { id: 'middle', title: 'Middle dated note', slug: 'middle', excerpt: 'Middle note.', status: 'Published', published_at: '2025-01-01' },
+    { id: 'private', title: 'PRIVATE BLOG DRAFT', slug: 'private', status: 'Draft', published_at: '2026-11-06' },
+  ];
+  const original = structuredClone(tables);
+  const { body, status } = await render('/blog', tables);
+  assert.equal(status, 200);
+  assert.equal((body.match(/class="blog-feature"/g) || []).length, 1);
+  assert.equal((body.match(/src="https:\/\/fixtures.example\/latest.webp"/g) || []).length, 1);
+  assert.match(body, /width="1600" height="900" loading="eager" fetchpriority="high"/);
+  assert.equal((body.match(/Newest published note/g) || []).length, 1);
+  const titles = ['Newest published note', 'Middle dated note', 'Oldest dated note', 'Undated legacy note'];
+  for (let i = 1; i < titles.length; i++) assert(body.indexOf(titles[i - 1]) < body.indexOf(titles[i]));
+  assert.match(body, /Publication date not recorded/);
+  assert.doesNotMatch(body, /PRIVATE BLOG DRAFT/);
+  assert.deepEqual(tables, original);
+});
+
+test('all-undated blogs feature the latest created record without a fabricated publication date or unsafe cover', async () => {
+  const tables = fixture();
+  tables.blog_posts = [
+    { id: 'old', title: 'Old imported note', slug: 'old-import', excerpt: 'Old.', status: 'Published', published_at: null, created_at: '2025-01-01' },
+    { id: 'new', title: 'New imported note', slug: 'new-import', excerpt: 'New.', status: 'Published', published_at: null, created_at: '2026-01-01', cover_image_url: 'javascript:alert(1)' },
+  ];
+  const { body } = await render('/blog', tables);
+  assert(body.indexOf('New imported note') < body.indexOf('Old imported note'));
+  assert.match(body, /Featured note/);
+  assert.doesNotMatch(body, /javascript:|<time datetime="202[56]-01-01/);
+});
 
 test('public singleton selection matches newest published creation date and descending ID ties', async () => {
   const tables = fixture();

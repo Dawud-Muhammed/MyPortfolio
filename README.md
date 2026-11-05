@@ -36,7 +36,7 @@ Before `npm run test:ui`, start `npm run dev -- --host 127.0.0.1 --port 5174 --s
 - [GitHub activity source and refresh](docs/GITHUB-ACTIVITY.md): public-data validation, cache timing, privacy and failure behavior; no additional key or SQL is needed for the graph.
 - [Step-by-step GitHub, Vercel and Supabase setup](docs/DEPLOYMENT-GUIDE.md): the exact commands, environment names, migration file and owner-access SQL for this release.
 - [Release procedure](docs/RELEASE.md): preview, staged migration, configuration and production boundary.
-- [Backend and AI controls](docs/BACKEND.md): model access, pricing, finite budgets, data eligibility, admin provisioning, cached audio and rollback.
+- [Backend and AI controls](docs/BACKEND.md): automatic published-public CMS knowledge, model access, pricing, finite budgets, admin provisioning and rollback.
 - [HTML rendering](docs/RENDERING.md): crawlable routes, metadata and freshness.
 - [Factual content review](docs/CONTENT-REVIEW.md): owner-confirmed claims still needed.
 - [Implementation checklist](docs/IMPLEMENTATION-PLAN.md): scope and progress.

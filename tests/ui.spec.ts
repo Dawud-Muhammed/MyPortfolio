@@ -167,6 +167,54 @@ test('isolated CMS: article date/reading-time/clean content and accessible galle
   await expect(thumbnail).toBeFocused();
 });
 
+test('blog features the newest cover once and keeps remaining notes chronological across themes and categories', async ({ page }) => {
+  test.setTimeout(90000);
+  const tables = await fixtures(page);
+  const base = tables.blog_posts[0];
+  const posts = [
+    { ...base, id: 'legacy', slug: 'legacy', title: 'TEST FIXTURE — Undated note', published_at: null, created_at: '2026-11-05', cover_image_url: null, category_id: 'backend' },
+    { ...base, id: 'old', slug: 'old', title: 'TEST FIXTURE — Old note', published_at: '2020-01-01', cover_image_url: imageUrl, category_id: 'backend' },
+    { ...base, id: 'new', slug: 'new', title: 'TEST FIXTURE — Newest note', published_at: '2026-11-05', cover_image_url: imageUrl, category_id: 'backend' },
+    { ...base, id: 'middle', slug: 'middle', title: 'TEST FIXTURE — Middle note', published_at: '2025-01-01', cover_image_url: imageUrl, category_id: 'writing' },
+  ];
+  await page.route('https://fixtures.supabase.test/rest/v1/blog_posts*', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(posts) }));
+  await page.route('https://fixtures.supabase.test/rest/v1/blog_categories*', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([{ id: 'backend', name: 'Backend' }, { id: 'writing', name: 'Writing' }]) }));
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/blog');
+  const feature = page.getByRole('article', { name: 'Featured article', exact: true });
+  await expect(feature.getByRole('heading', { name: 'TEST FIXTURE — Newest note' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'TEST FIXTURE — Newest note' })).toHaveCount(1);
+  await expect(feature.locator('img')).toHaveAttribute('src', imageUrl);
+  await expect(feature.locator('img')).toHaveAttribute('loading', 'eager');
+  await expect(page.locator('.blog-feed article h3')).toHaveText(['TEST FIXTURE — Middle note', 'TEST FIXTURE — Old note', 'TEST FIXTURE — Undated note']);
+  await expect(page.getByText('Publication date not recorded')).toBeVisible();
+  const coverWidth = (await feature.locator('img').boundingBox())!.width;
+  const thumbnailWidth = (await page.locator('.blog-list-card img').first().boundingBox())!.width;
+  expect(coverWidth).toBeGreaterThan(thumbnailWidth * 2);
+  await feature.getByRole('link').focus();
+  await expect(feature.getByRole('link')).toBeFocused();
+  for (const theme of ['light', 'dark']) {
+    await page.getByLabel('Color theme').selectOption(theme);
+    await page.evaluate(() => { (document.activeElement as HTMLElement | null)?.blur(); window.scrollTo(0, 0); });
+    await noOverflow(page);
+    await page.screenshot({ path: `artifacts/screenshots/blog-feature-${theme}-1440.png`, fullPage: true });
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await noOverflow(page);
+  await page.screenshot({ path: 'artifacts/screenshots/blog-feature-dark-390.png', fullPage: true });
+  await page.getByRole('button', { name: 'Writing', exact: true }).click();
+  await expect(feature.getByRole('heading', { name: 'TEST FIXTURE — Middle note' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'More notes', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'All notes', exact: true }).click();
+  posts[2].cover_image_url = '';
+  await page.reload();
+  await expect(feature.getByRole('heading', { name: 'TEST FIXTURE — Newest note' })).toBeVisible();
+  await expect(feature.locator('img')).toHaveCount(0);
+  await expect(feature.getByRole('link')).toHaveAttribute('href', '/blog/new');
+  await noOverflow(page);
+});
+
 test('contact validates labelled fields and shows inbox receipt using a mocked endpoint only', async ({ page }) => {
   await fixtures(page);
   let submissions = 0;
@@ -452,5 +500,69 @@ test('long project titles, failed CMS loads, and empty collections remain unders
   await page.goto('/projects');
   await expect(page.getByText('Projects couldn’t be loaded.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Try again' })).toBeVisible();
+});
+
+test('CMS automatically shares published portfolio knowledge without separate AI approval fields', async ({ page }) => {
+  test.setTimeout(90000);
+  await fixtures(page);
+  // This is an isolated editor session; real Auth, production data and paid requests are not used.
+  await page.route('**/src/lib/useAuth.ts*', route => route.fulfill({ status: 200, contentType: 'application/javascript', body: `export function useAuth() { return { session: { user: { email: 'cms-fixture@example.test' } }, loading: false, isAdmin: true, error: '', signOut: async () => {} }; }` }));
+  const tables: Record<string, unknown[]> = {
+    ...content(),
+    profile: [{ ...content().profile[0], assistant_eligible: false, availability: true }],
+    services: [{ id: 'service', title: 'TEST FIXTURE service', description: 'Synthetic service.', included_items: [], evidence_project_ids: [], is_published: true, assistant_eligible: false }],
+    experience: [{ id: 'experience', role: 'TEST FIXTURE engineer', company: 'Test company', is_published: true, assistant_eligible: false }],
+    faqs: [{ id: 'faq', question: 'TEST FIXTURE question?', answer: 'Synthetic answer.', is_published: true, assistant_eligible: false }],
+    assistant_settings: [{ id: true, enabled: true, portrait_url: null, suggested_questions: [] }],
+  };
+  const writes: { table: string; payload: Record<string, unknown> }[] = [];
+  await page.route('https://fixtures.supabase.test/rest/v1/**', async route => {
+    const request = route.request();
+    const address = new URL(request.url());
+    const table = address.pathname.split('/').pop()!;
+    let body: unknown = tables[table] || [];
+    if (request.method() === 'PATCH') {
+      const payload = request.postDataJSON() as Record<string, unknown>;
+      writes.push({ table, payload });
+      body = address.searchParams.has('select') ? { id: (tables[table]?.[0] as { id: unknown })?.id } : null;
+    } else if (table === 'assistant_usage_summary') body = { day_usd: 0, month_usd: 0, total_usd: 0, pending_requests: 0 };
+    await route.fulfill({ status: 200, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify(body) });
+  });
+
+  await page.goto('/admin/settings');
+  await expect(page.getByRole('heading', { name: 'Studio settings' })).toBeVisible();
+  await expect(page.getByLabel('Publish this profile and its public contact information')).toBeChecked();
+  await expect(page.getByLabel('Available for work', { exact: true })).toBeChecked();
+  await expect(page.getByText('Your published profile and public contact details are available to the AI guide automatically.', { exact: false })).toBeVisible();
+  await expect(page.getByRole('checkbox', { name: /approve.*AI/i })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Save profile', exact: true }).click();
+  await expect(page.getByText(/Profile saved/)).toBeVisible();
+  expect(writes.find(write => write.table === 'profile')?.payload).not.toHaveProperty('assistant_eligible');
+
+  for (const path of ['projects', 'blog', 'services', 'experience', 'faqs']) {
+    await page.goto(`/admin/${path}`);
+    await page.getByRole('button', { name: 'Edit', exact: true }).first().click();
+    const editor = page.getByRole('dialog');
+    await expect(editor.getByText(/Published public portfolio content is available to the AI guide automatically/)).toBeVisible();
+    await expect(editor.getByRole('checkbox', { name: /approved for AI/i })).toHaveCount(0);
+    if (path === 'projects') {
+      await expect(editor.getByLabel('Publication', { exact: true })).toHaveValue('published');
+      await expect(editor.getByLabel('Featured', { exact: true })).toBeChecked();
+    } else if (path === 'blog') await expect(editor.getByLabel('Status', { exact: true })).toHaveValue('Published');
+    else await expect(editor.getByLabel('Published on public site', { exact: true })).toBeChecked();
+    if (path === 'services') {
+      await editor.getByLabel('Published on public site', { exact: true }).uncheck();
+      await editor.getByRole('button', { name: 'Save changes', exact: true }).click();
+      await expect(editor).toHaveCount(0);
+      const serviceWrite = writes.find(write => write.table === 'services')?.payload;
+      expect(serviceWrite).toMatchObject({ is_published: false });
+      expect(serviceWrite).not.toHaveProperty('assistant_eligible');
+    }
+  }
+
+  await page.goto('/admin/assistant');
+  await expect(page.getByText(/The assistant automatically uses your published public portfolio content/)).toBeVisible();
+  await expect(page.getByRole('checkbox', { name: 'Enable paid text answers (server configuration must also be ready)' })).toBeChecked();
+  await expect(page.getByRole('link', { name: 'Edit public FAQs', exact: true })).toBeVisible();
 });
 

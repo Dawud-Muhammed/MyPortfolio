@@ -1,5 +1,6 @@
 // Request-time, anonymous rendering keeps social previews and no-JS visitors in
 // step with publication. No CDN/content cache and no service-role credentials.
+import { sortBlogPosts } from '../src/lib/blog-order.mjs';
 export const PUBLIC_ROUTES = ['/', '/about', '/projects', '/services', '/blog', '/gallery', '/contact'];
 const labels = ['Home', 'About', 'Projects', 'Services', 'Blog', 'Gallery', 'Contact'];
 const fallbackOrigin = 'https://dawud-muhammed.vercel.app';
@@ -13,7 +14,14 @@ function image(src, alt) { return url(src) ? `<img src="${escapeHtml(url(src))}"
 function date(value) { if (!value) return ''; const parsed = new Date(value); return Number.isNaN(parsed.getTime()) ? escapeHtml(value) : `<time datetime="${escapeHtml(value)}">${escapeHtml(parsed.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }))}</time>`; }
 function projectCards(rows) { return rows.map(project => `<article>${image(project.cover_image_url, project.title)}<h2>${link(`/projects/${encodeURIComponent(project.slug)}`, project.title)}</h2>${paragraphs(project.excerpt)}<p>Status: ${escapeHtml(project.status)}</p></article>`).join('') || '<p>No published projects yet.</p>'; }
 function publicationDate(value) { return value ? date(value) : '<span>Publication date not recorded</span>'; }
-function articleCards(rows) { return rows.map(post => `<article><h2>${link(`/blog/${encodeURIComponent(post.slug)}`, post.title)}</h2>${publicationDate(post.published_at)}${paragraphs(post.excerpt)}</article>`).join('') || '<p>No published articles yet.</p>'; }
+function articleCards(rows) {
+  const [latest, ...others] = sortBlogPosts(rows);
+  if (!latest) return '<p>No published articles yet.</p>';
+  const path = `/blog/${encodeURIComponent(latest.slug)}`;
+  const cover = url(latest.cover_image_url);
+  const feature = `<article class="blog-feature">${cover ? `<a href="${escapeHtml(path)}" tabindex="-1" aria-hidden="true"><img src="${escapeHtml(cover)}" alt="" width="1600" height="900" loading="eager" fetchpriority="high" style="display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover"/></a>` : ''}<p>${latest.published_at ? 'Latest note' : 'Featured note'}</p><h2>${link(path, latest.title)}</h2>${publicationDate(latest.published_at)}${paragraphs(latest.excerpt)}${link(path, 'Read article')}</article>`;
+  return feature + others.map(post => `<article><h2>${link(`/blog/${encodeURIComponent(post.slug)}`, post.title)}</h2>${publicationDate(post.published_at)}${paragraphs(post.excerpt)}</article>`).join('');
+}
 
 export async function publicRows(db, table, columns, filters = {}, order = 'order_index', ascending = true) {
   if (!db) throw new Error('Public content is not configured.');
@@ -21,7 +29,9 @@ export async function publicRows(db, table, columns, filters = {}, order = 'orde
   const publication = table === 'projects' ? ['publication_status', 'published'] : table === 'blog_posts' ? ['status', 'Published'] : ['is_published', true];
   query = query.eq(...publication);
   for (const [key, value] of Object.entries(filters)) query = query.eq(key, value);
-  const { data, error } = await query.order(order, { ascending }).limit(500);
+  query = query.order(order, { ascending, ...(table === 'blog_posts' && order === 'published_at' ? { nullsFirst: false } : {}) });
+  if (table === 'blog_posts' && order === 'published_at') query = query.order('created_at', { ascending: false, nullsFirst: false }).order('id', { ascending: false });
+  const { data, error } = await query.limit(500);
   if (error) throw new Error('Published content could not be loaded.');
   return data || [];
 }
@@ -94,7 +104,7 @@ export async function renderResponse({ path = '/', db, template, origin: configu
           for (const [key, label] of Object.entries({ problem: 'The problem', intended_users: 'Who it is for', role: 'My role', team_contribution: 'Team contribution', decisions: 'Key decisions', implementation: 'Implementation', challenges: 'Challenges', evidence: 'Evidence', outcomes: 'Outcomes & next steps' })) if (project[key]) body += `<section><h2>${label}</h2>${paragraphs(project[key])}</section>`;
         }
       } else if (path === '/blog') {
-        title = 'Blog'; description = 'Notes from Dawud Muhammed on building software and solving problems.'; body = articleCards(await publicRows(db, 'blog_posts', 'title,slug,excerpt,published_at', {}, 'published_at', false));
+        title = 'Blog'; description = 'Notes from Dawud Muhammed on building software and solving problems.'; body = articleCards(await publicRows(db, 'blog_posts', 'id,title,slug,excerpt,published_at,created_at,cover_image_url', {}, 'published_at', false));
       } else if (articleSlug) {
         const rows = await publicRows(db, 'blog_posts', 'title,slug,excerpt,content,published_at,seo_title,seo_description,cover_image_url,og_image_url', { slug: decodeURIComponent(articleSlug) }, 'published_at', false);
         const post = rows[0];

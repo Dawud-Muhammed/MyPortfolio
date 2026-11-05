@@ -1,5 +1,19 @@
 # Validation — 5 November 2026
 
+## Blog lead story and newest-first ordering
+
+All **78 automated checks**, type checks, lint and production build pass. A shared nonmutating sort keeps known publication dates newest first, with undated/invalid dates last by creation date and stable ID. The public query explicitly requests NULLS LAST, and initial HTML uses the same ordering. The newest post is featured once with a large cover; remaining posts use smaller editorial cards. Category filters feature their newest matching post. Missing/failed covers retain a readable card and article link; missing dates are never fabricated.
+
+Both focused browser scenarios passed in one clean run (19.3 seconds) after moving the preview outside the sandbox so the browser could reach it. They cover existing article/date/reading-time/detail/gallery behavior plus the new feature/order/category/single-post/missing-cover states, keyboard access, desktop light/dark and 390px phone overflow. A subsequent focused rerun passed (14.3 seconds) and refreshed the screenshot scroll position; captures use synthetic fixture images and text, not live portfolio evidence. Desktop light and phone dark captures were opened for visual review. No production writes/deployment, SQL or environment changes were made. Earlier assistant browser verification limitations below remain historical and are not claimed resolved by these blog checks.
+
+## Automatic public CMS knowledge
+
+All **73 automated checks** and the production build pass. The assistant now uses published public portfolio content without `assistant_eligible` approval gates, across 15 allowlisted collections. Real embedded PostgreSQL verification runs retrieval against the migrated schema, checks current publications and NULL-date legacy blogs, excludes drafts/scheduled posts/hidden socials/private fields, and confirms edits/unpublishing affect the next retrieval. The legacy columns remain ignored; this code patch needs no SQL update.
+
+Unit/handler checks cover old false approval flags reaching a mocked answer, latest published singletons, unpublished relationship labels, public field allowlists, relevant late article passages, a bounded 16,000-character source context, and current questions taking priority over long previous questions. Natural greeting/follow-up instructions are implemented; actual model behavior/account access remain unverified. No paid requests or hosted database/configuration/deployment changes were performed.
+
+A focused CMS browser scenario was added to check removal of approval fields, retained publication/featured/chat controls, and saves excluding the legacy field. The attempted new CMS and existing guide scenarios both failed before page load because Edge could not launch its sandbox profile. The rerun outside the sandbox was aborted during approval; no browser pass is claimed for this patch. Earlier browser results below belong to earlier revisions. Lint passes; application/node type checks also pass.
+
 ## Chat domain check follow-up
 
 All **67 automated checks**, type checks, lint and production build pass. Configured SITE_URL/VITE_SITE_URL and Vercel aliases are checked independently. A browser-confirmed same-origin request whose Origin matches the actual HTTPS Host can use a custom domain despite stale canonical settings. Tests cover that request reaching a mocked answer, foreign requests being rejected before budget/provider work, missing metadata, forged forwarded hosts, scheme mismatch, and GET readiness reporting the same domain failure. Browser readiness now checks Origin/Referer; a direct header-free GET only checks server configuration. No paid requests, hosted SQL, environment edits or deployment were performed. The browser suite was not rerun for this server-focused patch.

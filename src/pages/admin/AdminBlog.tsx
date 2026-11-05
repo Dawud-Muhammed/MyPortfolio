@@ -20,7 +20,6 @@ const config: CrudConfig = {
       { value: 'Draft', label: 'Draft' },
     ] },
     { name: 'published_at', label: 'Publication date', type: 'date' },
-    { name: 'assistant_eligible', label: 'Approved for AI guide knowledge', type: 'boolean' },
     { name: 'is_featured', label: 'Featured', type: 'boolean' },
     { name: 'excerpt', label: 'Excerpt', type: 'textarea', full: true, placeholder: 'Short summary...' },
     { name: 'content', label: 'Content (Markdown)', type: 'textarea', full: true, placeholder: '# Heading\n\nContent...' },

@@ -2,7 +2,9 @@
 
 The first version now supports typed questions and text replies only. The long introduction, all audio controls/playback code, audio settings in the editor, and bundled WAV are removed. Existing database columns/storage objects are retained for compatibility; no destructive SQL or voice migration is needed.
 
-## Confirmed deployed state
+Published public CMS content now becomes assistant knowledge automatically. The separate per-record AI approval checkboxes are removed, and legacy `assistant_eligible` values are ignored. This patch needs a code deployment, not a new SQL migration or a bulk database update. Publishing and chat-enable controls remain. The server selects relevant public text/metadata into a bounded context; it does not send private records or automatically open uploaded PDFs, images or videos.
+
+## Earlier deployed diagnostics — 5 November 2026
 
 Public read-only checks on 5 November 2026 found that the site's public Supabase connection works, `assistant_settings.enabled` is true, and `content_revision` exists. The deployed legacy `/api/assistant` nevertheless returned `enabled:false, revision:null`. In that version, this is its catch-all configuration fallback, not proof that the owner switch is off or that an OpenAI request failed. No paid request was made.
 
@@ -11,10 +13,10 @@ The screenshot follow-up showed masked integration values, including `SUPABASE_S
 ## Release and diagnose
 
 1. Push/deploy the current code to the existing Vercel project. Select the Production environment for its server variables, then redeploy after any variable change.
-2. Verify `SUPABASE_SERVICE_ROLE_KEY` or `SUPABASE_SECRET_KEY` is the server key belonging to the same project as the public CMS. It is required for durable metering and approved retrieval. `VITE_SUPABASE_ANON_KEY` cannot replace it. The URL can come from `SUPABASE_URL`, `VITE_SUPABASE_URL`, or `NEXT_PUBLIC_SUPABASE_URL`, in that order. Blank aliases are skipped.
+2. Verify `SUPABASE_SERVICE_ROLE_KEY` or `SUPABASE_SECRET_KEY` is the server key belonging to the same project as the public CMS. It is required for durable metering and public-content retrieval. `VITE_SUPABASE_ANON_KEY` cannot replace it. The URL can come from `SUPABASE_URL`, `VITE_SUPABASE_URL`, or `NEXT_PUBLIC_SUPABASE_URL`, in that order. Blank aliases are skipped.
 3. Keep `OPENAI_API_KEY`, a random `ASSISTANT_SESSION_SECRET` of at least 32 characters, the reviewed model/pricing marker, and positive spending limits configured. Never paste secret values into chat or Git. Leave owner/server switches enabled only when you intend paid chat to run.
 4. Use `SITE_URL=https://dawud.pro.et` and `VITE_SITE_URL=https://dawud.pro.et` for the live custom domain. Both variables are checked independently, alongside Vercel's deployment/production URLs. Browser requests from a custom alias also pass when `Sec-Fetch-Site: same-origin` and Origin matches the actual request Host over HTTPS in production. Forwarded-host headers alone never establish trust. Foreign and missing origins remain denied. Trailing slash/outer whitespace normalize safely.
-5. Open Admin → AI Guide → **Chat readiness**. Refresh its status after saving settings. This uses a free GET, not a paid answer. Approve at least one published profile/project/service/experience/FAQ for actual portfolio answers.
+5. Open Admin → AI Guide → **Chat readiness**. Refresh its status after saving settings. This uses a free GET, not a paid answer. Save and publish your profile, projects and other public portfolio content for actual answers; there is no additional AI approval step. Published blogs with missing or nonfuture publication dates are included too.
 6. Ask a short question after readiness is ready. This last step needs valid account/model access and functional database metering; a configuration check alone cannot certify provider access.
 
 The public endpoint returns a nonsecret reason code; the admin panel explains the corresponding action. It never returns keys, raw provider errors, or private records:

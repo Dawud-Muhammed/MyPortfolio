@@ -1,5 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { isSupabaseConfigured, publicSupabase, supabase } from './supabase';
+import { sortBlogPosts } from './blog-order.mjs';
 import type { Profile, HeroContent, HeroImage, Project, ProjectCategory, Technology, BlogPost, BlogCategory, BlogTag, Skill, Experience, Education, Certification, Service, Testimonial, SocialLink, SeoSettings, WebsiteSettings, NavigationItem, Faq, GalleryItem, Achievement, BlogComment, ContactMessage, AssistantSettings } from './types';
 
 type State<T> = { data: T; loading: boolean; error: string | null };
@@ -83,7 +84,15 @@ export const useProjects = () => useQuery<Project[]>('projects:published', EMPTY
 export const useProjectBySlug = (slug: string) => useQuery<Project | null>(`project:${slug}`, null, async () => { const rows = await getRows<Row>('projects', 'order_index', true, projectSelect, { slug, publication_status: 'published' }); return rows[0] ? mapProject(rows[0]) : null; });
 export const useProjectCategories = () => useAll<ProjectCategory>('project_categories', 'order_index', true);
 export const useTechnologies = () => useAll<Technology>('technologies', 'name', true);
-export const useBlogPosts = () => useQuery<BlogPost[]>('blog:published', EMPTY, async () => (await getRows<Row>('blog_posts', 'published_at', false, blogSelect, { status: 'Published' })).map(mapPost));
+export const useBlogPosts = () => useQuery<BlogPost[]>('blog:published', EMPTY, async () => {
+  const { data, error } = await publicSupabase.from('blog_posts').select(blogSelect)
+    .eq('status', 'Published')
+    .order('published_at', { ascending: false, nullsFirst: false })
+    .order('created_at', { ascending: false, nullsFirst: false })
+    .order('id', { ascending: false });
+  if (error) throw error;
+  return sortBlogPosts((data || []).map(row => mapPost(row as unknown as Row)));
+});
 export const useBlogPostBySlug = (slug: string) => useQuery<BlogPost | null>(`blog:${slug}`, null, async () => { const rows = await getRows<Row>('blog_posts', 'published_at', false, blogSelect, { slug, status: 'Published' }); return rows[0] ? mapPost(rows[0]) : null; });
 export const useBlogCategories = () => useAll<BlogCategory>('blog_categories', 'name', true);
 export const useBlogTags = () => useAll<BlogTag>('blog_tags', 'name', true);

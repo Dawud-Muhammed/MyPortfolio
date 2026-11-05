@@ -138,8 +138,10 @@ export function AdminAssistant() {
     <main className="max-w-4xl">
       <h1 className="text-2xl font-bold mb-3">AI portfolio guide</h1>
       <p className="text-foreground/70 mb-6">
-        Approve knowledge explicitly in Projects, Services, Experience, FAQs and
-        Profile settings. Drafts are excluded, even if eligible. No visitor
+        The assistant automatically uses your published public portfolio content,
+        including your profile, projects, career details, services, FAQs and blogs.
+        Edit or unpublish content in its collection to update the next answer.
+        Drafts, private messages and administrator data stay excluded. No visitor
         conversations are stored in the CMS.
       </p>
       {error && (
@@ -259,7 +261,7 @@ export function AdminAssistant() {
             {saving ? "Saving…" : "Save guide settings"}
           </button>
           <Link to="/admin/faqs" className="btn-ghost ml-3">
-            Edit approved FAQs
+            Edit public FAQs
           </Link>
         </form>
       )}

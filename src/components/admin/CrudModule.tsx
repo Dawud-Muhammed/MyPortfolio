@@ -24,11 +24,9 @@ export interface CrudConfig {
   extraSelectMapping?: (row: Row) => Row;
 }
 const publicationTables = new Set(['skills','experience','education','certifications','services','testimonials','social_links','navigation_items','faqs','gallery_items','achievements','technologies','project_categories','blog_categories','blog_tags']);
-const knowledgeTables = new Set(['experience','services','faqs']);
 function fieldsFor(config: CrudConfig): FieldDef[] {
   return [...config.fields,
     ...(publicationTables.has(config.table) ? [{ name: 'is_published', label: 'Published on public site', type: 'boolean' as const, defaultValue: false }] : []),
-    ...(knowledgeTables.has(config.table) ? [{ name: 'assistant_eligible', label: 'Approved for AI guide knowledge', type: 'boolean' as const, defaultValue: false }] : []),
   ];
 }
 
@@ -145,7 +143,7 @@ function CrudForm({ config, editing, onSave, onClose, saving, saveError }: { con
   const warnings = config.table === 'projects' ? [!technologyIds.length && 'Add verified technologies to avoid an empty technology section.', !data.demo_url && !data.github_url && !data.video_demo_url && 'No public demo, source or video evidence is linked.', !data.role && 'Describe your personal role and team contribution.'].filter(Boolean) : [];
   return <div className="fixed inset-0 z-[100] bg-black/60 flex items-end sm:items-center justify-center sm:p-4" onClick={onClose}><div ref={dialog} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="crud-title" className="glass-strong rounded-t-2xl sm:rounded-2xl w-full max-w-3xl max-h-[90dvh] flex flex-col" onClick={e => e.stopPropagation()}>
     <header className="p-5 border-b border-foreground/10 flex items-center justify-between"><h2 id="crud-title" className="text-xl font-semibold">{editing ? 'Edit' : 'Add'} {config.label}</h2><button disabled={saving} aria-label="Close editor" className="btn-ghost" onClick={onClose}><X size={20} /></button></header>
-    <div className="p-5 overflow-y-auto"><p className="text-sm text-foreground/60 mb-4">Published content refreshes open public pages within 30 seconds and the AI guide on its next request. Knowledge requires a separate approval switch.</p>
+    <div className="p-5 overflow-y-auto"><p className="text-sm text-foreground/60 mb-4">Published public portfolio content is available to the AI guide automatically on its next question. Drafts and private records stay excluded. Open public pages refresh within 30 seconds.</p>
       {(error || saveError) && <p role="alert" className="border border-error-500 rounded-lg p-3 mb-4">{error || saveError}</p>}
       {warnings.length > 0 && <aside className="border border-warning-500 rounded-lg p-3 mb-4"><p className="font-semibold">Publishing review</p><ul className="list-disc pl-5 text-sm">{warnings.map(w => <li key={String(w)}>{w}</li>)}</ul></aside>}
       <button type="button" className="btn-ghost mb-4" onClick={() => setPreview(!preview)}>{preview ? 'Back to editor' : 'Preview current draft'}</button>
