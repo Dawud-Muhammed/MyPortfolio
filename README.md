@@ -31,6 +31,7 @@ Before `npm run test:ui`, start `npm run dev -- --host 127.0.0.1 --port 5174 --s
 
 ## Operate and release
 
+- [Text-only chat release and diagnostics](docs/TEXT-CHAT-RELEASE.md): deploy the first chat version and resolve server readiness failures.
 - [Live CMS go-live handbook](docs/CMS-GO-LIVE.md): replace fallback copy with published content, understand the read-only preview, and handle CMS edge cases.
 - [GitHub activity source and refresh](docs/GITHUB-ACTIVITY.md): public-data validation, cache timing, privacy and failure behavior; no additional key or SQL is needed for the graph.
 - [Step-by-step GitHub, Vercel and Supabase setup](docs/DEPLOYMENT-GUIDE.md): the exact commands, environment names, migration file and owner-access SQL for this release.

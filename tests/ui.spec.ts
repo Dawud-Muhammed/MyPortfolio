@@ -270,21 +270,27 @@ test('guide: approved sources, route persistence, budget/provider errors, cancel
   await isolated.close();
 });
 
-test('audio rejection exposes explicit replay and never plays on page load', async ({ page }) => {
+test('backend configuration failure is shown as unavailable rather than intentionally paused', async ({page}) => {
+  await page.route('**/api/assistant',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({...guide,enabled:false,availability:'unavailable',reason:'server_configuration',revision:null})}));
+  await page.goto('/');await page.getByRole('button',{name:assistantName,exact:true}).click();
+  await expect(page.getByText('Chat is temporarily unavailable.',{exact:false})).toBeVisible();
+  await expect(page.getByText('Live answers are paused.',{exact:false})).toHaveCount(0);
+  await expect(page.getByLabel('Ask about Dawud’s work')).toBeVisible();
+});
+
+test('text-only chat ignores legacy greeting and audio configuration', async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('guide-sound', 'on');
-    (window as unknown as { audioAttempts: number }).audioAttempts = 0;
-    HTMLMediaElement.prototype.play = function () { (window as unknown as { audioAttempts: number }).audioAttempts++; return Promise.reject(new DOMException('Autoplay blocked', 'NotAllowedError')); };
+    localStorage.setItem('guide-sound','on');
+    (window as unknown as {audioAttempts:number}).audioAttempts=0;
+    HTMLMediaElement.prototype.play=function(){(window as unknown as {audioAttempts:number}).audioAttempts++;return Promise.resolve();};
   });
-  await page.route('**/api/assistant', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ...guide, greeting_audio_url: 'https://fixtures.example/intro.mp3' }) }));
-  await page.goto('/');
-  expect(await page.evaluate(() => (window as unknown as { audioAttempts: number }).audioAttempts)).toBe(0);
-  await page.getByRole('button', { name: assistantName, exact: true }).click();
-  await expect(page.getByText('Press Play introduction to listen.')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Play introduction' })).toBeVisible();
-  await expect(page.getByText('Synthetic voice', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Mute', exact: true }).click();
-  await page.getByRole('button', { name: 'Close guide' }).click();
+  await page.route('**/api/assistant',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({...guide,greeting:'LEGACY INTRO MUST NOT DISPLAY',greeting_audio_url:'https://fixtures.example/intro.mp3'})}));
+  await page.goto('/');await page.getByRole('button',{name:assistantName,exact:true}).click();
+  await expect(page.getByText('LEGACY INTRO MUST NOT DISPLAY')).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'Play introduction'})).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'Enable sound'})).toHaveCount(0);
+  await expect(page.getByLabel('Ask about Dawud’s work')).toBeVisible();
+  expect(await page.evaluate(()=>(window as unknown as {audioAttempts:number}).audioAttempts)).toBe(0);
 });
 
 test('GitHub calendar shows public-profile link, yearly totals, hover details and keyboard alternatives from synthetic data', async ({ page }) => {

@@ -686,18 +686,6 @@ textarea::placeholder {
   margin-top: 8px;
   line-height: 1.6;
 }
-.guide-audio {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-top: 10px;
-  font-size: 10px;
-  flex-wrap: wrap;
-}
-.guide-audio button {
-  text-decoration: underline;
-  min-height: 28px;
-}
 @media (min-width: 1600px) {
   .studio-hero {
     min-height: 730px;

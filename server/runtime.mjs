@@ -3,8 +3,10 @@ import { createClient } from '@supabase/supabase-js';
 import { PublicError, LIMITS } from './assistant-core.mjs';
 
 export function database(env = process.env) {
-  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) throw new PublicError('configuration_error', 'This service is not configured yet. Please use the direct contact links.');
-  return createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false, autoRefreshToken: false },
+  const endpoint = env.SUPABASE_URL?.trim() || env.VITE_SUPABASE_URL?.trim() || env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const serverKey = env.SUPABASE_SERVICE_ROLE_KEY?.trim() || env.SUPABASE_SECRET_KEY?.trim();
+  if (!endpoint || !serverKey) throw new PublicError('configuration_error', 'This service is not configured yet. Please use the direct contact links.');
+  return createClient(endpoint, serverKey, { auth: { persistSession: false, autoRefreshToken: false },
     global: { fetch: (url, init) => fetch(url, { ...init, signal: AbortSignal.timeout(8000) }) } });
 }
 export function json(res, status, data) {
@@ -26,11 +28,12 @@ export function parseBody(req) {
 }
 export function checkOrigin(req, env = process.env) {
   const origin = req.headers.origin;
-  const allowed = new Set([env.SITE_URL, env.VERCEL_URL ? `https://${env.VERCEL_URL}` : null].filter(Boolean));
+  const canonical = value => { try { const url=new URL(value.trim()); return ['https:','http:'].includes(url.protocol) && !url.username && !url.password ? url.origin : null; } catch { return null; } };
+  const allowed = new Set([canonical(env.SITE_URL || env.VITE_SITE_URL || ''), env.VERCEL_URL ? canonical(`https://${env.VERCEL_URL}`) : null].filter(Boolean));
   if (env.NODE_ENV !== 'production') {
     for(const host of ['localhost','127.0.0.1']) for(const port of [5173,3000,3001,4173]) allowed.add(`http://${host}:${port}`);
   }
-  if (!origin || !allowed.has(origin)) throw new PublicError('invalid_request','This request must come from the portfolio.',403);
+  if (!origin || !allowed.has(origin)) throw new PublicError('invalid_request','This request must come from the configured portfolio domain. Please contact Dawud if it continues.',403);
 }
 export function identities(req, res, env = process.env) {
   const secret = env.ASSISTANT_SESSION_SECRET;

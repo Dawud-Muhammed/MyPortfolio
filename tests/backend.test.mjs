@@ -1,7 +1,26 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildKnowledge, parseQuestion, readConfig, makeInput, reservationCost, usageCost, validateAnswer, validateContact, MODEL_CATALOG } from '../server/assistant-core.mjs';
-import { identities,checkOrigin } from '../server/runtime.mjs';
+import { identities,checkOrigin,database } from '../server/runtime.mjs';
+
+test('trusted Supabase client accepts Vercel integration names while rejecting public-only credentials',()=>{
+ const endpoint='https://fixtures.supabase.test';
+ for(const values of [
+  {SUPABASE_URL:endpoint,SUPABASE_SERVICE_ROLE_KEY:'test-server-key'},
+  {VITE_SUPABASE_URL:endpoint,SUPABASE_SECRET_KEY:'test-server-key'},
+  {NEXT_PUBLIC_SUPABASE_URL:endpoint,SUPABASE_SECRET_KEY:'test-server-key'},
+  {SUPABASE_URL:' ',VITE_SUPABASE_URL:endpoint,SUPABASE_SERVICE_ROLE_KEY:' ',SUPABASE_SECRET_KEY:'test-server-key'},
+ ]) assert.doesNotThrow(()=>database(values));
+ assert.throws(()=>database({VITE_SUPABASE_URL:endpoint,VITE_SUPABASE_ANON_KEY:'test-public-key'}));
+ assert.throws(()=>database({POSTGRES_URL:'postgresql://fixture.invalid/test'}));
+});
+
+test('explicit configured custom origins accept whitespace/trailing slash while foreign origins remain denied',()=>{
+ const req={headers:{origin:'https://dawud.pro.et'}};
+ checkOrigin(req,{NODE_ENV:'production',SITE_URL:' https://dawud.pro.et/ '});
+ checkOrigin(req,{NODE_ENV:'production',VITE_SITE_URL:'https://dawud.pro.et'});
+ assert.throws(()=>checkOrigin({headers:{origin:'https://foreign.example',host:'dawud.pro.et'}},{NODE_ENV:'production',SITE_URL:'https://dawud.pro.et'}));
+});
 
 test('knowledge excludes drafts, private records and ineligible content, including stale sources',()=>{
  const records={projects:[

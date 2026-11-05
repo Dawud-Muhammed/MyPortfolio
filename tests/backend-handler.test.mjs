@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
-import {createAssistantHandler} from '../api/assistant.js';
+import {createAssistantHandler,assistantReadiness} from '../api/assistant.js';
+import {readConfig} from '../server/assistant-core.mjs';
 
 class Response extends EventEmitter {
  constructor(){super();this.headers={};}
@@ -65,4 +66,40 @@ test('successful answer reconciles usage and exposes only approved links',async(
 test('unpublishing while a model runs suppresses the whole stale answer',async()=>{
  const f=fixture({changeContent:true}),res=new Response();await f.handler(request(),res);
  assert.equal(res.statusCode,409);assert.equal(res.body.code,'content_changed');assert.equal(res.body.answer,undefined);
+});
+
+test('public readiness distinguishes missing trusted backend from an intentionally paused assistant without leaking values',async()=>{
+ const res=new Response();
+ await createAssistantHandler({env:{OPENAI_API_KEY:'test-secret-must-not-appear'}})({method:'GET',headers:{}},res);
+ assert.equal(res.body.reason,'server_configuration');assert.equal(res.body.availability,'unavailable');
+ assert.equal(res.body.revision,null);assert.equal(res.body.enabled,false);
+ assert(!JSON.stringify(res.body).includes('test-secret'));
+ assert.equal(res.body.greeting_audio_url,undefined);assert.equal(res.body.greeting,undefined);
+});
+
+test('each configuration gate has a distinct nonsecret readiness reason',()=>{
+ for(const [changes,settings,expected] of [
+  [{ASSISTANT_ENABLED:'false'},{enabled:true},'server_disabled'],
+  [{},{enabled:false},'owner_disabled'],
+  [{ASSISTANT_PRICING_VERIFIED:''},{enabled:true},'pricing_unverified'],
+  [{OPENAI_API_KEY:''},{enabled:true},'api_key_missing'],
+  [{ASSISTANT_SESSION_SECRET:'short'},{enabled:true},'session_secret_invalid'],
+  [{ASSISTANT_ENABLED:' true '},{enabled:true},'ready'],
+ ]) {const config={...env,...changes};assert.equal(assistantReadiness(config,settings,readConfig(config)),expected);}
+});
+
+test('GET readiness is text-only and optional portrait/FAQ failures do not block configured chat',async()=>{
+ const db={from(table){const result=table==='assistant_settings'?{data:{enabled:true,suggested_questions:[]}}:{data:null,error:{message:'private diagnostic'}};
+  const query={select(){return query;},eq(){return query;},order(){return query;},limit(){return query;},single:async()=>result,maybeSingle:async()=>result,then:(resolve,reject)=>Promise.resolve(result).then(resolve,reject)};return query;}};
+ const res=new Response();await createAssistantHandler({env,database:()=>db,revision:async()=>'7'})({method:'GET'},res);
+ assert.equal(res.body.enabled,true);assert.equal(res.body.reason,'ready');assert.equal(res.body.revision,'7');
+ assert.deepEqual(res.body.faqs,[]);assert.equal(res.body.greeting,undefined);assert.equal(res.body.audio_is_synthetic,undefined);
+ assert(!JSON.stringify(res.body).includes('private diagnostic'));
+});
+
+test('unreadable settings report a settings failure instead of an owner-disabled state',async()=>{
+ const db={from:()=>({select(){return this;},eq(){return this;},single:async()=>({data:null,error:{message:'private database detail'}})})};
+ const res=new Response();await createAssistantHandler({env,database:()=>db})({method:'GET'},res);
+ assert.equal(res.body.reason,'settings_configuration');assert.equal(res.body.availability,'unavailable');
+ assert(!JSON.stringify(res.body).includes('private database'));
 });

@@ -1,5 +1,13 @@
 # Validation — 5 November 2026
 
+## Text-only chat follow-up
+
+Type checks, lint, production build and **63 automated checks pass**. All **19 browser scenarios pass in one run** (3.1 minutes), including ignored legacy audio preferences/configuration, no introduction/playback controls, unavailable-vs-paused behavior, chat replies using a mocked provider, cancellation, retries and source validation. The deployed public endpoint/CMS were checked read-only; owner enablement and the revision record exist, but its legacy server still returned the catch-all fallback. No real paid request or production configuration change was made. See TEXT-CHAT-RELEASE.md for required deployment verification.
+
+## Blog visibility follow-up
+
+The base release's publication-date requirement hid explicitly Published legacy articles whose date was NULL. `20261105110000_restore_undated_published_articles.sql` restores their public visibility, related public tags and approved email-free comments, without rewriting article data. Drafts and future-dated publications remain private. The isolated PostgreSQL test covers anonymous/non-owner reads, denied writes, unpublished removal, retained IDs and NULL dates. All **58 automated checks pass**; type checks and lint pass. The repeated paused notice was removed from the guide UI; server/CMS enablement and budget safeguards remain unchanged. No hosted SQL or paid requests were executed.
+
 ## CMS release-readiness follow-up
 
 Application/node type checks, ESLint and production build pass. **57 automated checks pass**, and the complete **18-scenario browser suite passes in one run** (2.7 minutes). The new checks cover duplicate published settings selection and live CMS copy/availability/WhatsApp values reaching public pages using isolated test data. The latter does not send a WhatsApp or contact message.
