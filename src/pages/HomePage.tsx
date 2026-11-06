@@ -56,9 +56,6 @@ export function HomePage() {
             )}
             <div>
               <span className="hero-hello">Hey, I’m</span>
-              <span className="hero-role">
-                {profile?.title || "Backend developer · Full-stack builder"}
-              </span>
             </div>
           </div>
           <h1 id="hero-title">
